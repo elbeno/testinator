@@ -1,0 +1,7 @@
+Import('env')
+
+import os
+name = os.path.basename(Dir('.').srcnode().abspath)
+
+env.Program(name, Glob('*.cpp'), LIBS=['testpp'])
+env.Install(env['BINDIR'], name)

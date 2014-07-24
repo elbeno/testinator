@@ -1,0 +1,5 @@
+Import('env')
+
+env.Library(env['PROJNAME'], Glob('*.cpp'))
+env.Install(env['INCDIR'], Glob('*.h'))
+env.Install(env['LIBDIR'], Glob('*.a'))
