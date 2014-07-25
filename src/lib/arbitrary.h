@@ -21,6 +21,11 @@ namespace testpp
     static std::vector<T> shrink(const T& t) { return std::vector<T>(); }
   };
 
+  template <typename T>
+  struct Arbitrary<const T, false> : public Arbitrary<T, false> {};
+  template <typename T>
+  struct Arbitrary<const T, true> : public Arbitrary<T, true> {};
+
 }
 
 #include "arbitrary_arithmetic.h"

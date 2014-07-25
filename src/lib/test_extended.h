@@ -5,9 +5,9 @@
 namespace testpp
 {
   std::ostream& RunAllTests(
-      Results& results, RunFlags flags, std::ostream& stream);
+      Results& results, const RunParams& params, std::ostream& stream);
 
   std::ostream& RunSuite(
       const char* suite,
-      Results& results, RunFlags flags, std::ostream& stream);
+      Results& results, const RunParams& params, std::ostream& stream);
 }

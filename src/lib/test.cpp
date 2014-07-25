@@ -29,14 +29,14 @@ namespace
     void Unregister(Test* test);
 
     ostream& RunAllTests(
-        testpp::Results& results, testpp::RunFlags flags, ostream& stream);
+        testpp::Results& results, const testpp::RunParams& params, ostream& stream);
 
     ostream& RunSuite(
         const char* suiteName,
-        testpp::Results& results, testpp::RunFlags flags, ostream& stream);
+        testpp::Results& results, const testpp::RunParams& params, ostream& stream);
 
-    bool RunTest(Test* test);
-    bool RunTest(const char* testName);
+    bool RunTest(Test* test, const testpp::RunParams& params);
+    bool RunTest(const char* testName, const testpp::RunParams& params);
 
   private:
     // Map of all tests.
@@ -50,7 +50,7 @@ namespace
     typedef map<Test*, string> TestSuiteNameMap;
 
     void RunTests(
-        TestMap& m, testpp::Results& results, testpp::RunFlags flags, ostream& stream);
+        TestMap& m, testpp::Results& results, const testpp::RunParams& params, ostream& stream);
 
     TestMap m_tests;
     TestNameMap m_testNames;
@@ -110,12 +110,12 @@ void TestRegistry::Unregister(Test* test)
 
 //------------------------------------------------------------------------------
 ostream& TestRegistry::RunAllTests(
-    testpp::Results& results, testpp::RunFlags flags, ostream& stream)
+    testpp::Results& results, const testpp::RunParams& params, ostream& stream)
 {
   TestMap localMap;
   localMap.swap(m_tests);
 
-  RunTests(localMap, results, flags, stream);
+  RunTests(localMap, results, params, stream);
 
   m_tests.swap(localMap);
   return stream;
@@ -124,7 +124,7 @@ ostream& TestRegistry::RunAllTests(
 //------------------------------------------------------------------------------
 ostream& TestRegistry::RunSuite(
     const char* suiteName,
-    testpp::Results& results, testpp::RunFlags flags, ostream& stream)
+    testpp::Results& results, const testpp::RunParams& params, ostream& stream)
 {
   TestMap localMap;
 
@@ -136,7 +136,7 @@ ostream& TestRegistry::RunSuite(
     localMap.insert(make_pair(m_testNames[i->second], i->second));
   }
 
-  RunTests(localMap, results, flags, stream);
+  RunTests(localMap, results, params, stream);
 
   return stream;
 }
@@ -144,7 +144,7 @@ ostream& TestRegistry::RunSuite(
 //------------------------------------------------------------------------------
 void TestRegistry::RunTests(
     TestMap& localMap,
-    testpp::Results& results, testpp::RunFlags flags, ostream& stream)
+    testpp::Results& results, const testpp::RunParams& params, ostream& stream)
 {
   s_stream = &stream;
 
@@ -159,7 +159,7 @@ void TestRegistry::RunTests(
   {
     testNames.push_back(&i->first);
   }
-  if (!(flags & testpp::ALPHA_ORDER))
+  if (!(params.m_flags & testpp::ALPHA_ORDER))
   {
     random_shuffle(
         testNames.begin(), testNames.end(),
@@ -172,18 +172,18 @@ void TestRegistry::RunTests(
        ++i)
   {
     Test* test = localMap[**i];
-    bool success = RunTest(test);
-    if (!(flags & testpp::QUIET)
-        && (!success || !(flags & testpp::QUIET_SUCCESS)))
+    bool success = RunTest(test, params);
+    if (!(params.m_flags & testpp::QUIET)
+        && (!success || !(params.m_flags & testpp::QUIET_SUCCESS)))
     {
       const char* colorCode = success ? GREEN : RED;
       const char* resultText = success ? "PASS" : "FAIL";
-      if (flags & testpp::COLOR)
+      if (params.m_flags & testpp::COLOR)
       {
         stream << colorCode;
       }
       stream << resultText;
-      if (flags & testpp::COLOR)
+      if (params.m_flags & testpp::COLOR)
       {
         stream << NORMAL;
       }
@@ -205,10 +205,10 @@ void TestRegistry::RunTests(
 }
 
 //------------------------------------------------------------------------------
-bool TestRegistry::RunTest(Test* test)
+bool TestRegistry::RunTest(Test* test, const testpp::RunParams& params)
 {
   bool success = false;
-  if (test->Setup())
+  if (test->Setup(params))
   {
     success = test->RunWrapper();
     test->Teardown();
@@ -217,10 +217,10 @@ bool TestRegistry::RunTest(Test* test)
 }
 
 //------------------------------------------------------------------------------
-bool TestRegistry::RunTest(const char* testName)
+bool TestRegistry::RunTest(const char* testName, const testpp::RunParams& params)
 {
   TestMap::iterator i = m_tests.find(testName);
-  return i != m_tests.end() && RunTest(i->second);
+  return i != m_tests.end() && RunTest(i->second, params);
 }
 
 //------------------------------------------------------------------------------
@@ -238,37 +238,37 @@ Test::~Test()
 
 //------------------------------------------------------------------------------
 void testpp::RunAllTests(
-    testpp::Results& results, testpp::RunFlags flags)
+    testpp::Results& results, const testpp::RunParams& params)
 {
-  GetTestRegistry().RunAllTests(results, flags, cout);
+  GetTestRegistry().RunAllTests(results, params, cout);
 }
 
 //------------------------------------------------------------------------------
 ostream& testpp::RunAllTests(
-    testpp::Results& results, testpp::RunFlags flags, ostream& stream)
+    testpp::Results& results, const testpp::RunParams& params, ostream& stream)
 {
-  return GetTestRegistry().RunAllTests(results, flags, stream);
+  return GetTestRegistry().RunAllTests(results, params, stream);
 }
 
 //------------------------------------------------------------------------------
 void testpp::RunSuite(
-    const char* suite, testpp::Results& results, testpp::RunFlags flags)
+    const char* suite, testpp::Results& results, const testpp::RunParams& params)
 {
-  GetTestRegistry().RunSuite(suite, results, flags, cout);
+  GetTestRegistry().RunSuite(suite, results, params, cout);
 }
 
 //------------------------------------------------------------------------------
 ostream& testpp::RunSuite(
     const char* suite,
-    testpp::Results& results, testpp::RunFlags flags, ostream& stream)
+    testpp::Results& results, const testpp::RunParams& params, ostream& stream)
 {
-  return GetTestRegistry().RunSuite(suite, results, flags, stream);
+  return GetTestRegistry().RunSuite(suite, results, params, stream);
 }
 
 //------------------------------------------------------------------------------
-bool testpp::Run(const char* testName)
+bool testpp::Run(const char* testName, const testpp::RunParams& params)
 {
-  return GetTestRegistry().RunTest(testName);
+  return GetTestRegistry().RunTest(testName, params);
 }
 
 //------------------------------------------------------------------------------

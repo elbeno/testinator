@@ -5,26 +5,6 @@
 namespace testpp
 {
   //------------------------------------------------------------------------------
-  class Test
-  {
-  public:
-    Test(const char* name, const char* suite = "");
-    virtual ~Test();
-
-    virtual bool Setup() { return true; }
-    virtual void Teardown() {}
-    virtual bool Run() { return true; }
-
-    virtual bool RunWrapper()
-    {
-      return Run() && m_success;
-    }
-
-  protected:
-    bool m_success;
-  };
-
-  //------------------------------------------------------------------------------
   enum RunFlags
   {
     NONE = 0,
@@ -44,6 +24,14 @@ namespace testpp
   };
 
   //------------------------------------------------------------------------------
+  struct RunParams
+  {
+    RunParams() : m_flags(COLOR | QUIET_SUCCESS), m_numPropertyChecks(100) {}
+    unsigned int m_flags;
+    size_t m_numPropertyChecks;
+  };
+
+  //------------------------------------------------------------------------------
   struct Results
   {
     int m_numPassed;
@@ -51,12 +39,32 @@ namespace testpp
   };
 
   //------------------------------------------------------------------------------
-  void RunAllTests(Results& results, RunFlags flags = COLOR);
-  void RunSuite(const char* suiteName, Results& results, RunFlags flags = COLOR);
+  void RunAllTests(Results& results, const RunParams& params = RunParams());
+  void RunSuite(const char* suiteName, Results& results, const RunParams& params = RunParams());
 
-  bool Run(const char* testName);
+  bool Run(const char* testName, const testpp::RunParams& params = RunParams());
 
   std::ostream& GetStream();
+
+  //------------------------------------------------------------------------------
+  class Test
+  {
+  public:
+    Test(const char* name, const char* suite = "");
+    virtual ~Test();
+
+    virtual bool Setup(const testpp::RunParams&) { return true; }
+    virtual void Teardown() {}
+    virtual bool Run() { return true; }
+
+    virtual bool RunWrapper()
+    {
+      return Run() && m_success;
+    }
+
+  protected:
+    bool m_success;
+  };
 }
 
 //------------------------------------------------------------------------------

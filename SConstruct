@@ -18,8 +18,7 @@ env.Append(CCFLAGS = "-stdlib=libc++")
 env.Append(LINKFLAGS = "-lc++")
 env.Replace(CXX = 'clang++')
 
-import os
-env['PROJNAME'] = os.path.basename(os.getcwd())
+env['PROJNAME'] = 'testpp'
 
 Export('env')
 env.SConscript('src/SConscript', variant_dir='build/$BUILDTYPE')
