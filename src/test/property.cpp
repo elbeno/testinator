@@ -66,3 +66,32 @@ DECLARE_PROPERTY(MyType, Property, const MyType& m)
 {
   return m.m_val == 1337;
 }
+
+//------------------------------------------------------------------------------
+struct MyUnspecializedType
+{
+  MyUnspecializedType() : m_val(1337) {}
+  int m_val;
+};
+
+ostream& operator<<(ostream& s, const MyUnspecializedType& m)
+{
+  return s << m.m_val;
+}
+
+DECLARE_PROPERTY(MyUnspecializedType, Property, const MyUnspecializedType& m)
+{
+  return m.m_val == 1337;
+}
+
+//------------------------------------------------------------------------------
+DECLARE_PROPERTY(ConstInt, Property, const int)
+{
+  return true;
+}
+
+//------------------------------------------------------------------------------
+DECLARE_PROPERTY(ConstChar, Property, const char)
+{
+  return true;
+}

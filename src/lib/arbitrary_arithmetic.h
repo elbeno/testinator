@@ -43,6 +43,9 @@ namespace testpp
     }
   };
 
+  template <typename T>
+  struct Arbitrary<const T, true> : public Arbitrary<T, true> {};
+
   //------------------------------------------------------------------------------
   // specialization for bool
   //------------------------------------------------------------------------------
@@ -59,6 +62,9 @@ namespace testpp
       return std::vector<bool>();
     }
   };
+
+  template <>
+  struct Arbitrary<const bool, true> : public Arbitrary<bool, true> {};
 
   //------------------------------------------------------------------------------
   // specialization for char
@@ -79,5 +85,8 @@ namespace testpp
       return std::vector<char>();
     }
   };
+
+  template <>
+  struct Arbitrary<const char, true> : public Arbitrary<char, true> {};
 
 }

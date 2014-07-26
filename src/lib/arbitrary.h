@@ -13,7 +13,7 @@ namespace testpp
     // Generates an instance of a T. The generation parameter in some way
     // controls the "complexity" of T, if applicable, for instance, a higher
     // generation implies a larger container in some way.
-    static T generate(std::size_t generation);
+    static T generate(std::size_t generation) { return T(); }
 
     // Given a T, tries to shrink it, generating a vector of Ts derived from it.
     // Higher precedence items (more aggressively shrunk) should be near the
