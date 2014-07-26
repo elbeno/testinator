@@ -3,6 +3,8 @@
 using namespace std;
 
 //------------------------------------------------------------------------------
+// A test of the machinery
+
 struct TestFunctor
 {
   bool operator()(int) const { return true; }
@@ -16,6 +18,8 @@ DECLARE_TEST(Functor, Property)
 }
 
 //------------------------------------------------------------------------------
+// Another machinery test
+
 struct FuncTraitsStruct
 {
   void operator()(int);
@@ -29,6 +33,8 @@ DECLARE_TEST(FunctorTraits, Property)
 }
 
 //------------------------------------------------------------------------------
+// A simple test of string reversal invariant
+
 DECLARE_PROPERTY(StringReverse, Property, const string& s)
 {
   string r(s);
@@ -38,12 +44,17 @@ DECLARE_PROPERTY(StringReverse, Property, const string& s)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_PROPERTY(StringLacksA, Property, const string& s)
+// This is supposed to fail to demonstrate how shrinking finds the minimal
+// failure
+
+DECLARE_PROPERTY(FailTriggersShrink, Property, const string& s)
 {
   return s.find('A') == s.npos;
 }
 
 //------------------------------------------------------------------------------
+// A user-defined type test
+
 struct MyType
 {
   MyType() : m_val(1337) {}
@@ -68,6 +79,10 @@ DECLARE_PROPERTY(MyType, Property, const MyType& m)
 }
 
 //------------------------------------------------------------------------------
+// Another user-defined type test: without a specialization of Arbitrary,
+// generate() returns a default-constructed object, and shrink always returns an
+// empty vector
+
 struct MyUnspecializedType
 {
   MyUnspecializedType() : m_val(1337) {}

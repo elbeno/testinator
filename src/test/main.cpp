@@ -178,8 +178,8 @@ public:
 
   virtual bool Run()
   {
-    TestReportResultsInternal test0("test0", true);
-    TestReportResultsInternal test1("test1", false);
+    TestReportResultsInternal test0("expected_fail", true);
+    TestReportResultsInternal test1("expected_pass", false);
 
     testpp::RunParams p;
     p.m_flags = testpp::QUIET_SUCCESS;

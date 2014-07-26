@@ -43,7 +43,7 @@ namespace testpp
       delete m_internal;
     }
 
-    bool check(std::size_t N = 100, bool quiet = false)
+    bool check(std::size_t N = 100, bool quiet = true)
     {
       return m_internal->check(N, quiet);
     }
@@ -74,9 +74,9 @@ namespace testpp
           });
 
         if (!m_failedResults.empty())
-          std::cout << N << " tests, " << m_failedResults.size() << " failures." << std::endl;
+          std::cout << N << " checks, " << m_failedResults.size() << " failures." << std::endl;
         else if (!quiet)
-          std::cout << N << " tests passed." << std::endl;
+          std::cout << N << " checks passed." << std::endl;
 
         return (m_failedResults.empty());
       }
@@ -146,7 +146,7 @@ namespace testpp
       testpp::Property p(*this);                           \
       if (!m_quiet)                                        \
         std::cout << m_name << ": ";                       \
-      return p.check(m_numChecks);                         \
+      return p.check(m_numChecks, m_quiet);                \
     }                                                      \
     bool operator()(ARG);                                  \
     size_t m_numChecks;                                    \
