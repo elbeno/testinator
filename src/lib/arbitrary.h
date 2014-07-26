@@ -23,8 +23,6 @@ namespace testpp
 
   template <typename T>
   struct Arbitrary<const T, false> : public Arbitrary<T, false> {};
-  template <typename T>
-  struct Arbitrary<const T, true> : public Arbitrary<T, true> {};
 
 }
 

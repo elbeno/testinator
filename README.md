@@ -46,9 +46,16 @@ generate arbitrary values of this type and feed them to your property checker.
 
 TestPP knows how to generate values of standard types, but if you have a type
 that you've defined, you may need to tell TestPP how to generate it. To do this,
-specialize the `Arbitrary` template. Examples are in `arbitrary_*.h`.
+specialize the `Arbitrary` template. Examples are in `arbitrary_*.h`. The output
+operator, `operator<<`, should also be available for your type.
 
 `Arbitrary` supplies two functions: `generate` which returns a single value, and
 `shrink` which takes a value, and returns a vector of values based on it. If
 TestPP finds that a property fails to hold for a given value, it will call
 `shrink` in an attempt to find the smallest test case that breaks the property.
+
+For types that don't make sense to shrink, `shrink` should return an empty
+vector. It should also return an empty vector if the argument has been shrunk
+enough.
+
+Examples of usage can be found in property.cpp.

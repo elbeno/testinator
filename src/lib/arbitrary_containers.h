@@ -25,18 +25,21 @@ namespace testpp
 
     static std::vector<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::vector<T> v;
-      std::generate_n(std::back_inserter(v), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::back_inserter(v), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::vector<T>> shrink(const std::vector<T>& t)
     {
-      std::vector<std::vector<T>> v(2);
+      std::vector<std::vector<T>> v;
+      if (t.size() < 2)
+        return v;
       auto it = t.begin() + t.size()/2;
+      v.push_back(std::vector<T>());
       copy(t.begin(), it, std::back_inserter(v[0]));
+      v.push_back(std::vector<T>());
       copy(it, t.end(), std::back_inserter(v[1]));
       return v;
     }
@@ -52,18 +55,21 @@ namespace testpp
 
     static std::deque<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::deque<T> v;
-      std::generate_n(std::back_inserter(v), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::back_inserter(v), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::deque<T>> shrink(const std::deque<T>& t)
     {
-      std::vector<std::deque<T>> v(2);
+      std::vector<std::deque<T>> v;
+      if (t.size() < 2)
+        return v;
       auto it = t.begin() + t.size()/2;
+      v.push_back(std::deque<T>());
       copy(t.begin(), it, std::back_inserter(v[0]));
+      v.push_back(std::deque<T>());
       copy(it, t.end(), std::back_inserter(v[1]));
       return v;
     }
@@ -79,20 +85,23 @@ namespace testpp
 
     static std::list<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::list<T> v;
-      std::generate_n(std::back_inserter(v), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::back_inserter(v), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::list<T>> shrink(const std::list<T>& t)
     {
-      std::vector<std::list<T>> v(2);
+      std::vector<std::list<T>> v;
+      if (t.size() < 2)
+        return v;
       auto it = t.begin();
+      v.push_back(std::list<T>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].push_front(*it);
-      copy(it, t.end(), std::back_inserter(v[1]));
+      v.push_back(std::list<T>());
+      copy(it, t.end(), std::front_inserter(v[1]));
       return v;
     }
   };
@@ -107,21 +116,25 @@ namespace testpp
 
     static std::forward_list<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::forward_list<T> v;
-      std::generate_n(std::front_inserter(v), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::front_inserter(v), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::forward_list<T>> shrink(const std::forward_list<T>& t)
     {
-      std::vector<std::forward_list<T>> v(2);
+      std::vector<std::forward_list<T>> v;
       std::size_t len = 0;
       for (auto it = t.begin(); it != t.end(); ++it, ++len);
+      if (len < 2)
+        return v;
+
       auto it = t.begin();
+      v.push_back(std::forward_list<T>());
       for (int count = 0; count < len/2; count++, it++)
         v[0].push_front(*it);
+      v.push_back(std::forward_list<T>());
       copy(it, t.end(), std::front_inserter(v[1]));
       return v;
     }
@@ -137,19 +150,20 @@ namespace testpp
 
     static std::set<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::set<T> v;
-      std::generate_n(std::inserter(v, v.begin()), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::inserter(v, v.begin()), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::set<T>> shrink(const std::set<T>& t)
     {
-      std::vector<std::set<T>> v(2);
+      std::vector<std::set<T>> v;
       auto it = t.begin();
+      v.push_back(std::set<T>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].insert(*it);
+      v.push_back(std::set<T>());
       copy(it, t.end(), std::inserter(v[1], v[1].begin()));
       return v;
     }
@@ -165,25 +179,26 @@ namespace testpp
 
     static std::multiset<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::multiset<T> v;
-      std::generate_n(std::inserter(v, v.begin()), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::inserter(v, v.begin()), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::multiset<T>> shrink(const std::multiset<T>& t)
     {
-      std::vector<std::multiset<T>> v(2);
+      std::vector<std::multiset<T>> v;
       auto it = t.begin();
+      v.push_back(std::multiset<T>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].insert(*it);
+      v.push_back(std::multiset<T>());
       copy(it, t.end(), std::inserter(v[1], v[1].begin()));
       return v;
     }
   };
 
-  //------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
   // specialization for unordered_set
   //------------------------------------------------------------------------------
   template <typename T>
@@ -193,19 +208,20 @@ namespace testpp
 
     static std::unordered_set<T> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::unordered_set<T> v;
-      std::generate_n(std::inserter(v, v.begin()), N,
-                      std::bind(Arbitrary<T>::generate, generation));
+      std::generate_n(std::inserter(v, v.begin()), N * ((generation / 100) + 1),
+                      [&] () { return Arbitrary<T>::generate(generation++); });
       return v;
     }
 
     static std::vector<std::unordered_set<T>> shrink(const std::unordered_set<T>& t)
     {
-      std::vector<std::unordered_set<T>> v(2);
+      std::vector<std::unordered_set<T>> v;
       auto it = t.begin();
+      v.push_back(std::unordered_set<T>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].insert(*it);
+      v.push_back(std::unordered_set<T>());
       copy(it, t.end(), std::inserter(v[1], v[1].begin()));
       return v;
     }
@@ -219,9 +235,9 @@ namespace testpp
   {
     static std::pair<T1, T2> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
-      return std::pair<T1, T2>(Arbitrary<T1>::generate(generation),
-                               Arbitrary<T2>::generate(generation));
+      return std::pair<T1, T2>(
+          Arbitrary<T1>::generate(generation),
+          Arbitrary<T2>::generate(generation));
     }
 
     static std::vector<std::pair<T1, T2>> shrink(const std::pair<T1, T2>& t)
@@ -247,20 +263,22 @@ namespace testpp
 
     static std::map<K, V> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::map<K, V> v;
-      std::generate_n(std::inserter(v, v.begin()), N,
-                      std::bind(Arbitrary<typename std::map<K, V>::value_type>::generate,
-                                generation));
+      std::generate_n(
+          std::inserter(v, v.begin()), N * ((generation / 100) + 1),
+          [&] () { return Arbitrary<typename std::map<K, V>::value_type>::generate(
+                generation++); });
       return v;
     }
 
     static std::vector<std::map<K, V>> shrink(const std::map<K, V>& t)
     {
-      std::vector<std::map<K, V>> v(2);
+      std::vector<std::map<K, V>> v;
       auto it = t.begin();
+      v.push_back(std::map<K, V>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].insert(*it);
+      v.push_back(std::map<K, V>());
       copy(it, t.end(), std::inserter(v[1], v[1].begin()));
       return v;
     }
@@ -276,20 +294,22 @@ namespace testpp
 
     static std::multimap<K, V> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::multimap<K, V> v;
-      std::generate_n(std::inserter(v, v.begin()), N,
-                      std::bind(Arbitrary<typename std::multimap<K, V>::value_type>::generate,
-                                generation));
+      std::generate_n(
+          std::inserter(v, v.begin()), N * ((generation / 100) + 1),
+          [&] () { return Arbitrary<typename std::multimap<K, V>::value_type>::generate(
+                generation++); });
       return v;
     }
 
     static std::vector<std::multimap<K, V>> shrink(const std::multimap<K, V>& t)
     {
-      std::vector<std::multimap<K, V>> v(2);
+      std::vector<std::multimap<K, V>> v;
       auto it = t.begin();
+      v.push_back(std::multimap<K, V>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].insert(*it);
+      v.push_back(std::multimap<K, V>());
       copy(it, t.end(), std::inserter(v[1], v[1].begin()));
       return v;
     }
@@ -305,20 +325,22 @@ namespace testpp
 
     static std::unordered_map<K, V> generate(std::size_t generation = 0)
     {
-      if (generation < 3) generation = 3;
       std::unordered_map<K, V> v;
-      std::generate_n(std::inserter(v, v.begin()), N,
-                      std::bind(Arbitrary<typename std::unordered_map<K, V>::value_type>::generate,
-                                generation));
+      std::generate_n(
+          std::inserter(v, v.begin()), N * ((generation / 100) + 1),
+          [&] () { return Arbitrary<typename std::unordered_map<K, V>::value_type>::generate(
+                generation++); });
       return v;
     }
 
     static std::vector<std::unordered_map<K, V>> shrink(const std::unordered_map<K, V>& t)
     {
-      std::vector<std::unordered_map<K, V>> v(2);
+      std::vector<std::unordered_map<K, V>> v;
       auto it = t.begin();
+      v.push_back(std::unordered_map<K, V>());
       for (int count = 0; count < t.size()/2; count++, it++)
         v[0].insert(*it);
+      v.push_back(std::unordered_map<K, V>());
       copy(it, t.end(), std::inserter(v[1], v[1].begin()));
       return v;
     }

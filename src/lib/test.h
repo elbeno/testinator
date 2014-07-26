@@ -9,18 +9,15 @@ namespace testpp
   {
     NONE = 0,
 
-    // QUIET means no output.
-    QUIET = 1 << 0,
-
     // COLOR means use ANSI color coded output: red for fail, green for pass.
-    COLOR = 1 << 1,
+    COLOR = 1 << 0,
 
     // ALPHA_ORDER means run tests in alphabetical order (default is random
     // order).
-    ALPHA_ORDER = 1 << 2,
+    ALPHA_ORDER = 1 << 1,
 
     // QUIET_SUCCESS means output for failing tests only.
-    QUIET_SUCCESS = 1 << 3,
+    QUIET_SUCCESS = 1 << 2,
   };
 
   //------------------------------------------------------------------------------
@@ -64,6 +61,7 @@ namespace testpp
 
   protected:
     bool m_success;
+    std::string m_name;
   };
 }
 

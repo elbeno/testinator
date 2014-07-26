@@ -173,8 +173,7 @@ void TestRegistry::RunTests(
   {
     Test* test = localMap[**i];
     bool success = RunTest(test, params);
-    if (!(params.m_flags & testpp::QUIET)
-        && (!success || !(params.m_flags & testpp::QUIET_SUCCESS)))
+    if (!success || !(params.m_flags & testpp::QUIET_SUCCESS))
     {
       const char* colorCode = success ? GREEN : RED;
       const char* resultText = success ? "PASS" : "FAIL";
@@ -226,6 +225,7 @@ bool TestRegistry::RunTest(const char* testName, const testpp::RunParams& params
 //------------------------------------------------------------------------------
 Test::Test(const char* name, const char* suite)
   : m_success(true)
+  , m_name(name)
 {
   GetTestRegistry().Register(this, name, suite);
 }

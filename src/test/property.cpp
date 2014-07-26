@@ -1,29 +1,6 @@
-#include <test_extended.h>
 #include <property.h>
 
-#include <algorithm>
-#include <string>
-#include <iostream>
 using namespace std;
-
-//------------------------------------------------------------------------------
-DECLARE_TEST(Lambda, Property)
-{
-  testpp::Property p([] (int) { return true; });
-  return p.check();
-}
-
-//------------------------------------------------------------------------------
-bool TestFunction(int)
-{
-  return true;
-}
-
-DECLARE_TEST(Function, Property)
-{
-  testpp::Property p(TestFunction);
-  return p.check();
-}
 
 //------------------------------------------------------------------------------
 struct TestFunctor
@@ -39,57 +16,16 @@ DECLARE_TEST(Functor, Property)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(NullProperty, Property)
-{
-  testpp::Property p([] (int) { return false; });
-  return !p.check(1, true);
-}
-
-//------------------------------------------------------------------------------
-DECLARE_TEST(StringReverse, Property)
-{
-  testpp::Property p([] (const string& s) {
-      string r(s);
-      reverse(r.begin(), r.end());
-      reverse(r.begin(), r.end());
-      return s == r; });
-  return p.check();
-}
-
-//------------------------------------------------------------------------------
-DECLARE_TEST(LambdaTraits, Property)
-{
-  auto lambda = [](int i) { return long(i*10); };
-
-  typedef testpp::function_traits<decltype(lambda)> traits;
-
-  return std::is_same<long, traits::result_type>::value
-    && std::is_same<int, traits::arg<0>::type>::value;
-}
-
-//------------------------------------------------------------------------------
-long funcTraitsFn(int);
-
-DECLARE_TEST(FuncTraits, Property)
-{
-  typedef testpp::function_traits<decltype(funcTraitsFn)> traits;
-
-  return std::is_same<long, traits::result_type>::value
-    && std::is_same<int, traits::arg<0>::type>::value;
-}
-
-//------------------------------------------------------------------------------
 struct FuncTraitsStruct
 {
-  long operator()(int);
+  void operator()(int);
 };
 
 DECLARE_TEST(FunctorTraits, Property)
 {
   typedef testpp::function_traits<FuncTraitsStruct> traits;
 
-  return std::is_same<long, traits::result_type>::value
-    && std::is_same<int, traits::arg<0>::type>::value;
+  return std::is_same<int, traits::argType>::value;
 }
 
 //------------------------------------------------------------------------------
@@ -99,4 +35,34 @@ DECLARE_PROPERTY(StringReverse, Property, const string& s)
   reverse(r.begin(), r.end());
   reverse(r.begin(), r.end());
   return s == r;
+}
+
+//------------------------------------------------------------------------------
+DECLARE_PROPERTY(StringLacksA, Property, const string& s)
+{
+  return s.find('A') == s.npos;
+}
+
+//------------------------------------------------------------------------------
+struct MyType
+{
+  MyType() : m_val(1337) {}
+  int m_val;
+};
+
+template <>
+struct testpp::Arbitrary<MyType, false>
+{
+  static MyType generate(std::size_t generation) { return MyType(); }
+  static std::vector<MyType> shrink(const MyType& t) { return std::vector<MyType>(); }
+};
+
+ostream& operator<<(ostream& s, const MyType& m)
+{
+  return s << m.m_val;
+}
+
+DECLARE_PROPERTY(MyType, Property, const MyType& m)
+{
+  return m.m_val == 1337;
 }

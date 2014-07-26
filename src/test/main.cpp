@@ -143,7 +143,7 @@ public:
     TestRunMultipleInternal test1("test1");
 
     testpp::RunParams p;
-    p.m_flags = testpp::QUIET;
+    p.m_flags = testpp::QUIET_SUCCESS;
     testpp::Results r;
     testpp::RunAllTests(r, p);
 
@@ -182,7 +182,7 @@ public:
     TestReportResultsInternal test1("test1", false);
 
     testpp::RunParams p;
-    p.m_flags = testpp::QUIET;
+    p.m_flags = testpp::QUIET_SUCCESS;
     testpp::Results r;
     testpp::RunAllTests(r, p);
 
@@ -248,7 +248,7 @@ public:
     testpp::Test myTest2("test2", "suite2");
 
     testpp::RunParams p;
-    p.m_flags = testpp::QUIET;
+    p.m_flags = testpp::QUIET_SUCCESS;
     testpp::Results r;
     testpp::RunSuite("suite1", r, p);
 
@@ -416,7 +416,7 @@ int main(int argc, char* argv[])
     }
 
     {
-      string option = "--num=";
+      string option = "--numChecks=";
       if (s.compare(0, option.size(), option) == 0)
       {
         p.m_numPropertyChecks = atoi(s.substr(option.size()).c_str());
@@ -437,7 +437,7 @@ int main(int argc, char* argv[])
       string option = "--verbose";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_flags &= ~(testpp::QUIET | testpp::QUIET_SUCCESS);
+        p.m_flags &= ~testpp::QUIET_SUCCESS;
         continue;
       }
     }
