@@ -58,4 +58,43 @@ For types that don't make sense to shrink, `shrink` should return an empty
 vector. It should also return an empty vector if the argument has been shrunk
 enough.
 
-Examples of usage can be found in property.cpp.
+Examples of usage can be found in `property.cpp`.
+
+## Timing
+
+Sometimes you want to time tests. You can set up a timed test easily, just like
+a regular test. There is no return value, because it's assumed the test exists
+so you can see what time it takes.
+
+To use timed tests, `#include <timed_test.h>`.
+
+```cpp
+DECLARE_TIMED_TEST(TestName, SuiteName)
+{
+  // your logic here...
+}
+```
+
+And you will see (verbose) output like:
+
+`Simple: 100 tests run in 1206146ns (12061 ns per test).`
+
+## Complexity
+
+Sometimes timing isn't enough, and what you really want to test is: what is the
+complexity of my algorithm? You might want to do this to get some kind of
+guarantee your algorithm will scale, for example. You can use an algorithmic
+complexity property, similar to a property, but with an extra "expected
+complexity".
+
+To use complexity properties, `#include <complexity.h>`.
+
+```cpp
+DECLARE_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
+{
+  max_element(s.begin(), s.end());
+}
+```
+
+If the test comes in *under* the expected complexity, it will be considered a
+pass, but the anomaly will be reported.
