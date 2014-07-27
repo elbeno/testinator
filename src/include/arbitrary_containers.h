@@ -19,7 +19,7 @@ namespace testpp
   // specialization for vector
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::vector<T>, false>
+  struct Arbitrary<std::vector<T>>
   {
     static const std::size_t N = 10;
 
@@ -49,7 +49,7 @@ namespace testpp
   // specialization for deque
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::deque<T>, false>
+  struct Arbitrary<std::deque<T>>
   {
     static const std::size_t N = 10;
 
@@ -79,7 +79,7 @@ namespace testpp
   // specialization for list
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::list<T>, false>
+  struct Arbitrary<std::list<T>>
   {
     static const std::size_t N = 10;
 
@@ -110,7 +110,7 @@ namespace testpp
   // specialization for forward_list
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::forward_list<T>, false>
+  struct Arbitrary<std::forward_list<T>>
   {
     static const std::size_t N = 10;
 
@@ -144,7 +144,7 @@ namespace testpp
   // specialization for set
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::set<T>, false>
+  struct Arbitrary<std::set<T>>
   {
     static const std::size_t N = 10;
 
@@ -173,7 +173,7 @@ namespace testpp
   // specialization for multiset
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::multiset<T>, false>
+  struct Arbitrary<std::multiset<T>>
   {
     static const std::size_t N = 10;
 
@@ -202,7 +202,7 @@ namespace testpp
   // specialization for unordered_set
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::unordered_set<T>, false>
+  struct Arbitrary<std::unordered_set<T>>
   {
     static const std::size_t N = 10;
 
@@ -231,7 +231,7 @@ namespace testpp
   // specialization for pair
   //------------------------------------------------------------------------------
   template <typename T1, typename T2>
-  struct Arbitrary<std::pair<T1, T2>, false>
+  struct Arbitrary<std::pair<T1, T2>>
   {
     static std::pair<T1, T2> generate(std::size_t generation = 0)
     {
@@ -257,7 +257,7 @@ namespace testpp
   // specialization for map
   //------------------------------------------------------------------------------
   template <typename K, typename V>
-  struct Arbitrary<std::map<K, V>, false>
+  struct Arbitrary<std::map<K, V>>
   {
     static const std::size_t N = 10;
 
@@ -288,7 +288,7 @@ namespace testpp
   // specialization for multimap
   //------------------------------------------------------------------------------
   template <typename K, typename V>
-  struct Arbitrary<std::multimap<K, V>, false>
+  struct Arbitrary<std::multimap<K, V>>
   {
     static const std::size_t N = 10;
 
@@ -319,7 +319,7 @@ namespace testpp
   // specialization for unordered_map
   //------------------------------------------------------------------------------
   template <typename K, typename V>
-  struct Arbitrary<std::unordered_map<K, V>, false>
+  struct Arbitrary<std::unordered_map<K, V>>
   {
     static const std::size_t N = 10;
 

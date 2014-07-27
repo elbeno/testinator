@@ -61,40 +61,12 @@ struct MyType
   int m_val;
 };
 
-template <>
-struct testpp::Arbitrary<MyType, false>
-{
-  static MyType generate(std::size_t generation) { return MyType(); }
-  static std::vector<MyType> shrink(const MyType& t) { return std::vector<MyType>(); }
-};
-
 ostream& operator<<(ostream& s, const MyType& m)
 {
   return s << m.m_val;
 }
 
 DECLARE_PROPERTY(MyType, Property, const MyType& m)
-{
-  return m.m_val == 1337;
-}
-
-//------------------------------------------------------------------------------
-// Another user-defined type test: without a specialization of Arbitrary,
-// generate() returns a default-constructed object, and shrink always returns an
-// empty vector
-
-struct MyUnspecializedType
-{
-  MyUnspecializedType() : m_val(1337) {}
-  int m_val;
-};
-
-ostream& operator<<(ostream& s, const MyUnspecializedType& m)
-{
-  return s << m.m_val;
-}
-
-DECLARE_PROPERTY(MyUnspecializedType, Property, const MyUnspecializedType& m)
 {
   return m.m_val == 1337;
 }

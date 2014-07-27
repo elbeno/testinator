@@ -1,13 +1,12 @@
 #pragma once
 
-#include <type_traits>
 #include <vector>
 
 namespace testpp
 {
 
   //------------------------------------------------------------------------------
-  template <typename T, bool = std::is_arithmetic<T>::value>
+  template <typename T>
   struct Arbitrary
   {
     // Generates an instance of a T. The generation parameter in some way
@@ -22,10 +21,11 @@ namespace testpp
   };
 
   template <typename T>
-  struct Arbitrary<const T, false> : public Arbitrary<T, false> {};
+  struct Arbitrary<const T> : public Arbitrary<T> {};
 
 }
 
 #include "arbitrary_arithmetic.h"
-#include "arbitrary_containers.h"
+#include "arbitrary_associative_containers.h"
+#include "arbitrary_sequence_containers.h"
 #include "arbitrary_string.h"

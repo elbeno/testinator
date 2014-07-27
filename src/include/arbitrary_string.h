@@ -11,7 +11,7 @@ namespace testpp
   // specialization for string
   //------------------------------------------------------------------------------
   template <typename T>
-  struct Arbitrary<std::basic_string<T>, false>
+  struct Arbitrary<std::basic_string<T>>
   {
     static const std::size_t N = 10;
 

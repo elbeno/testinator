@@ -148,8 +148,8 @@ namespace testpp
         std::cout << m_name << ": ";                       \
       return p.check(m_numChecks, m_quiet);                \
     }                                                      \
-    bool operator()(ARG);                                  \
+    bool operator()(ARG) const;                            \
     size_t m_numChecks;                                    \
     bool m_quiet;                                          \
   } s_##SUITE##NAME##_Property;                            \
-  bool SUITE##NAME##Property::operator()(ARG)
+  bool SUITE##NAME##Property::operator()(ARG) const
