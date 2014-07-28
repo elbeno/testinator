@@ -16,13 +16,24 @@ namespace testpp
     struct Arbitrary_RandomSequence
     {
       static const std::size_t N = 10;
+      typedef typename C::value_type V;
 
       static C generate(std::size_t generation = 0)
       {
         C v;
+        std::size_t n = N * ((generation / 100) + 1);
         std::generate_n(
-            std::back_inserter(v), N * ((generation / 100) + 1),
-            [&] () { return Arbitrary<typename C::value_type>::generate(generation++); });
+            std::back_inserter(v), n,
+            [&] () { return Arbitrary<V>::generate(generation++); });
+        return v;
+      }
+
+      static C generate_n(std::size_t n)
+      {
+        C v;
+        std::generate_n(
+            std::back_inserter(v), n,
+            [&] () { return Arbitrary<V>::generate(n); });
         return v;
       }
 
@@ -61,8 +72,17 @@ namespace testpp
     static std::list<T> generate(std::size_t generation = 0)
     {
       std::list<T> v;
-      std::generate_n(std::back_inserter(v), N * ((generation / 100) + 1),
+      std::size_t n = N * ((generation / 100) + 1);
+      std::generate_n(std::back_inserter(v), n,
                       [&] () { return Arbitrary<T>::generate(generation++); });
+      return v;
+    }
+
+    static std::list<T> generate_n(std::size_t n)
+    {
+      std::list<T> v;
+      std::generate_n(std::back_inserter(v), n,
+                      [&] () { return Arbitrary<T>::generate(n); });
       return v;
     }
 
@@ -73,7 +93,7 @@ namespace testpp
         return v;
       auto it = t.begin();
       v.push_back(std::list<T>());
-      for (int count = 0; count < t.size()/2; count++, it++)
+      for (std::size_t count = 0; count < t.size()/2; count++, it++)
         v[0].push_front(*it);
       v.push_back(std::list<T>());
       copy(it, t.end(), std::front_inserter(v[1]));
@@ -92,8 +112,17 @@ namespace testpp
     static std::forward_list<T> generate(std::size_t generation = 0)
     {
       std::forward_list<T> v;
-      std::generate_n(std::front_inserter(v), N * ((generation / 100) + 1),
+      std::size_t n = N * ((generation / 100) + 1);
+      std::generate_n(std::front_inserter(v), n,
                       [&] () { return Arbitrary<T>::generate(generation++); });
+      return v;
+    }
+
+    static std::forward_list<T> generate_n(std::size_t n)
+    {
+      std::forward_list<T> v;
+      std::generate_n(std::front_inserter(v), n,
+                      [&] () { return Arbitrary<T>::generate(n); });
       return v;
     }
 
@@ -107,7 +136,7 @@ namespace testpp
 
       auto it = t.begin();
       v.push_back(std::forward_list<T>());
-      for (int count = 0; count < len/2; count++, it++)
+      for (std::size_t count = 0; count < len/2; count++, it++)
         v[0].push_front(*it);
       v.push_back(std::forward_list<T>());
       copy(it, t.end(), std::front_inserter(v[1]));

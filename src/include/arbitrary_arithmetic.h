@@ -34,6 +34,11 @@ namespace testpp
         }
       }
 
+      static T generate_n(std::size_t n)
+      {
+        return generate(n);
+      }
+
       static std::vector<T> shrink(const T&)
       {
         return std::vector<T>();

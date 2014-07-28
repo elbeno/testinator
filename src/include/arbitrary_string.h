@@ -18,8 +18,19 @@ namespace testpp
     static std::basic_string<T> generate(std::size_t generation = 0)
     {
       std::basic_string<T> s;
-      std::generate_n(std::back_inserter(s), N * ((generation / 100) + 1),
+      std::size_t n = N * ((generation / 100) + 1);
+      s.reserve(n);
+      std::generate_n(std::back_inserter(s), n,
                       [&] () { return Arbitrary<T>::generate(generation++); });
+      return s;
+    }
+
+    static std::basic_string<T> generate_n(std::size_t n)
+    {
+      std::basic_string<T> s;
+      s.reserve(n);
+      std::generate_n(std::back_inserter(s), n,
+                      [&] () { return Arbitrary<T>::generate(n); });
       return s;
     }
 

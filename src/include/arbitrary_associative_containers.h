@@ -18,13 +18,24 @@ namespace testpp
     struct Arbitrary_Assoc
     {
       static const std::size_t N = 10;
+      typedef typename C::value_type V;
 
       static C generate(std::size_t generation = 0)
       {
         C v;
+        std::size_t n = N * ((generation / 100) + 1);
         std::generate_n(
-            std::inserter(v, v.begin()), N * ((generation / 100) + 1),
-            [&] () { return Arbitrary<typename C::value_type>::generate(generation++); });
+            std::inserter(v, v.begin()), n,
+            [&] () { return Arbitrary<V>::generate(generation++); });
+        return v;
+      }
+
+      static C generate_n(std::size_t n)
+      {
+        C v;
+        std::generate_n(
+            std::inserter(v, v.begin()), n,
+            [&] () { return Arbitrary<V>::generate(n); });
         return v;
       }
 
@@ -35,7 +46,7 @@ namespace testpp
           return v;
         auto it = c.begin();
         v.push_back(C());
-        for (int count = 0; count < c.size()/2; count++, it++)
+        for (std::size_t count = 0; count < c.size()/2; count++, it++)
           v[0].insert(*it);
         v.push_back(C());
         copy(it, c.end(), std::inserter(v[1], v[1].begin()));

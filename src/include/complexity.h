@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <numeric>
 
 namespace testpp
 {
@@ -15,14 +16,19 @@ namespace testpp
     ORDER_LOG_N,
     ORDER_N,
     ORDER_N_LOG_N,
-    ORDER_N_2
+    ORDER_N2,
+    NUM_ORDERS
   };
 
   //------------------------------------------------------------------------------
   class ComplexityProperty
   {
-    static const size_t N = 100;
-    static const size_t COMPMULTLOG = 5;
+    static const size_t MULTIPLIER = 32;
+    static const size_t NUM_ITER = 5;
+
+    static int CalculateOrder(
+        unsigned long long* timesN, unsigned long long* timesMultN, size_t size,
+        size_t N, size_t k);
 
   public:
     static const char* Order(int o);
@@ -38,16 +44,16 @@ namespace testpp
       delete m_internal;
     }
 
-    int check(bool quiet = true, int expected_order = ORDER_N)
+    int check(std::size_t N = 100, bool quiet = true, int expected_order = ORDER_N)
     {
-      return m_internal->check(quiet, expected_order);
+      return m_internal->check(N, quiet, expected_order);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual int check(bool quiet, int expected_order) = 0;
+      virtual int check(std::size_t N, bool quiet, int expected_order) = 0;
     };
 
     template <typename U>
@@ -60,57 +66,25 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual int check(bool quiet, int expected_order)
+      virtual int check(std::size_t N, bool quiet, int expected_order)
       {
-        // vary the actual N by the expected order: we need to do more tests to
-        // discern O(1) from O(log N) than we do to discern O(n log n) from O(n
-        // squared)
-        size_t n = N;// * (1 << ((ORDER_N_2 + 1) - expected_order));
-
-        // Get the timings for N and (1<<COMPMULTLOG) * N, 5 samples each
-        unsigned long long countsN[5];
-        unsigned long long countsMultN[5];
-        for (int i = 0; i < 5; ++i)
+        // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
+        unsigned long long countsN[NUM_ITER];
+        unsigned long long countsMultN[NUM_ITER];
+        for (std::size_t i = 0; i < NUM_ITER; ++i)
         {
-          countsN[i] = checkInternal(n);
-          countsMultN[i] = checkInternal(n * (1 << COMPMULTLOG));
+          countsN[i] = checkInternal(N, N);
+          countsMultN[i] = checkInternal(N, N * MULTIPLIER);
         }
 
-        // sort the timings
-        std::sort(&countsN[0], &countsN[5]);
-        std::sort(&countsMultN[0], &countsMultN[5]);
-
-        // take the means of the 3 middle values of each set
-        unsigned long long meanN = (countsN[1] + countsN[2] + countsN[3]) / 3;
-        unsigned long long meanMultN = (countsMultN[1] + countsMultN[2] + countsMultN[3]) / 3;
-
-        // now divide through and bucket into a complexity category
-        double cat = (double)(meanMultN / meanN) / (double)(1 << COMPMULTLOG);
-
-        // some notional values for each category
-        const double O_1 = 1;
-        const double O_log_n = COMPMULTLOG;
-        const double O_n = (1<<COMPMULTLOG);
-        const double O_n_log_n = (1<<COMPMULTLOG) * COMPMULTLOG;
-        const double O_n_2 = COMPMULTLOG * COMPMULTLOG;
-
-        // return the closest category: within 2x
-        if (cat < O_1 || (cat - O_1) < O_1)
-          return ORDER_1;
-        if (cat < O_log_n || (cat - O_log_n) < O_log_n)
-          return ORDER_LOG_N;
-        if (cat < O_n || (cat - O_n) < O_n)
-          return ORDER_N;
-        if (cat < O_n_log_n || (cat - O_n_log_n) < O_n_log_n)
-          return ORDER_N_LOG_N;
-        return ORDER_N_2;
+        return CalculateOrder(countsN, countsMultN, NUM_ITER, N, MULTIPLIER);
       }
 
-      unsigned long long checkInternal(std::size_t N)
+      unsigned long long checkInternal(std::size_t num, std::size_t N)
       {
-        paramType p = Arbitrary<paramType>::generate(N);
+        paramType p = Arbitrary<paramType>::generate_n(N);
         auto t1 = std::chrono::high_resolution_clock::now();
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < num; ++i)
         {
           m_u(p);
         }
@@ -138,15 +112,16 @@ namespace testpp
     {}                                                                  \
     virtual bool Setup(const testpp::RunParams& params)                 \
     {                                                                   \
+      m_numChecks = params.m_numPropertyChecks;                         \
       m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;          \
       return true;                                                      \
     }                                                                   \
     virtual bool Run()                                                  \
     {                                                                   \
       testpp::ComplexityProperty p(*this);                              \
-      int order = p.check(m_quiet, testpp::ORDER);                      \
-      bool exact = (order == testpp::ORDER);                            \
-      if (!m_quiet || !exact)                                           \
+      int order = p.check(m_numChecks, m_quiet, testpp::ORDER);         \
+      bool success = (order <= testpp::ORDER);                          \
+      if (!m_quiet || !success)                                         \
       {                                                                 \
         std::cout << m_name << ": ";                                    \
         std::cout << "expected "                                        \
@@ -154,9 +129,10 @@ namespace testpp
                   << ", actually "                                      \
                   << testpp::ComplexityProperty::Order(order) << std::endl; \
       }                                                                 \
-      return order <= testpp::ORDER;                                    \
+      return success;                                                   \
     }                                                                   \
     void operator()(ARG) const;                                         \
+    size_t m_numChecks;                                                 \
     bool m_quiet;                                                       \
   } s_##SUITE##NAME##_ComplexityProperty;                               \
   void SUITE##NAME##ComplexityProperty::operator()(ARG) const

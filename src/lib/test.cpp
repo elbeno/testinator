@@ -1,5 +1,4 @@
 #include <test_extended.h>
-#include <complexity.h>
 
 using namespace testpp;
 
@@ -276,19 +275,4 @@ bool testpp::Run(const char* testName, const testpp::RunParams& params)
 ostream& testpp::GetStream()
 {
   return *s_stream;
-}
-
-//------------------------------------------------------------------------------
-static const char* s_order[] =
-{
-  "O(1)",
-  "O(log N)",
-  "O(N)",
-  "O(N log N)",
-  "O(N squared)",
-};
-
-const char* testpp::ComplexityProperty::Order(int o)
-{
-  return s_order[o];
 }
