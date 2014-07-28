@@ -44,19 +44,92 @@ namespace testpp
         return std::vector<T>();
       }
     };
+
+    template <typename T>
+    struct Arbitrary_Arithmetic_IntCast
+    {
+      static T generate(std::size_t generation = 0)
+      {
+        switch (generation)
+        {
+          case 0:
+            return 0;
+          case 1:
+            return std::numeric_limits<T>::min();
+          case 2:
+            return std::numeric_limits<T>::max();
+
+          default:
+          {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<int> dis(
+                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+            return static_cast<T>(dis(gen));
+          }
+        }
+      }
+
+      static T generate_n(std::size_t n)
+      {
+        return generate(n);
+      }
+
+      static std::vector<T> shrink(const T&)
+      {
+        return std::vector<T>();
+      }
+    };
+
+    template <typename T>
+    struct Arbitrary_Arithmetic_Real
+    {
+      static T generate(std::size_t generation = 0)
+      {
+        switch (generation)
+        {
+          case 0:
+            return 0;
+          case 1:
+            return std::numeric_limits<T>::min();
+          case 2:
+            return std::numeric_limits<T>::max();
+
+          default:
+          {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<T> dis(
+                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+            return dis(gen);
+          }
+        }
+      }
+
+      static T generate_n(std::size_t n)
+      {
+        return generate(n);
+      }
+
+      static std::vector<T> shrink(const T&)
+      {
+        return std::vector<T>();
+      }
+    };
+
   }
 
   //------------------------------------------------------------------------------
   // specializations for arithmetic types
   //------------------------------------------------------------------------------
   template <>
-  struct Arbitrary<signed char> : public Arbitrary_Arithmetic<signed char> {};
+  struct Arbitrary<signed char> : public Arbitrary_Arithmetic_IntCast<signed char> {};
 
   template <>
-  struct Arbitrary<unsigned char> : public Arbitrary_Arithmetic<unsigned char> {};
+  struct Arbitrary<unsigned char> : public Arbitrary_Arithmetic_IntCast<unsigned char> {};
 
   template <>
-  struct Arbitrary<wchar_t> : public Arbitrary_Arithmetic<wchar_t> {};
+  struct Arbitrary<wchar_t> : public Arbitrary_Arithmetic_IntCast<wchar_t> {};
 
   template <>
   struct Arbitrary<char16_t> : public Arbitrary_Arithmetic<char16_t> {};
@@ -89,13 +162,13 @@ namespace testpp
   struct Arbitrary<unsigned long long> : public Arbitrary_Arithmetic<unsigned long long> {};
 
   template <>
-  struct Arbitrary<float> : public Arbitrary_Arithmetic<float> {};
+  struct Arbitrary<float> : public Arbitrary_Arithmetic_Real<float> {};
 
   template <>
-  struct Arbitrary<double> : public Arbitrary_Arithmetic<double> {};
+  struct Arbitrary<double> : public Arbitrary_Arithmetic_Real<double> {};
 
   template <>
-  struct Arbitrary<long double> : public Arbitrary_Arithmetic<long double> {};
+  struct Arbitrary<long double> : public Arbitrary_Arithmetic_Real<long double> {};
 
   //------------------------------------------------------------------------------
   // specialization for bool
@@ -106,6 +179,11 @@ namespace testpp
     static bool generate(std::size_t generation = 0)
     {
       return (generation & 1) == 0;
+    }
+
+    static bool generate_n(std::size_t n)
+    {
+      return generate(n);
     }
 
     static std::vector<bool> shrink(const bool&)
@@ -120,12 +198,17 @@ namespace testpp
   template <>
   struct Arbitrary<char>
   {
-    static char generate(std::size_t generation = 0)
+    static char generate(std::size_t = 0)
     {
       std::random_device rd;
       std::mt19937 gen(rd());
-      std::uniform_int_distribution<char> dis(32, 126);
-      return dis(gen);
+      std::uniform_int_distribution<int> dis(32, 126);
+      return static_cast<char>(dis(gen));
+    }
+
+    static char generate_n(std::size_t n)
+    {
+      return generate(n);
     }
 
     static std::vector<char> shrink(const char&)

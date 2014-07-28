@@ -44,16 +44,16 @@ namespace testpp
       delete m_internal;
     }
 
-    int check(std::size_t N = 100, bool quiet = true, int expected_order = ORDER_N)
+    int check(std::size_t N = 100)
     {
-      return m_internal->check(N, quiet, expected_order);
+      return m_internal->check(N);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual int check(std::size_t N, bool quiet, int expected_order) = 0;
+      virtual int check(std::size_t N) = 0;
     };
 
     template <typename U>
@@ -66,7 +66,7 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual int check(std::size_t N, bool quiet, int expected_order)
+      virtual int check(std::size_t N)
       {
         // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
         unsigned long long countsN[NUM_ITER];
@@ -119,7 +119,7 @@ namespace testpp
     virtual bool Run()                                                  \
     {                                                                   \
       testpp::ComplexityProperty p(*this);                              \
-      int order = p.check(m_numChecks, m_quiet, testpp::ORDER);         \
+      int order = p.check(m_numChecks);                                 \
       bool success = (order <= testpp::ORDER);                          \
       if (!m_quiet || !success)                                         \
       {                                                                 \
