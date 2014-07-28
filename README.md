@@ -97,4 +97,4 @@ DECLARE_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
 ```
 
 If the test comes in *under* the expected complexity, it will be considered a
-pass, but the anomaly will be reported.
+pass. Complexity results will be reported in verbose output.
