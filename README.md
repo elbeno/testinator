@@ -49,14 +49,35 @@ that you've defined, you may need to tell TestPP how to generate it. To do this,
 specialize the `Arbitrary` template. Examples are in `arbitrary_*.h`. The output
 operator, `operator<<`, should also be available for your type.
 
-`Arbitrary` supplies two functions: `generate` which returns a single value, and
-`shrink` which takes a value, and returns a vector of values based on it. If
-TestPP finds that a property fails to hold for a given value, it will call
-`shrink` in an attempt to find the smallest test case that breaks the property.
+`Arbitrary` supplies three functions:
 
-For types that don't make sense to shrink, `shrink` should return an empty
-vector. It should also return an empty vector if the argument has been shrunk
-enough.
+* `generate` which returns a single value according to a loose notion of
+  "generation", allowing you to alter the "size" of the generated value
+
+* `generate_n`, which is similar, but with a stricter definition of size -- see
+  [Complexity](#complexity) below
+
+* `shrink` which takes a value, and returns a vector of values based on it. For
+  types that don't make sense to shrink, `shrink` should return an empty vector.
+  It should also return an empty vector if the argument has been shrunk enough.
+
+Both `generate` and `generate_n` take an argument that can be used to seed an
+RNG. On failure, the failing seed will be reported so that you can reproduce the
+test.
+
+If TestPP finds that a property fails to hold for a given value, it will call
+`shrink` in an attempt to find the smallest test case that breaks the property.
+For example, a test on a string that breaks if 'A' is present may produce:
+
+```
+BrokenStringProperty: Failed: ~+9Sbh~"D q`A%:-\_+G (seed=1419143051)
+Failed: q`A%:-\_+G
+Failed: q`A%:
+Failed: A%:
+Failed: A
+100 checks, 5 failures.
+FAIL: Property::BrokenStringProperty
+```
 
 Examples of usage can be found in `property.cpp`.
 
@@ -96,5 +117,8 @@ DECLARE_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
 }
 ```
 
-If the test comes in *under* the expected complexity, it will be considered a
-pass. Complexity results will be reported in verbose output.
+Generating values for use in complexity properties will call `generate_n` on the
+`Arbitrary<>` class.
+
+If the complexity test comes in *under* the expected complexity, it will be
+considered a pass. Complexity results will be reported in verbose output.

@@ -151,6 +151,8 @@ ostream& TestRegistry::RunTest(
     testpp::Results& results, const testpp::RunParams& params, ostream& stream)
 {
   TestMap::iterator i = m_tests.find(testName);
+  if (i == m_tests.end())
+    return stream;
 
   TestMap localMap;
   localMap.insert(make_pair(testName, i->second));

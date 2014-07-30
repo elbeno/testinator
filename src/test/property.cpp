@@ -82,3 +82,33 @@ DECLARE_PROPERTY(ConstChar, Property, const char)
 {
   return true;
 }
+
+//------------------------------------------------------------------------------
+// A user-defined type can also be used to produce a bounded type
+
+struct MyBoundedType
+{
+  static const int MAX_VAL = 10;
+  MyBoundedType(int v) : m_val(v) {}
+  int m_val;
+};
+
+ostream& operator<<(ostream& s, const MyBoundedType& m)
+{
+  return s << m.m_val;
+}
+
+template <>
+struct testpp::Arbitrary<MyBoundedType>
+{
+  static MyBoundedType generate(std::size_t generation, unsigned long int /*randomSeed*/)
+  { return MyBoundedType(generation % MyBoundedType::MAX_VAL); }
+
+  static vector<MyBoundedType> shrink(const MyBoundedType&)
+  { return vector<MyBoundedType>(); }
+};
+
+DECLARE_PROPERTY(Bounded, Property, const MyBoundedType& m)
+{
+  return m.m_val < MyBoundedType::MAX_VAL;
+}
