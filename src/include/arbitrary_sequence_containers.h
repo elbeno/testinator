@@ -18,22 +18,22 @@ namespace testpp
       static const std::size_t N = 10;
       typedef typename C::value_type V;
 
-      static C generate(std::size_t generation = 0)
+      static C generate(std::size_t generation, unsigned long int randomSeed)
       {
         C v;
         std::size_t n = N * ((generation / 100) + 1);
         std::generate_n(
             std::back_inserter(v), n,
-            [&] () { return Arbitrary<V>::generate(generation++); });
+            [&] () { return Arbitrary<V>::generate(generation++, randomSeed++); });
         return v;
       }
 
-      static C generate_n(std::size_t n)
+      static C generate_n(std::size_t n, unsigned long int randomSeed)
       {
         C v;
         std::generate_n(
             std::back_inserter(v), n,
-            [&] () { return Arbitrary<V>::generate(n); });
+            [&] () { return Arbitrary<V>::generate_n(n, randomSeed++); });
         return v;
       }
 
@@ -69,20 +69,20 @@ namespace testpp
   {
     static const std::size_t N = 10;
 
-    static std::list<T> generate(std::size_t generation = 0)
+    static std::list<T> generate(std::size_t generation, unsigned long int randomSeed)
     {
       std::list<T> v;
       std::size_t n = N * ((generation / 100) + 1);
       std::generate_n(std::back_inserter(v), n,
-                      [&] () { return Arbitrary<T>::generate(generation++); });
+                      [&] () { return Arbitrary<T>::generate(generation++, randomSeed++); });
       return v;
     }
 
-    static std::list<T> generate_n(std::size_t n)
+    static std::list<T> generate_n(std::size_t n, unsigned long int randomSeed)
     {
       std::list<T> v;
       std::generate_n(std::back_inserter(v), n,
-                      [&] () { return Arbitrary<T>::generate(n); });
+                      [&] () { return Arbitrary<T>::generate_n(n, randomSeed++); });
       return v;
     }
 
@@ -109,20 +109,20 @@ namespace testpp
   {
     static const std::size_t N = 10;
 
-    static std::forward_list<T> generate(std::size_t generation = 0)
+    static std::forward_list<T> generate(std::size_t generation, unsigned long int randomSeed)
     {
       std::forward_list<T> v;
       std::size_t n = N * ((generation / 100) + 1);
       std::generate_n(std::front_inserter(v), n,
-                      [&] () { return Arbitrary<T>::generate(generation++); });
+                      [&] () { return Arbitrary<T>::generate(generation++, randomSeed++); });
       return v;
     }
 
-    static std::forward_list<T> generate_n(std::size_t n)
+    static std::forward_list<T> generate_n(std::size_t n, unsigned long int randomSeed)
     {
       std::forward_list<T> v;
       std::generate_n(std::front_inserter(v), n,
-                      [&] () { return Arbitrary<T>::generate(n); });
+                      [&] () { return Arbitrary<T>::generate_n(n, randomSeed++); });
       return v;
     }
 

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iostream>
 #include <numeric>
+#include <random>
 
 namespace testpp
 {
@@ -44,16 +45,16 @@ namespace testpp
       delete m_internal;
     }
 
-    int check(std::size_t N = 100)
+    int check(std::size_t N, unsigned long int randomSeed)
     {
-      return m_internal->check(N);
+      return m_internal->check(N, randomSeed);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual int check(std::size_t N) = 0;
+      virtual int check(std::size_t N, unsigned long int randomSeed) = 0;
     };
 
     template <typename U>
@@ -66,23 +67,24 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual int check(std::size_t N)
+      virtual int check(std::size_t N, unsigned long int randomSeed)
       {
         // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
         unsigned long long countsN[NUM_ITER];
         unsigned long long countsMultN[NUM_ITER];
         for (std::size_t i = 0; i < NUM_ITER; ++i)
         {
-          countsN[i] = checkInternal(N, N);
-          countsMultN[i] = checkInternal(N, N * MULTIPLIER);
+          countsN[i] = checkInternal(N, N, randomSeed);
+          countsMultN[i] = checkInternal(N, N * MULTIPLIER, randomSeed);
         }
 
         return CalculateOrder(countsN, countsMultN, NUM_ITER, N, MULTIPLIER);
       }
 
-      unsigned long long checkInternal(std::size_t num, std::size_t N)
+      unsigned long long checkInternal(
+          std::size_t num, std::size_t N, unsigned long int randomSeed)
       {
-        paramType p = Arbitrary<paramType>::generate_n(N);
+        paramType p = Arbitrary<paramType>::generate_n(N, randomSeed);
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < num; ++i)
         {
@@ -114,12 +116,18 @@ namespace testpp
     {                                                                   \
       m_numChecks = params.m_numPropertyChecks;                         \
       m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;          \
+      m_randomSeed = params.m_randomSeed;                               \
+      if (m_randomSeed == 0)                                            \
+      {                                                                 \
+        std::random_device rd;                                          \
+        m_randomSeed = rd();                                            \
+      }                                                                 \
       return true;                                                      \
     }                                                                   \
     virtual bool Run()                                                  \
     {                                                                   \
       testpp::ComplexityProperty p(*this);                              \
-      int order = p.check(m_numChecks);                                 \
+      int order = p.check(m_numChecks, m_randomSeed);                   \
       bool success = (order <= testpp::ORDER);                          \
       if (!m_quiet || !success)                                         \
       {                                                                 \
@@ -127,12 +135,14 @@ namespace testpp
         std::cout << "expected "                                        \
                   << testpp::ComplexityProperty::Order(testpp::ORDER)   \
                   << ", actually "                                      \
-                  << testpp::ComplexityProperty::Order(order) << std::endl; \
+                  << testpp::ComplexityProperty::Order(order);          \
+        std::cout << " (seed=" << m_randomSeed << ")" << std::endl;     \
       }                                                                 \
       return success;                                                   \
     }                                                                   \
     void operator()(ARG) const;                                         \
     size_t m_numChecks;                                                 \
     bool m_quiet;                                                       \
+    unsigned long int m_randomSeed;                                     \
   } s_##SUITE##NAME##_ComplexityProperty;                               \
   void SUITE##NAME##ComplexityProperty::operator()(ARG) const

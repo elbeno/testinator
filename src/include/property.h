@@ -22,16 +22,16 @@ namespace testpp
       delete m_internal;
     }
 
-    bool check(std::size_t N = 100, bool quiet = true)
+    bool check(std::size_t N, bool quiet, unsigned long int randomSeed)
     {
-      return m_internal->check(N, quiet);
+      return m_internal->check(N, quiet, randomSeed);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual bool check(std::size_t N, bool quiet) = 0;
+      virtual bool check(std::size_t N, bool quiet, unsigned long int randomSeed) = 0;
     };
 
     template <typename U>
@@ -44,13 +44,22 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual bool check(std::size_t N, bool quiet)
+      virtual bool check(std::size_t N, bool quiet, unsigned long int randomSeed)
       {
         m_failedResults.clear();
-        checkInternal(N);
-        std::for_each(m_failedResults.begin(), m_failedResults.end(), [&] (const paramType& p) {
-            std::cout << "Failed: " << p << std::endl;
-          });
+        m_failedSeeds.clear();
+
+        checkInternal(N, randomSeed);
+
+        for (size_t i = 0; i < m_failedResults.size(); ++i)
+        {
+          std::cout << "Failed: " << m_failedResults[i];
+          if (i < m_failedSeeds.size())
+          {
+            std::cout << " (seed=" << m_failedSeeds[i] << ")";
+          }
+          std::cout << std::endl;
+        }
 
         if (!m_failedResults.empty())
           std::cout << N << " checks, " << m_failedResults.size() << " failures." << std::endl;
@@ -60,13 +69,20 @@ namespace testpp
         return (m_failedResults.empty());
       }
 
-      void checkInternal(std::size_t N)
+      void checkInternal(std::size_t N, unsigned long int randomSeed)
       {
         for (std::size_t i = 0; i < N; ++i)
         {
-          paramType p = Arbitrary<paramType>::generate(N);
+          unsigned long int seed = randomSeed;
+          if (seed == 0)
+          {
+            std::random_device rd;
+            seed = rd();
+          }
+          paramType p = Arbitrary<paramType>::generate(N, seed);
           if (!checkSingle(p))
           {
+            m_failedSeeds.push_back(seed);
             return;
           }
         }
@@ -96,6 +112,7 @@ namespace testpp
 
       U m_u;
       std::vector<paramType> m_failedResults;
+      std::vector<unsigned long int> m_failedSeeds;
     };
 
     InternalBase* m_internal;
@@ -118,6 +135,7 @@ namespace testpp
     {                                                      \
       m_numChecks = params.m_numPropertyChecks;            \
       m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;  \
+      m_randomSeed = params.m_randomSeed;                  \
       return true;                                         \
     }                                                      \
     virtual bool Run()                                     \
@@ -125,10 +143,11 @@ namespace testpp
       testpp::Property p(*this);                           \
       if (!m_quiet)                                        \
         std::cout << m_name << ": ";                       \
-      return p.check(m_numChecks, m_quiet);                \
+      return p.check(m_numChecks, m_quiet, m_randomSeed);  \
     }                                                      \
     bool operator()(ARG) const;                            \
     size_t m_numChecks;                                    \
     bool m_quiet;                                          \
+    unsigned long int m_randomSeed;                        \
   } s_##SUITE##NAME##_Property;                            \
   bool SUITE##NAME##Property::operator()(ARG) const

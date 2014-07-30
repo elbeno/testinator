@@ -20,22 +20,22 @@ namespace testpp
       static const std::size_t N = 10;
       typedef typename C::value_type V;
 
-      static C generate(std::size_t generation = 0)
+      static C generate(std::size_t generation, unsigned long int randomSeed)
       {
         C v;
         std::size_t n = N * ((generation / 100) + 1);
         std::generate_n(
             std::inserter(v, v.begin()), n,
-            [&] () { return Arbitrary<V>::generate(generation++); });
+            [&] () { return Arbitrary<V>::generate(generation++, randomSeed++); });
         return v;
       }
 
-      static C generate_n(std::size_t n)
+      static C generate_n(std::size_t n, unsigned long int randomSeed)
       {
         C v;
         std::generate_n(
             std::inserter(v, v.begin()), n,
-            [&] () { return Arbitrary<V>::generate(n); });
+            [&] () { return Arbitrary<V>::generate_n(n, randomSeed++); });
         return v;
       }
 
@@ -73,11 +73,18 @@ namespace testpp
   template <typename T1, typename T2>
   struct Arbitrary<std::pair<T1, T2>>
   {
-    static std::pair<T1, T2> generate(std::size_t generation = 0)
+    static std::pair<T1, T2> generate(std::size_t generation, unsigned long int randomSeed)
     {
       return std::pair<T1, T2>(
-          Arbitrary<T1>::generate(generation),
-          Arbitrary<T2>::generate(generation));
+          Arbitrary<T1>::generate(generation, randomSeed),
+          Arbitrary<T2>::generate(generation, randomSeed));
+    }
+
+    static std::pair<T1, T2> generate_n(std::size_t n, unsigned long int randomSeed)
+    {
+      return std::pair<T1, T2>(
+          Arbitrary<T1>::generate_n(n, randomSeed),
+          Arbitrary<T2>::generate_n(n, randomSeed));
     }
 
     static std::vector<std::pair<T1, T2>> shrink(const std::pair<T1, T2>& t)

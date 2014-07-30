@@ -14,7 +14,7 @@ DECLARE_TEST(Functor, Property)
 {
   TestFunctor f;
   testpp::Property p(f);
-  return p.check();
+  return p.check(0, true, 0);
 }
 
 //------------------------------------------------------------------------------

@@ -12,17 +12,20 @@ namespace testpp
     // Generates an instance of a T. The generation parameter in some way
     // controls the "complexity" of T, if applicable, for instance, a higher
     // generation implies a larger container in some way.
-    static T generate(std::size_t generation) { return T(); }
+    static T generate(std::size_t /*generation*/, unsigned long int /*randomSeed*/)
+    { return T(); }
 
     // Generates an instance of a T of EXACT complexity n for use in complexity
     // properties. For instance, a string of length n. This is used mostly for
     // container types.
-    static T generate_n(std::size_t n) { return T(); }
+    static T generate_n(std::size_t /*n*/, unsigned long int /*randomSeed*/)
+    { return T(); }
 
     // Given a T, tries to shrink it, generating a vector of Ts derived from it.
     // Higher precedence items (more aggressively shrunk) should be near the
     // front of the vector.
-    static std::vector<T> shrink(const T& t) { return std::vector<T>(); }
+    static std::vector<T> shrink(const T& /*t*/)
+    { return std::vector<T>(); }
   };
 
   template <typename T>

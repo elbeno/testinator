@@ -12,7 +12,7 @@ namespace testpp
     template <typename T>
     struct Arbitrary_Arithmetic
     {
-      static T generate(std::size_t generation = 0)
+      static T generate(std::size_t generation, unsigned long int randomSeed)
       {
         switch (generation)
         {
@@ -25,8 +25,7 @@ namespace testpp
 
           default:
           {
-            std::random_device rd;
-            std::mt19937 gen(rd());
+            std::mt19937 gen(randomSeed);
             std::uniform_int_distribution<T> dis(
                 std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return dis(gen);
@@ -34,9 +33,9 @@ namespace testpp
         }
       }
 
-      static T generate_n(std::size_t n)
+      static T generate_n(std::size_t n, unsigned long int randomSeed)
       {
-        return generate(n);
+        return generate(n, randomSeed);
       }
 
       static std::vector<T> shrink(const T&)
@@ -48,7 +47,7 @@ namespace testpp
     template <typename T>
     struct Arbitrary_Arithmetic_IntCast
     {
-      static T generate(std::size_t generation = 0)
+      static T generate(std::size_t generation, unsigned long int randomSeed)
       {
         switch (generation)
         {
@@ -61,8 +60,7 @@ namespace testpp
 
           default:
           {
-            std::random_device rd;
-            std::mt19937 gen(rd());
+            std::mt19937 gen(randomSeed);
             std::uniform_int_distribution<int> dis(
                 std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return static_cast<T>(dis(gen));
@@ -70,9 +68,9 @@ namespace testpp
         }
       }
 
-      static T generate_n(std::size_t n)
+      static T generate_n(std::size_t n, unsigned long int randomSeed)
       {
-        return generate(n);
+        return generate(n, randomSeed);
       }
 
       static std::vector<T> shrink(const T&)
@@ -84,7 +82,7 @@ namespace testpp
     template <typename T>
     struct Arbitrary_Arithmetic_Real
     {
-      static T generate(std::size_t generation = 0)
+      static T generate(std::size_t generation, unsigned long int randomSeed)
       {
         switch (generation)
         {
@@ -97,8 +95,7 @@ namespace testpp
 
           default:
           {
-            std::random_device rd;
-            std::mt19937 gen(rd());
+            std::mt19937 gen(randomSeed);
             std::uniform_real_distribution<T> dis(
                 std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return dis(gen);
@@ -106,9 +103,9 @@ namespace testpp
         }
       }
 
-      static T generate_n(std::size_t n)
+      static T generate_n(std::size_t n, unsigned long int randomSeed)
       {
-        return generate(n);
+        return generate(n, randomSeed);
       }
 
       static std::vector<T> shrink(const T&)
@@ -176,14 +173,14 @@ namespace testpp
   template <>
   struct Arbitrary<bool>
   {
-    static bool generate(std::size_t generation = 0)
+    static bool generate(std::size_t generation, unsigned long int)
     {
       return (generation & 1) == 0;
     }
 
-    static bool generate_n(std::size_t n)
+    static bool generate_n(std::size_t n, unsigned long int randomSeed)
     {
-      return generate(n);
+      return generate(n, randomSeed);
     }
 
     static std::vector<bool> shrink(const bool&)
@@ -198,17 +195,16 @@ namespace testpp
   template <>
   struct Arbitrary<char>
   {
-    static char generate(std::size_t = 0)
+    static char generate(std::size_t, unsigned long int randomSeed)
     {
-      std::random_device rd;
-      std::mt19937 gen(rd());
+      std::mt19937 gen(randomSeed);
       std::uniform_int_distribution<int> dis(32, 126);
       return static_cast<char>(dis(gen));
     }
 
-    static char generate_n(std::size_t n)
+    static char generate_n(std::size_t n, unsigned long int randomSeed)
     {
-      return generate(n);
+      return generate(n, randomSeed);
     }
 
     static std::vector<char> shrink(const char&)

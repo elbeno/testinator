@@ -419,7 +419,18 @@ int main(int argc, char* argv[])
       string option = "--numChecks=";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_numPropertyChecks = atoi(s.substr(option.size()).c_str());
+        char* end;
+        p.m_numPropertyChecks = strtoul(s.substr(option.size()).c_str(), &end, 10);
+        continue;
+      }
+    }
+
+    {
+      string option = "--seed=";
+      if (s.compare(0, option.size(), option) == 0)
+      {
+        char* end;
+        p.m_randomSeed = strtoul(s.substr(option.size()).c_str(), &end, 10);
         continue;
       }
     }

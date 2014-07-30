@@ -23,9 +23,14 @@ namespace testpp
   //------------------------------------------------------------------------------
   struct RunParams
   {
-    RunParams() : m_flags(COLOR | QUIET_SUCCESS), m_numPropertyChecks(100) {}
+    RunParams()
+      : m_flags(COLOR | QUIET_SUCCESS)
+      , m_numPropertyChecks(100)
+      , m_randomSeed(0)
+    {}
     unsigned int m_flags;
     size_t m_numPropertyChecks;
+    unsigned long m_randomSeed;
   };
 
   //------------------------------------------------------------------------------
