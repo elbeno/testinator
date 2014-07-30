@@ -19,6 +19,9 @@ DECLARE_TEST(TestName, SuiteName)
 }
 ```
 
+You can use the macros `EXPECT` and `EXPECT_NOT` (from `test_macros.h`) to test
+conditions in a way that will output the condition on failure.
+
 ## Properties
 
 TestPP is different from most C++ unit testing frameworks because it also
@@ -46,10 +49,11 @@ generate arbitrary values of this type and feed them to your property checker.
 
 TestPP knows how to generate values of standard types, but if you have a type
 that you've defined, you may need to tell TestPP how to generate it. To do this,
-specialize the `Arbitrary` template. Examples are in `arbitrary_*.h`. The output
-operator, `operator<<`, should also be available for your type.
+specialize the `Arbitrary` template. Examples are in `arbitrary_*.h` and
+`property.cpp`. The output operator, `operator<<`, should also be available for
+your type.
 
-`Arbitrary` supplies three functions:
+`Arbitrary` supplies three static functions:
 
 * `generate` which returns a single value according to a loose notion of
   "generation", allowing you to alter the "size" of the generated value
@@ -118,7 +122,7 @@ DECLARE_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
 ```
 
 Generating values for use in complexity properties will call `generate_n` on the
-`Arbitrary<>` class.
+`Arbitrary` class.
 
 If the complexity test comes in *under* the expected complexity, it will be
 considered a pass. Complexity results will be reported in verbose output.
