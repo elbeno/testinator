@@ -43,8 +43,9 @@ namespace testpp
   //------------------------------------------------------------------------------
   void RunAllTests(Results& results, const RunParams& params = RunParams());
   void RunSuite(const char* suiteName, Results& results, const RunParams& params = RunParams());
+  void RunTest(const char* testName, Results& results, const RunParams& params = RunParams());
 
-  bool Run(const char* testName, const testpp::RunParams& params = RunParams());
+  bool Run(const char* testName, const RunParams& params = RunParams());
 
   std::ostream& GetStream();
 

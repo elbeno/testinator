@@ -35,6 +35,10 @@ namespace
         const char* suiteName,
         testpp::Results& results, const testpp::RunParams& params, ostream& stream);
 
+    ostream& RunTest(
+        const char* testName,
+        testpp::Results& results, const testpp::RunParams& params, ostream& stream);
+
     bool RunTest(Test* test, const testpp::RunParams& params);
     bool RunTest(const char* testName, const testpp::RunParams& params);
 
@@ -135,6 +139,21 @@ ostream& TestRegistry::RunSuite(
   {
     localMap.insert(make_pair(m_testNames[i->second], i->second));
   }
+
+  RunTests(localMap, results, params, stream);
+
+  return stream;
+}
+
+//------------------------------------------------------------------------------
+ostream& TestRegistry::RunTest(
+    const char* testName,
+    testpp::Results& results, const testpp::RunParams& params, ostream& stream)
+{
+  TestMap::iterator i = m_tests.find(testName);
+
+  TestMap localMap;
+  localMap.insert(make_pair(testName, i->second));
 
   RunTests(localMap, results, params, stream);
 
@@ -255,6 +274,13 @@ void testpp::RunSuite(
     const char* suite, testpp::Results& results, const testpp::RunParams& params)
 {
   GetTestRegistry().RunSuite(suite, results, params, cout);
+}
+
+//------------------------------------------------------------------------------
+void testpp::RunTest(
+    const char* test, testpp::Results& results, const testpp::RunParams& params)
+{
+  GetTestRegistry().RunTest(test, results, params, cout);
 }
 
 //------------------------------------------------------------------------------

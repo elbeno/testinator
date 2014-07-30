@@ -399,12 +399,22 @@ DECLARE_PROPERTY(NumChecks, Property, int)
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  string testName;
   string suiteName;
   testpp::RunParams p;
 
   for (int i = 1; i < argc; ++i)
   {
     string s = argv[i];
+
+    {
+      string option = "--testName=";
+      if (s.compare(0, option.size(), option) == 0)
+      {
+        testName = s.substr(option.size());
+        continue;
+      }
+    }
 
     {
       string option = "--suiteName=";
@@ -472,10 +482,12 @@ int main(int argc, char* argv[])
 
   testpp::Results r;
 
-  if (suiteName.empty())
-    testpp::RunAllTests(r, p);
-  else
+  if (!testName.empty())
+    testpp::RunTest(testName.c_str(), r, p);
+  else if (!suiteName.empty())
     testpp::RunSuite(suiteName.c_str(), r, p);
+  else
+    testpp::RunAllTests(r, p);
 
   cout << r.m_numPassed << "/" << r.m_numPassed + r.m_numFailed
        << " tests passed." << endl;
