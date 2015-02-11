@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-DECLARE_COMPLEXITY_PROPERTY(O_1, Complexity, const string& s, ORDER_1)
+DECLARE_COMPLEXITY_PROPERTY(O_1, Complexity, const string&, ORDER_1)
 {
 }
 

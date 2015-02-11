@@ -22,7 +22,7 @@ const char* testpp::ComplexityProperty::Order(int o)
 }
 
 int testpp::ComplexityProperty::CalculateOrder(
-    unsigned long long* countsN, unsigned long long* countsMultN, size_t size,
+    long long* countsN, long long* countsMultN, size_t size,
     size_t N, size_t k)
 {
   // sort the timings

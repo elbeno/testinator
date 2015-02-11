@@ -47,11 +47,12 @@ namespace testpp
         }
         auto t2 = std::chrono::high_resolution_clock::now();
         auto nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count();
+        auto n = decltype(nanos)(N);
 
         if (!quiet)
         {
-          std::cout << N << " tests run in " << nanos << "ns ("
-                    << (nanos/N) << " ns per test)." << std::endl;
+          std::cout << n << " tests run in " << nanos << "ns ("
+                    << (nanos/n) << " ns per test)." << std::endl;
         }
       }
 

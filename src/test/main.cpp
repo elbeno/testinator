@@ -1,11 +1,5 @@
-#include <test_extended.h>
+#include <test.h>
 #include <property.h>
-
-#include <cstdlib>
-#include <iostream>
-#include <map>
-#include <string>
-#include <sstream>
 
 using namespace std;
 
@@ -19,12 +13,13 @@ namespace
 class TestCallTest : public testpp::Test
 {
 public:
-  TestCallTest(const char* name) : testpp::Test(name, s_suiteName) {}
+  TestCallTest(const string& name) : testpp::Test(name, s_suiteName) {}
 
   virtual bool Run()
   {
     testpp::Test myTest("call_test");
-    return testpp::Run("call_test");
+    testpp::Results rs = testpp::RunTest("call_test");
+    return !rs.empty() && rs.front().m_success;
   }
 };
 
@@ -32,12 +27,12 @@ public:
 class TestSetupFirst : public testpp::Test
 {
 public:
-  TestSetupFirst(const char* name)
+  TestSetupFirst(const string& name)
     : testpp::Test(name, s_suiteName)
     , m_setupCalled(false)
   {}
 
-  virtual bool Setup(const testpp::RunParams& params)
+  virtual bool Setup(const testpp::RunParams&)
   {
     m_setupCalled = true;
     return true;
@@ -56,7 +51,7 @@ private:
 class TestTeardownAfterwardsInternal : public testpp::Test
 {
 public:
-  TestTeardownAfterwardsInternal(const char* name, bool forceFail = false)
+  TestTeardownAfterwardsInternal(const string& name, bool forceFail = false)
     : testpp::Test(name)
     , m_runCalled(false)
     , m_teardownCalled(false)
@@ -83,14 +78,14 @@ public:
 class TestTeardownAfterwards : public testpp::Test
 {
 public:
-  TestTeardownAfterwards(const char* name)
+  TestTeardownAfterwards(const string& name)
     : testpp::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     TestTeardownAfterwardsInternal myTest("teardown_test");
-    testpp::Run("teardown_test");
+    testpp::RunTest("teardown_test");
     return myTest.m_teardownCalled;
   }
 };
@@ -99,14 +94,14 @@ public:
 class TestTeardownAfterFail : public testpp::Test
 {
 public:
-  TestTeardownAfterFail(const char* name)
+  TestTeardownAfterFail(const string& name)
     : testpp::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     TestTeardownAfterwardsInternal myTest("teardown_test", true);
-    testpp::Run("teardown_test");
+    testpp::RunTest("teardown_test");
     return myTest.m_teardownCalled;
   }
 };
@@ -115,7 +110,7 @@ public:
 class TestRunMultipleInternal : public testpp::Test
 {
 public:
-  TestRunMultipleInternal(const char* name)
+  TestRunMultipleInternal(const string& name)
     : testpp::Test(name)
     , m_runCalled(false)
   {}
@@ -133,7 +128,7 @@ public:
 class TestRunMultiple : public testpp::Test
 {
 public:
-  TestRunMultiple(const char* name)
+  TestRunMultiple(const string& name)
     : testpp::Test(name, s_suiteName)
   {}
 
@@ -141,12 +136,7 @@ public:
   {
     TestRunMultipleInternal test0("test0");
     TestRunMultipleInternal test1("test1");
-
-    testpp::RunParams p;
-    p.m_flags = testpp::QUIET_SUCCESS;
-    testpp::Results r;
-    testpp::RunAllTests(r, p);
-
+    testpp::Results rs = testpp::RunAllTests();
     return test0.m_runCalled && test1.m_runCalled;
   }
 };
@@ -155,7 +145,7 @@ public:
 class TestReportResultsInternal : public testpp::Test
 {
 public:
-  TestReportResultsInternal(const char* name, bool fail)
+  TestReportResultsInternal(const string& name, bool fail)
     : testpp::Test(name)
     , m_fail(fail)
   {}
@@ -172,7 +162,7 @@ public:
 class TestReportResults : public testpp::Test
 {
 public:
-  TestReportResults(const char* name)
+  TestReportResults(const string& name)
     : testpp::Test(name, s_suiteName)
   {}
 
@@ -180,57 +170,13 @@ public:
   {
     TestReportResultsInternal test0("expected_fail", true);
     TestReportResultsInternal test1("expected_pass", false);
+    testpp::Results rs = testpp::RunAllTests();
 
-    testpp::RunParams p;
-    p.m_flags = testpp::QUIET_SUCCESS;
-    testpp::Results r;
-    testpp::RunAllTests(r, p);
-
-    return r.m_numPassed == 1 && r.m_numFailed == 1;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestOutputToStream : public testpp::Test
-{
-public:
-  TestOutputToStream(const char* name)
-    : testpp::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    ostringstream oss;
-    testpp::Test myTest("call_test");
-    testpp::RunParams p;
-    p.m_flags = testpp::NONE;
-    testpp::Results r;
-    testpp::RunAllTests(r, p, oss);
-
-    static string expected = "PASS: ::call_test\n";
-    return oss.str() == expected;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestColorOutput : public testpp::Test
-{
-public:
-  TestColorOutput(const char* name)
-    : testpp::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    ostringstream oss;
-    testpp::Test myTest("call_test");
-    testpp::RunParams p;
-    p.m_flags = testpp::COLOR;
-    testpp::Results r;
-    testpp::RunAllTests(r, p, oss);
-
-    static string expected = "\033[32;1mPASS\033[0m: ::call_test\n";
-    return oss.str() == expected;
+    auto numPassed = count_if(rs.begin(), rs.end(),
+                              [] (const testpp::Result& r) { return r.m_success; });
+    auto total = decltype(numPassed)(rs.size());
+    auto numFailed = total - numPassed;
+    return numPassed == 1 && numFailed == 1;
   }
 };
 
@@ -238,7 +184,7 @@ public:
 class TestRunSuite : public testpp::Test
 {
 public:
-  TestRunSuite(const char* name)
+  TestRunSuite(const string& name)
     : testpp::Test(name, s_suiteName)
   {}
 
@@ -246,90 +192,12 @@ public:
   {
     testpp::Test myTest1("test1", "suite1");
     testpp::Test myTest2("test2", "suite2");
+    testpp::Results rs = testpp::RunSuite("suite1");
 
-    testpp::RunParams p;
-    p.m_flags = testpp::QUIET_SUCCESS;
-    testpp::Results r;
-    testpp::RunSuite("suite1", r, p);
 
-    return r.m_numPassed == 1;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestQuietSuccess : public testpp::Test
-{
-public:
-  TestQuietSuccess(const char* name)
-    : testpp::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    ostringstream oss;
-    testpp::Test myTest("call_test");
-    testpp::RunParams p;
-    p.m_flags = testpp::QUIET_SUCCESS;
-    testpp::Results r;
-    testpp::RunAllTests(r, p, oss);
-
-    static string expected = "";
-    return oss.str() == expected;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestAlphaOrder : public testpp::Test
-{
-public:
-  TestAlphaOrder(const char* name)
-    : testpp::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    ostringstream oss;
-    testpp::Test myTestA("A");
-    testpp::Test myTestB("B");
-    testpp::Test myTestC("C");
-    testpp::Test myTestD("D");
-    testpp::Test myTestE("E");
-    testpp::RunParams p;
-    p.m_flags = testpp::ALPHA_ORDER;
-    testpp::Results r;
-    testpp::RunAllTests(r, p, oss);
-
-    static string expected = "PASS: ::A\nPASS: ::B\nPASS: ::C\n"
-      "PASS: ::D\nPASS: ::E\n";
-    return oss.str() == expected;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestRandomOrder : public testpp::Test
-{
-public:
-  TestRandomOrder(const char* name)
-    : testpp::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    testpp::Test myTestA("A");
-    testpp::Test myTestB("B");
-    testpp::Test myTestC("C");
-    testpp::Test myTestD("D");
-    testpp::Test myTestE("E");
-    testpp::RunParams p;
-    p.m_flags = testpp::NONE;
-    testpp::Results r;
-
-    ostringstream oss1;
-    testpp::RunAllTests(r, p, oss1);
-    ostringstream oss2;
-    testpp::RunAllTests(r, p, oss2);
-
-    return oss1.str() != oss2.str();
+    auto numPassed = count_if(rs.begin(), rs.end(),
+                              [] (const testpp::Result& r) { return r.m_success; });
+    return numPassed == 1;
   }
 };
 
@@ -337,7 +205,7 @@ public:
 class TestCheckMacroInternal : public testpp::Test
 {
 public:
-  TestCheckMacroInternal(const char* name, bool fail)
+  TestCheckMacroInternal(const string& name, bool fail)
     : testpp::Test(name)
     , m_fail(fail)
   {}
@@ -345,7 +213,6 @@ public:
   virtual bool Run()
   {
     EXPECT_NOT(m_fail);
-    EXPECT(!m_fail);
     return true;
   }
 private:
@@ -356,7 +223,7 @@ private:
 class TestCheckMacro : public testpp::Test
 {
 public:
-  TestCheckMacro(const char* name)
+  TestCheckMacro(const string& name)
     : testpp::Test(name, s_suiteName)
   {}
 
@@ -364,18 +231,13 @@ public:
   {
     ostringstream oss;
     TestCheckMacroInternal myTestA("A", true);
-    TestCheckMacroInternal myTestB("B", false);
-    testpp::RunParams p;
-    p.m_flags = testpp::ALPHA_ORDER;
-    testpp::Results r;
-    testpp::RunAllTests(r, p, oss);
+    testpp::Results rs = testpp::RunAllTests();
 
     static string expected =
-      "EXPECT_NOT FAILED: build/debug/test/main.cpp:347 (m_fail)\n"
-      "EXPECT FAILED: build/debug/test/main.cpp:348 (!m_fail)\n"
-      "FAIL: ::A\n"
-      "PASS: ::B\n";
-    return oss.str() == expected;
+      "EXPECT_NOT FAILED: build/debug/test/main.cpp:215 (m_fail)";
+
+    return !rs.empty() && !rs.front().m_success
+      && rs.front().m_message == expected;
   }
 };
 
@@ -458,39 +320,36 @@ int main(int argc, char* argv[])
       string option = "--verbose";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_flags &= ~testpp::QUIET_SUCCESS;
+        p.m_flags &= ~(static_cast<unsigned int>(testpp::QUIET_SUCCESS));
         continue;
       }
     }
   }
 
   s_numPropertyChecks = p.m_numPropertyChecks;
-
   TestCallTest test0("TestCallTest");
   TestSetupFirst test1("TestSetupFirst");
   TestTeardownAfterwards test2("TestTeardownAfterwards");
   TestTeardownAfterFail test3("TestTeardownAfterFail");
   TestRunMultiple test4("TestRunMultiple");
   TestReportResults test5("TestReportResults");
-  TestOutputToStream test6("TestOutputToStream");
-  TestColorOutput test7("TestColorOutput");
-  TestRunSuite test8("TestRunSuite");
-  TestQuietSuccess test9("TestQuietSuccess");
-  TestAlphaOrder test10("TestAlphaOrder");
-  TestRandomOrder test11("TestRandomOrder");
-  TestCheckMacro test12("TestCheckMacro");
-
-  testpp::Results r;
+  TestRunSuite test6("TestRunSuite");
+  TestCheckMacro test7("TestCheckMacro");
+  testpp::Results rs;
 
   if (!testName.empty())
-    testpp::RunTest(testName.c_str(), r, p);
+    rs = testpp::RunTest(testName, p);
   else if (!suiteName.empty())
-    testpp::RunSuite(suiteName.c_str(), r, p);
+    rs = testpp::RunSuite(suiteName, p);
   else
-    testpp::RunAllTests(r, p);
+    rs = testpp::RunAllTests(p);
 
-  cout << r.m_numPassed << "/" << r.m_numPassed + r.m_numFailed
+  auto numPassed = count_if(rs.begin(), rs.end(),
+                            [] (const testpp::Result& r) { return r.m_success; });
+  auto total = decltype(numPassed)(rs.size());
+  cout << numPassed << "/" << total
        << " tests passed." << endl;
 
-  return r.m_numFailed;
+  auto numFailed = total - numPassed;
+  return numFailed;
 }

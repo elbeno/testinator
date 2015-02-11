@@ -1,6 +1,7 @@
 #pragma once
 
-#include <ostream>
+#include <string>
+#include <vector>
 
 namespace testpp
 {
@@ -34,40 +35,38 @@ namespace testpp
   };
 
   //------------------------------------------------------------------------------
-  struct Results
+  struct Result
   {
-    int m_numPassed;
-    int m_numFailed;
+    std::string m_suiteName;
+    std::string m_testName;
+    bool m_success;
+    std::string m_message;
   };
 
+  using Results = std::vector<Result>;
+
   //------------------------------------------------------------------------------
-  void RunAllTests(Results& results, const RunParams& params = RunParams());
-  void RunSuite(const char* suiteName, Results& results, const RunParams& params = RunParams());
-  void RunTest(const char* testName, Results& results, const RunParams& params = RunParams());
-
-  bool Run(const char* testName, const RunParams& params = RunParams());
-
-  std::ostream& GetStream();
+  Results RunAllTests(const RunParams& params = RunParams());
+  Results RunSuite(const std::string& suiteName, const RunParams& params = RunParams());
+  Results RunTest(const std::string& testName, const RunParams& params = RunParams());
 
   //------------------------------------------------------------------------------
   class Test
   {
   public:
-    Test(const char* name, const char* suite = "");
+    Test(const std::string& name, const std::string& suiteName = std::string());
     virtual ~Test();
 
-    virtual bool Setup(const testpp::RunParams&) { return true; }
+    virtual bool Setup(const RunParams&) { return true; }
     virtual void Teardown() {}
     virtual bool Run() { return true; }
 
-    virtual bool RunWrapper()
-    {
-      return Run() && m_success;
-    }
+    Result RunWrapper();
 
   protected:
     bool m_success;
     std::string m_name;
+    std::string m_message;
   };
 }
 

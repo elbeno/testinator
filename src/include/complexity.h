@@ -28,7 +28,7 @@ namespace testpp
     static const size_t NUM_ITER = 5;
 
     static int CalculateOrder(
-        unsigned long long* timesN, unsigned long long* timesMultN, size_t size,
+        long long* timesN, long long* timesMultN, size_t size,
         size_t N, size_t k);
 
   public:
@@ -70,8 +70,8 @@ namespace testpp
       virtual int check(std::size_t N, unsigned long int randomSeed)
       {
         // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
-        unsigned long long countsN[NUM_ITER];
-        unsigned long long countsMultN[NUM_ITER];
+        long long countsN[NUM_ITER];
+        long long countsMultN[NUM_ITER];
         for (std::size_t i = 0; i < NUM_ITER; ++i)
         {
           countsN[i] = checkInternal(N, N, randomSeed);
@@ -81,7 +81,7 @@ namespace testpp
         return CalculateOrder(countsN, countsMultN, NUM_ITER, N, MULTIPLIER);
       }
 
-      unsigned long long checkInternal(
+      long long checkInternal(
           std::size_t num, std::size_t N, unsigned long int randomSeed)
       {
         paramType p = Arbitrary<paramType>::generate_n(N, randomSeed);

@@ -3,5 +3,6 @@ Import('env')
 import os
 name = os.path.basename(Dir('.').srcnode().abspath)
 
-env.Program(name, Glob('*.cpp'), LIBS=['testpp'])
+src = Glob('*.cpp')
+env.Program(name, src, LIBS=['testpp'])
 env.Install(env['BINDIR'], name)
