@@ -4,7 +4,9 @@
 #include "function_traits.h"
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <random>
 
@@ -28,7 +30,7 @@ namespace testpp
     static const size_t NUM_ITER = 5;
 
     static int CalculateOrder(
-        long long* timesN, long long* timesMultN, size_t size,
+        int64_t* timesN, int64_t* timesMultN, size_t size,
         size_t N, size_t k);
 
   public:
@@ -36,13 +38,8 @@ namespace testpp
 
     template <typename F>
     ComplexityProperty(const F& f)
+      : m_internal(std::make_unique<Internal<F>>(f))
     {
-      m_internal = new Internal<F>(f);
-    }
-
-    ~ComplexityProperty()
-    {
-      delete m_internal;
     }
 
     int check(std::size_t N, unsigned long int randomSeed)
@@ -60,18 +57,15 @@ namespace testpp
     template <typename U>
     struct Internal : public InternalBase
     {
-      typedef function_traits<U> traits;
-      typedef typename std::remove_cv<
-        typename std::remove_reference<
-          typename traits::argType>::type>::type paramType;
+      using paramType = std::decay_t<typename function_traits<U>::argType>;
 
       Internal(const U& u) : m_u(u) {}
 
       virtual int check(std::size_t N, unsigned long int randomSeed)
       {
         // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
-        long long countsN[NUM_ITER];
-        long long countsMultN[NUM_ITER];
+        int64_t countsN[NUM_ITER];
+        int64_t countsMultN[NUM_ITER];
         for (std::size_t i = 0; i < NUM_ITER; ++i)
         {
           countsN[i] = checkInternal(N, N, randomSeed);
@@ -81,23 +75,25 @@ namespace testpp
         return CalculateOrder(countsN, countsMultN, NUM_ITER, N, MULTIPLIER);
       }
 
-      long long checkInternal(
+      int64_t checkInternal(
           std::size_t num, std::size_t N, unsigned long int randomSeed)
       {
         paramType p = Arbitrary<paramType>::generate_n(N, randomSeed);
+        m_u(p); // warm the cache
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < num; ++i)
         {
           m_u(p);
         }
         auto t2 = std::chrono::high_resolution_clock::now();
-        return (t2 - t1).count();
+        return std::chrono::duration_cast<std::chrono::nanoseconds>
+          (t2 - t1).count();
       }
 
       U m_u;
     };
 
-    InternalBase* m_internal;
+    std::unique_ptr<InternalBase> m_internal;
   };
 
 }

@@ -9,20 +9,20 @@ namespace testpp
     : public function_traits<decltype(&T::operator())>
   {};
 
-  template <typename R, typename Arg>
-  struct function_traits<R(Arg)>
+  template <typename R, typename A>
+  struct function_traits<R(A)>
   {
-    typedef Arg argType;
+    using argType = A;
   };
 
-  template <typename C, typename R, typename Arg>
-  struct function_traits<R(C::*)(Arg)>
-    : public function_traits<R(Arg)>
+  template <typename C, typename R, typename A>
+  struct function_traits<R(C::*)(A)>
+    : public function_traits<R(A)>
   {};
 
-  template <typename C, typename R, typename Arg>
-  struct function_traits<R(C::*)(Arg) const>
-    : public function_traits<R(Arg)>
+  template <typename C, typename R, typename A>
+  struct function_traits<R(C::*)(A) const>
+    : public function_traits<R(A)>
   {};
 
 }

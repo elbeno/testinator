@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <memory>
 
 namespace testpp
 {
@@ -12,13 +13,8 @@ namespace testpp
   public:
     template <typename F>
     TimedTest(const F& f)
+      : m_internal(std::make_unique<Internal<F>>(f))
     {
-      m_internal = new Internal<F>(f);
-    }
-
-    ~TimedTest()
-    {
-      delete m_internal;
     }
 
     void check(std::size_t N = 100, bool quiet = true)
@@ -40,13 +36,15 @@ namespace testpp
 
       virtual void check(std::size_t N, bool quiet)
       {
+        m_u(); // warm the cache
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < N; ++i)
         {
           m_u();
         }
         auto t2 = std::chrono::high_resolution_clock::now();
-        auto nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count();
+        auto nanos = std::chrono::duration_cast<std::chrono::nanoseconds>
+          (t2 - t1).count();
         auto n = decltype(nanos)(N);
 
         if (!quiet)
@@ -59,7 +57,7 @@ namespace testpp
       U m_u;
     };
 
-    InternalBase* m_internal;
+    std::unique_ptr<InternalBase> m_internal;
   };
 
 }

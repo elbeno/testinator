@@ -3,6 +3,7 @@
 #include "arbitrary.h"
 #include "function_traits.h"
 #include <iostream>
+#include <memory>
 
 namespace testpp
 {
@@ -13,13 +14,8 @@ namespace testpp
   public:
     template <typename F>
     Property(const F& f)
+      : m_internal(std::make_unique<Internal<F>>(f))
     {
-      m_internal = new Internal<F>(f);
-    }
-
-    ~Property()
-    {
-      delete m_internal;
     }
 
     bool check(std::size_t N, bool quiet, unsigned long int randomSeed)
@@ -37,10 +33,7 @@ namespace testpp
     template <typename U>
     struct Internal : public InternalBase
     {
-      typedef function_traits<U> traits;
-      typedef typename std::remove_cv<
-        typename std::remove_reference<
-          typename traits::argType>::type>::type paramType;
+      using paramType = std::decay_t<typename function_traits<U>::argType>;
 
       Internal(const U& u) : m_u(u) {}
 
@@ -115,7 +108,7 @@ namespace testpp
       std::vector<unsigned long int> m_failedSeeds;
     };
 
-    InternalBase* m_internal;
+    std::unique_ptr<InternalBase> m_internal;
   };
 
 }

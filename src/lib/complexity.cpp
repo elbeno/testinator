@@ -3,8 +3,6 @@ using namespace testpp;
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
-using namespace std;
 
 //------------------------------------------------------------------------------
 static const char* s_order[NUM_ORDERS] =
@@ -22,7 +20,7 @@ const char* testpp::ComplexityProperty::Order(int o)
 }
 
 int testpp::ComplexityProperty::CalculateOrder(
-    long long* countsN, long long* countsMultN, size_t size,
+    int64_t* countsN, int64_t* countsMultN, size_t size,
     size_t N, size_t k)
 {
   // sort the timings
@@ -36,47 +34,42 @@ int testpp::ComplexityProperty::CalculateOrder(
       std::accumulate(&countsMultN[1], &countsMultN[size-2], 0)) / (size - 2);
 
   // the actual ratio of times
-  double ratio = timeMultN / timeN;
+  double actualRatio = timeMultN / timeN;
 
   // calculate expected ratios
-  double expectedRatio[NUM_ORDERS];
+  double ratio[NUM_ORDERS] =
+  {
   // O(1) =>
   // t(N) = K
   // t(kN) = K
   // t(kN) / t(N) = 1
-  expectedRatio[ORDER_1] = 1;
+    1.0,
   // O(log N) =>
   // t(N) = log(N)
   // t(kN) = log(kN)
   // t(kN) / t(N) = log(kN) / log(N) = (log(k) + log(N)) / log(N) = 1 + log(k) / log(N)
-  expectedRatio[ORDER_LOG_N] = 1 + log2(k) / log2(N);
+    1 + log2(k) / log2(N),
   // O(N) =>
   // t(N) = N
   // t(kN) = kN
   // t(kN) / t(N) = k
-  expectedRatio[ORDER_N] = k;
+    static_cast<double>(k),
   // O(N log N) =>
   // t(N) = N * log(N)
   // t(kN) = kN * log(kN)
   // t(kN) / t(N) = kN * log(kN) / N * log(N) = k * log(kN) / log(N)
-  expectedRatio[ORDER_N_LOG_N] = expectedRatio[ORDER_LOG_N] * expectedRatio[ORDER_N];
+    k * (1 + log2(k) / log2(N)),
   // O(N^2) =>
   // t(N) = N^2
   // t(kN) = (kN)^2 = k^2 * N^2
   // t(kN) / t(N) = k^2 * N^2 / N^2 = k^2
-  expectedRatio[ORDER_N2] = expectedRatio[ORDER_N] * expectedRatio[ORDER_N];
+    static_cast<double>(k * k)
+  };
 
   // find the closest order to the to actual value
-  int order = ORDER_1;
-  double least = numeric_limits<double>::max();
-  for (int i = 0; i < NUM_ORDERS; ++i)
-  {
-    double orderValue = abs(ratio - expectedRatio[i]);
-    if (orderValue < least)
-    {
-      least = orderValue;
-      order = i;
-    }
-  }
-  return order;
+  std::transform(ratio, &ratio[NUM_ORDERS],
+                 ratio,
+                 [actualRatio] (double d) { return std::abs(actualRatio - d); });
+  auto m = std::min_element(ratio, &ratio[NUM_ORDERS]);
+  return m - ratio;
 }
