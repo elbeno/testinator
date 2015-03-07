@@ -74,7 +74,7 @@ void TestRegistry::Unregister(Test* test)
   const string& suiteName = m_suiteNames[test];
   m_suiteNames.erase(test);
   auto range = m_testsBySuite.equal_range(suiteName);
-  for (auto i = range.first; i != range.second; ++i)
+  for (auto& i = range.first; i != range.second; ++i)
   {
     if (i->second == test)
     {
@@ -99,7 +99,7 @@ Results TestRegistry::RunSuite(const string& suiteName, const RunParams& params)
 {
   TestMap localMap;
   auto range = m_testsBySuite.equal_range(suiteName);
-  for (auto i = range.first; i != range.second; ++i)
+  for (auto& i = range.first; i != range.second; ++i)
   {
     localMap.insert(make_pair(m_testNames[i->second], i->second));
   }
@@ -121,14 +121,12 @@ Results TestRegistry::RunTest(const string& testName, const RunParams& params)
 //------------------------------------------------------------------------------
 Results TestRegistry::RunTests(TestMap& localMap, const RunParams& params)
 {
-  Results rs;
-
   // Make a vector of test names, shuffle them if necessary.
   vector<const string*> testNames;
   testNames.reserve(localMap.size());
-  for (auto i = localMap.begin(); i != localMap.end(); ++i)
+  for (auto& i : localMap)
   {
-    testNames.push_back(&i->first);
+    testNames.push_back(&i.first);
   }
   if (!(params.m_flags & testpp::ALPHA_ORDER))
   {
@@ -138,7 +136,9 @@ Results TestRegistry::RunTests(TestMap& localMap, const RunParams& params)
   }
 
   // Run each test.
-  for (auto i : testNames)
+  Results rs;
+  rs.reserve(testNames.size());
+  for (auto& i : testNames)
   {
     Test* test = localMap[*i];
     rs.push_back(RunTest(test, params));

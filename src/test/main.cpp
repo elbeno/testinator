@@ -346,7 +346,7 @@ int main(int argc, char* argv[])
 
   auto numPassed = count_if(rs.begin(), rs.end(),
                             [] (const testpp::Result& r) { return r.m_success; });
-  auto total = decltype(numPassed)(rs.size());
+  auto total = static_cast<decltype(numPassed)>(rs.size());
   cout << numPassed << "/" << total
        << " tests passed." << endl;
 

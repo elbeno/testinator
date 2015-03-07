@@ -6,7 +6,7 @@
 namespace testpp
 {
   //------------------------------------------------------------------------------
-  enum RunFlags
+  enum RunFlags : uint32_t
   {
     NONE = 0,
 
@@ -24,14 +24,9 @@ namespace testpp
   //------------------------------------------------------------------------------
   struct RunParams
   {
-    RunParams()
-      : m_flags(COLOR | QUIET_SUCCESS)
-      , m_numPropertyChecks(100)
-      , m_randomSeed(0)
-    {}
-    unsigned int m_flags;
-    size_t m_numPropertyChecks;
-    unsigned long m_randomSeed;
+    uint32_t m_flags = COLOR | QUIET_SUCCESS;
+    size_t m_numPropertyChecks = 100;
+    unsigned long m_randomSeed = 0;
   };
 
   //------------------------------------------------------------------------------
