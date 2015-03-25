@@ -1,5 +1,0 @@
-Import('env')
-
-env.Library(env['PROJNAME'], Glob('*.cpp'))
-env.Install(env['INCDIR'], Glob('../include/*.h'))
-env.Install(env['LIBDIR'], Glob('*.a'))

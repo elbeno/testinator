@@ -4,5 +4,5 @@ import os
 name = os.path.basename(Dir('.').srcnode().abspath)
 
 src = Glob('*.cpp')
-env.Program(name, src, LIBS=['testpp'])
+env.Program(name, src)
 env.Install(env['BINDIR'], name)

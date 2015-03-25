@@ -1,5 +1,7 @@
 #pragma once
 
+#include "output.h"
+
 #include <string>
 #include <vector>
 
@@ -41,11 +43,6 @@ namespace testpp
   using Results = std::vector<Result>;
 
   //------------------------------------------------------------------------------
-  Results RunAllTests(const RunParams& params = RunParams());
-  Results RunSuite(const std::string& suiteName, const RunParams& params = RunParams());
-  Results RunTest(const std::string& testName, const RunParams& params = RunParams());
-
-  //------------------------------------------------------------------------------
   class Test
   {
   public:
@@ -56,7 +53,13 @@ namespace testpp
     virtual void Teardown() {}
     virtual bool Run() { return true; }
 
-    Result RunWrapper();
+    Result RunWrapper()
+    {
+      Result r;
+      r.m_success = Run() && m_success;
+      r.m_message = m_message;
+      return r;
+    }
 
   protected:
     bool m_success;
@@ -77,4 +80,38 @@ namespace testpp
   bool SUITE##NAME::Run()
 
 //------------------------------------------------------------------------------
+#include "test_registry.h"
+
+namespace testpp
+{
+  //------------------------------------------------------------------------------
+  inline Results RunAllTests(const RunParams& params = RunParams())
+  {
+    return GetTestRegistry().RunAllTests(params);
+  }
+
+  inline Results RunSuite(const std::string& suiteName, const RunParams& params = RunParams())
+  {
+    return GetTestRegistry().RunSuite(suiteName, params);
+  }
+
+  inline Results RunTest(const std::string& testName, const RunParams& params = RunParams())
+  {
+    return GetTestRegistry().RunTest(testName, params);
+  }
+
+  //------------------------------------------------------------------------------
+  inline Test::Test(const std::string& name, const std::string& suite)
+    : m_success(true)
+    , m_name(name)
+  {
+    GetTestRegistry().Register(this, name, suite);
+  }
+
+  inline Test::~Test()
+  {
+    GetTestRegistry().Unregister(this);
+  }
+}
+
 #include "test_macros.h"

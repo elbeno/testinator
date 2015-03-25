@@ -1,4 +1,4 @@
-#include <test_extended.h>
+#include <test.h>
 #include <arbitrary.h>
 using namespace std;
 
