@@ -22,7 +22,8 @@ namespace testpp
 #define EXPECT_AUX(type, cond, file, line)                              \
   if (!(cond))                                                          \
   {                                                                     \
-    m_message = testpp::FailureMessage(type, #cond, file, line);        \
+    testpp::GetTestRegistry().GetOutputter().diagnostic(                \
+        testpp::FailureMessage(type, #cond, file, line));               \
     m_success = false;                                                  \
   }
 #define EXPECT(cond) EXPECT_AUX("EXPECT", cond, __FILE__, __LINE__)
@@ -30,7 +31,8 @@ namespace testpp
 #define EXPECT_NOT_AUX(type, cond, file, line)                          \
   if (cond)                                                             \
   {                                                                     \
-    m_message = testpp::FailureMessage(type, #cond, file, line);        \
+    testpp::GetTestRegistry().GetOutputter().diagnostic(                \
+        testpp::FailureMessage(type, #cond, file, line));               \
     m_success = false;                                                  \
   }
 #define EXPECT_NOT(cond) EXPECT_NOT_AUX("EXPECT_NOT", cond, __FILE__, __LINE__)

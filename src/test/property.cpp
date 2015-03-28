@@ -8,13 +8,14 @@ using namespace std;
 struct TestFunctor
 {
   bool operator()(int) const { return true; }
+  unsigned long m_randomSeed = 0;
 };
 
 DECLARE_TEST(Functor, Property)
 {
   TestFunctor f;
   testpp::Property p(f);
-  return p.check(0, true, 0);
+  return p.check(0, true);
 }
 
 //------------------------------------------------------------------------------

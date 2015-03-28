@@ -2,8 +2,11 @@
 
 #include "arbitrary.h"
 #include "function_traits.h"
+#include "test.h"
+
 #include <iostream>
 #include <memory>
+#include <random>
 
 namespace testpp
 {
@@ -18,16 +21,16 @@ namespace testpp
     {
     }
 
-    bool check(std::size_t N, bool quiet, unsigned long int randomSeed)
+    bool check(std::size_t N, bool quiet)
     {
-      return m_internal->check(N, quiet, randomSeed);
+      return m_internal->check(N, quiet);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual bool check(std::size_t N, bool quiet, unsigned long int randomSeed) = 0;
+      virtual bool check(std::size_t N, bool quiet) = 0;
     };
 
     template <typename U>
@@ -37,12 +40,12 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual bool check(std::size_t N, bool quiet, unsigned long int randomSeed)
+      virtual bool check(std::size_t N, bool quiet)
       {
         m_failedResults.clear();
         m_failedSeeds.clear();
 
-        checkInternal(N, randomSeed);
+        checkInternal(N);
 
         for (size_t i = 0; i < m_failedResults.size(); ++i)
         {
@@ -62,22 +65,18 @@ namespace testpp
         return (m_failedResults.empty());
       }
 
-      void checkInternal(std::size_t N, unsigned long int randomSeed)
+      void checkInternal(std::size_t N)
       {
+        auto seed = m_u.m_randomSeed;
         for (std::size_t i = 0; i < N; ++i)
         {
-          unsigned long int seed = randomSeed;
-          if (seed == 0)
-          {
-            std::random_device rd;
-            seed = rd();
-          }
           paramType p = Arbitrary<paramType>::generate(N, seed);
           if (!checkSingle(p))
           {
             m_failedSeeds.push_back(seed);
             return;
           }
+          seed = GetTestRegistry().RNG()();
         }
       }
 
@@ -113,34 +112,50 @@ namespace testpp
 
 }
 
-#include "test.h"
+namespace testpp
+{
+  class PropertyTest : public Test
+  {
+  public:
+    PropertyTest(const std::string& name, const std::string& suiteName)
+      : Test(name, suiteName)
+    {}
+
+    virtual bool Setup(const testpp::RunParams& params) override
+    {
+      m_numChecks = params.m_numPropertyChecks;
+      m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;
+      m_randomSeed = params.m_randomSeed;
+      if (m_randomSeed == 0)
+      {
+        std::random_device rd;
+        m_randomSeed = rd();
+      }
+      GetTestRegistry().RNG().seed(m_randomSeed);
+      return true;
+    }
+
+    size_t m_numChecks = 1;
+    bool m_quiet = false;
+    unsigned long m_randomSeed = 0;
+  };
+}
 
 //------------------------------------------------------------------------------
-#define DECLARE_PROPERTY(NAME, SUITE, ARG)                 \
-  class SUITE##NAME##Property : public testpp::Test        \
-  {                                                        \
-  public:                                                  \
-    SUITE##NAME##Property()                                \
-      : testpp::Test(#NAME "Property", #SUITE)             \
-      , m_numChecks(1)                                     \
-    {}                                                     \
-    virtual bool Setup(const testpp::RunParams& params)    \
-    {                                                      \
-      m_numChecks = params.m_numPropertyChecks;            \
-      m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;  \
-      m_randomSeed = params.m_randomSeed;                  \
-      return true;                                         \
-    }                                                      \
-    virtual bool Run()                                     \
-    {                                                      \
-      testpp::Property p(*this);                           \
-      if (!m_quiet)                                        \
-        std::cout << m_name << ": ";                       \
-      return p.check(m_numChecks, m_quiet, m_randomSeed);  \
-    }                                                      \
-    bool operator()(ARG) const;                            \
-    size_t m_numChecks;                                    \
-    bool m_quiet;                                          \
-    unsigned long int m_randomSeed;                        \
-  } s_##SUITE##NAME##_Property;                            \
+#define DECLARE_PROPERTY(NAME, SUITE, ARG)                  \
+  class SUITE##NAME##Property : public testpp::PropertyTest \
+  {                                                         \
+  public:                                                   \
+    SUITE##NAME##Property()                                 \
+      : testpp::PropertyTest(#NAME "Property", #SUITE)      \
+    {}                                                      \
+    virtual bool Run() override                             \
+    {                                                       \
+      testpp::Property p(*this);                            \
+      if (!m_quiet)                                         \
+        std::cout << m_name << ": ";                        \
+      return p.check(m_numChecks, m_quiet);                 \
+    }                                                       \
+    bool operator()(ARG) const;                             \
+  } s_##SUITE##NAME##_Property;                             \
   bool SUITE##NAME##Property::operator()(ARG) const

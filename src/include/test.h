@@ -26,6 +26,10 @@ namespace testpp
   //------------------------------------------------------------------------------
   struct RunParams
   {
+    RunParams(const Outputter& o)
+      : m_outputter(o)
+    {}
+    const Outputter& m_outputter;
     uint32_t m_flags = COLOR | QUIET_SUCCESS;
     size_t m_numPropertyChecks = 100;
     unsigned long m_randomSeed = 0;
@@ -61,8 +65,11 @@ namespace testpp
       return r;
     }
 
+    const std::string& name() const { return m_name; }
+    bool success() const { return m_success; }
+
   protected:
-    bool m_success;
+    bool m_success = true;
     std::string m_name;
     std::string m_message;
   };
@@ -75,7 +82,7 @@ namespace testpp
   public:                                       \
     SUITE##NAME()                               \
       : testpp::Test(#NAME, #SUITE) {}          \
-    virtual bool Run();                         \
+    virtual bool Run() override;                \
   } s_##SUITE##NAME##_Test;                     \
   bool SUITE##NAME::Run()
 
@@ -85,25 +92,24 @@ namespace testpp
 namespace testpp
 {
   //------------------------------------------------------------------------------
-  inline Results RunAllTests(const RunParams& params = RunParams())
+  inline Results RunAllTests(const RunParams& params)
   {
     return GetTestRegistry().RunAllTests(params);
   }
 
-  inline Results RunSuite(const std::string& suiteName, const RunParams& params = RunParams())
+  inline Results RunSuite(const std::string& suiteName, const RunParams& params)
   {
     return GetTestRegistry().RunSuite(suiteName, params);
   }
 
-  inline Results RunTest(const std::string& testName, const RunParams& params = RunParams())
+  inline Results RunTest(const std::string& testName, const RunParams& params)
   {
     return GetTestRegistry().RunTest(testName, params);
   }
 
   //------------------------------------------------------------------------------
   inline Test::Test(const std::string& name, const std::string& suite)
-    : m_success(true)
-    , m_name(name)
+    : m_name(name)
   {
     GetTestRegistry().Register(this, name, suite);
   }

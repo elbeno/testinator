@@ -2,6 +2,8 @@
 
 #include "arbitrary.h"
 #include "function_traits.h"
+#include "property.h"
+
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
@@ -105,16 +107,16 @@ namespace testpp
     {
     }
 
-    int check(std::size_t N, unsigned long int randomSeed)
+    int check(std::size_t N)
     {
-      return m_internal->check(N, randomSeed);
+      return m_internal->check(N);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual int check(std::size_t N, unsigned long int randomSeed) = 0;
+      virtual int check(std::size_t N) = 0;
     };
 
     template <typename U>
@@ -124,24 +126,25 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual int check(std::size_t N, unsigned long int randomSeed)
+      virtual int check(std::size_t N) override
       {
         // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
         int64_t countsN[NUM_ITER];
         int64_t countsMultN[NUM_ITER];
         for (std::size_t i = 0; i < NUM_ITER; ++i)
         {
-          countsN[i] = checkInternal(N, N, randomSeed);
-          countsMultN[i] = checkInternal(N, N * MULTIPLIER, randomSeed);
+          countsN[i] = checkInternal(N, N);
+          countsMultN[i] = checkInternal(N, N * MULTIPLIER);
         }
 
         return CalculateOrder(countsN, countsMultN, NUM_ITER, N, MULTIPLIER);
       }
 
       int64_t checkInternal(
-          std::size_t num, std::size_t N, unsigned long int randomSeed)
+          std::size_t num, std::size_t N)
       {
-        paramType p = Arbitrary<paramType>::generate_n(N, randomSeed);
+        auto seed = GetTestRegistry().RNG()();
+        paramType p = Arbitrary<paramType>::generate_n(N, seed);
         m_u(p); // warm the cache
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < num; ++i)
@@ -161,32 +164,18 @@ namespace testpp
 
 }
 
-#include "test.h"
-
 //------------------------------------------------------------------------------
 #define DECLARE_COMPLEXITY_PROPERTY(NAME, SUITE, ARG, ORDER)            \
-  class SUITE##NAME##ComplexityProperty : public testpp::Test           \
+  class SUITE##NAME##ComplexityProperty : public testpp::PropertyTest   \
   {                                                                     \
   public:                                                               \
     SUITE##NAME##ComplexityProperty()                                   \
-      : testpp::Test(#NAME "ComplexityProperty", #SUITE)                \
+      : testpp::PropertyTest(#NAME "ComplexityProperty", #SUITE)        \
     {}                                                                  \
-    virtual bool Setup(const testpp::RunParams& params)                 \
-    {                                                                   \
-      m_numChecks = params.m_numPropertyChecks;                         \
-      m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;          \
-      m_randomSeed = params.m_randomSeed;                               \
-      if (m_randomSeed == 0)                                            \
-      {                                                                 \
-        std::random_device rd;                                          \
-        m_randomSeed = rd();                                            \
-      }                                                                 \
-      return true;                                                      \
-    }                                                                   \
-    virtual bool Run()                                                  \
+    virtual bool Run() override                                         \
     {                                                                   \
       testpp::ComplexityProperty p(*this);                              \
-      int order = p.check(m_numChecks, m_randomSeed);                   \
+      int order = p.check(m_numChecks);                                 \
       bool success = (order <= testpp::ORDER);                          \
       if (!m_quiet || !success)                                         \
       {                                                                 \
@@ -195,13 +184,9 @@ namespace testpp
                   << testpp::ComplexityProperty::Order(testpp::ORDER)   \
                   << ", actually "                                      \
                   << testpp::ComplexityProperty::Order(order);          \
-        std::cout << " (seed=" << m_randomSeed << ")" << std::endl;     \
       }                                                                 \
       return success;                                                   \
     }                                                                   \
     void operator()(ARG) const;                                         \
-    size_t m_numChecks;                                                 \
-    bool m_quiet;                                                       \
-    unsigned long int m_randomSeed;                                     \
   } s_##SUITE##NAME##_ComplexityProperty;                               \
   void SUITE##NAME##ComplexityProperty::operator()(ARG) const

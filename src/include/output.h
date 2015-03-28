@@ -1,90 +1,82 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 
 namespace testpp
 {
-  //------------------------------------------------------------------------------
-  struct DefaultOutputter
+  static constexpr const char* const RED = "\033[31;1m";
+  static constexpr const char* const GREEN = "\033[32;1m";
+  static constexpr const char* const NORMAL = "\033[0m";
+
+  struct Outputter
   {
-    void startRun(int)
-    {
-    }
-
-    void skipTest(const char*, const char*)
-    {
-    }
-
-    void startTest(const char*)
-    {
-    }
-
-    void diagnostic(const char*)
-    {
-    }
-
-    void endTest(const char*, bool success)
-    {
-      ++m_numTests;
-      if (success) ++m_numSuccesses;
-    }
-
-    void abort(const char*)
-    {
-    }
-
-    void endRun()
-    {
-      std::cout << m_numSuccesses << '/' << m_numTests
-                << " tests passed." << std::endl;
-    }
-
-    int m_numTests = 0;
-    int m_numSuccesses = 0;
+    virtual void startRun(int) const {};
+    virtual void skipTest(const std::string&, const std::string&) const {};
+    virtual void startTest(const std::string&) const {};
+    virtual void diagnostic(const std::string&) const {};
+    virtual void endTest(const std::string&, bool) const {};
+    virtual void abort(const std::string&) const {};
+    virtual void endRun(int, int) const {};
   };
 
   //------------------------------------------------------------------------------
-  struct VerboseOutputter
+  struct DefaultOutputter : public Outputter
   {
-    void startRun(int)
+    DefaultOutputter(std::ostream& os = std::cout)
+      : m_os(os)
+    {}
+
+    virtual void startRun(int) const override
     {
     }
 
-    void skipTest(const char*, const char*)
+    virtual void skipTest(const std::string&, const std::string&) const override
     {
     }
 
-    void startTest(const char*)
+    virtual void startTest(const std::string&) const override
     {
     }
 
-    void diagnostic(const char*)
+    virtual void diagnostic(const std::string& msg) const override
     {
+      m_os << msg << std::endl;
     }
 
-    void endTest(const char*, bool)
+    virtual void endTest(const std::string& name, bool success) const override
     {
+      if (!success)
+      {
+        m_os << RED << "FAIL" << NORMAL
+             << ": " << name << std::endl;
+      }
     }
 
-    void abort(const char*)
+    virtual void abort(const std::string& msg) const override
     {
+      m_os << "Aborted (" << msg << ')' << std::endl;
     }
 
-    void endRun()
+    virtual void endRun(int numTests, int numSuccesses) const override
     {
+      m_os << numSuccesses << '/' << numTests
+           << " tests passed." << std::endl;
     }
+
+    std::ostream& m_os;
   };
 
   //------------------------------------------------------------------------------
-  struct TAPOutputter
+  struct TAPOutputter : public Outputter
   {
-    void startRun(int num_tests)
+    virtual void startRun(int numTests) const override
     {
       m_numTests = 0;
-      std::cout << "1.." << num_tests << std::endl;
+      std::cout << "1.." << numTests << std::endl;
     }
 
-    void skipTest(const char* name, const char* msg)
+    virtual void skipTest(const std::string& name, const std::string& msg) const override
     {
       std::cout << "ok "
                 << ++m_numTests
@@ -92,32 +84,32 @@ namespace testpp
                 << " # skip " << msg << std::endl;
     }
 
-    void startTest(const char*)
+    virtual void startTest(const std::string&) const override
     {
     }
 
-    void diagnostic(const char* msg)
+    virtual void diagnostic(const std::string& msg) const override
     {
       std::cout << "# " << msg << std::endl;
     }
 
-    void endTest(const char* name, bool success)
+    virtual void endTest(const std::string& name, bool success) const override
     {
       std::cout << (success ? "ok " : "not ok ")
                 << ++m_numTests
                 << ' ' << name << std::endl;
     }
 
-    void abort(const char* msg)
+    virtual void abort(const std::string& msg) const override
     {
       std::cout << "Bail out! " << msg << std::endl;
     }
 
-    void endRun()
+    virtual void endRun(int, int) const override
     {
     }
 
-    int m_numTests = 0;
+    mutable int m_numTests;
   };
 
 }

@@ -1,3 +1,5 @@
+#include "output.h"
+
 #include <algorithm>
 #include <map>
 #include <random>
@@ -27,6 +29,9 @@ namespace testpp
 
       m_testsBySuite.insert({suiteName, test});
       m_suiteNames.insert({test, suiteName});
+
+      std::random_device rd;
+      m_generator.seed(rd());
     }
 
     //------------------------------------------------------------------------------
@@ -81,6 +86,9 @@ namespace testpp
       return RunTests(localMap, params);
     }
 
+    std::mt19937& RNG() { return m_generator; }
+    const Outputter& GetOutputter() const { return *m_outputter; }
+
   private:
     // Map of all tests.
     using TestMap = std::map<std::string, Test*>;
@@ -94,6 +102,9 @@ namespace testpp
 
     Results RunTests(TestMap& m, const RunParams& params)
     {
+      params.m_outputter.startRun(m.size());
+      int numSuccesses = 0;
+
       // Make a vector of test names, shuffle them if necessary.
       std::vector<const std::string*> testNames;
       testNames.reserve(m.size());
@@ -103,9 +114,7 @@ namespace testpp
       }
       if (!(params.m_flags & testpp::ALPHA_ORDER))
       {
-        std::random_device rd;
-        std::mt19937 g(rd());
-        std::shuffle(testNames.begin(), testNames.end(), g);
+        std::shuffle(testNames.begin(), testNames.end(), m_generator);
       }
 
       // Run each test.
@@ -114,19 +123,29 @@ namespace testpp
       for (auto& i : testNames)
       {
         Test* test = m[*i];
-        rs.push_back(RunTest(test, params));
+        Result r = RunTest(test, params);
+        if (r.m_success) ++numSuccesses;
+        rs.push_back(std::move(r));
       }
 
+      params.m_outputter.endRun(m.size(), numSuccesses);
       return rs;
     }
 
     Result RunTest(Test* test, const RunParams& params)
     {
+      m_outputter = &params.m_outputter;
       Result r;
       if (test->Setup(params))
       {
+        params.m_outputter.startTest(test->name());
         r = test->RunWrapper();
+        params.m_outputter.endTest(test->name(), test->success());
         test->Teardown();
+      }
+      else
+      {
+        m_outputter->skipTest(test->name(), std::string());
       }
       return r;
     }
@@ -135,6 +154,9 @@ namespace testpp
     TestNameMap m_testNames;
     TestSuiteMap m_testsBySuite;
     TestSuiteNameMap m_suiteNames;
+
+    std::mt19937 m_generator;
+    const Outputter* m_outputter;
   };
 
   //------------------------------------------------------------------------------

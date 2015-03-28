@@ -1,5 +1,6 @@
-#include <test.h>
+#include <output.h>
 #include <property.h>
+#include <test.h>
 
 using namespace std;
 
@@ -17,8 +18,10 @@ public:
 
   virtual bool Run()
   {
+    ostringstream oss;
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
     testpp::Test myTest("call_test");
-    testpp::Results rs = testpp::RunTest("call_test");
+    testpp::Results rs = testpp::RunTest("call_test", p);
     return !rs.empty() && rs.front().m_success;
   }
 };
@@ -84,8 +87,10 @@ public:
 
   virtual bool Run()
   {
+    ostringstream oss;
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
     TestTeardownAfterwardsInternal myTest("teardown_test");
-    testpp::RunTest("teardown_test");
+    testpp::RunTest("teardown_test", p);
     return myTest.m_teardownCalled;
   }
 };
@@ -100,8 +105,10 @@ public:
 
   virtual bool Run()
   {
+    ostringstream oss;
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
     TestTeardownAfterwardsInternal myTest("teardown_test", true);
-    testpp::RunTest("teardown_test");
+    testpp::RunTest("teardown_test", p);
     return myTest.m_teardownCalled;
   }
 };
@@ -136,7 +143,9 @@ public:
   {
     TestRunMultipleInternal test0("test0");
     TestRunMultipleInternal test1("test1");
-    testpp::Results rs = testpp::RunAllTests();
+    ostringstream oss;
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
+    testpp::Results rs = testpp::RunAllTests(p);
     return test0.m_runCalled && test1.m_runCalled;
   }
 };
@@ -170,7 +179,9 @@ public:
   {
     TestReportResultsInternal test0("expected_fail", true);
     TestReportResultsInternal test1("expected_pass", false);
-    testpp::Results rs = testpp::RunAllTests();
+    ostringstream oss;
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
+    testpp::Results rs = testpp::RunAllTests(p);
 
     auto numPassed = count_if(rs.begin(), rs.end(),
                               [] (const testpp::Result& r) { return r.m_success; });
@@ -192,8 +203,9 @@ public:
   {
     testpp::Test myTest1("test1", "suite1");
     testpp::Test myTest2("test2", "suite2");
-    testpp::Results rs = testpp::RunSuite("suite1");
-
+    ostringstream oss;
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
+    testpp::Results rs = testpp::RunSuite("suite1", p);
 
     auto numPassed = count_if(rs.begin(), rs.end(),
                               [] (const testpp::Result& r) { return r.m_success; });
@@ -231,13 +243,14 @@ public:
   {
     ostringstream oss;
     TestCheckMacroInternal myTestA("A", true);
-    testpp::Results rs = testpp::RunAllTests();
+    testpp::RunParams p{testpp::DefaultOutputter(oss)};
+    testpp::Results rs = testpp::RunAllTests(p);
 
     static string expected =
-      "EXPECT_NOT FAILED: build/debug/test/main.cpp:215 (m_fail)";
+      "EXPECT_NOT FAILED: build/debug/test/main.cpp:227 (m_fail)";
 
     return !rs.empty() && !rs.front().m_success
-      && rs.front().m_message == expected;
+      && oss.str().find(expected) != string::npos;
   }
 };
 
@@ -263,7 +276,7 @@ int main(int argc, char* argv[])
 {
   string testName;
   string suiteName;
-  testpp::RunParams p;
+  testpp::RunParams p{testpp::DefaultOutputter()};
 
   for (int i = 1; i < argc; ++i)
   {
@@ -347,9 +360,5 @@ int main(int argc, char* argv[])
   auto numPassed = count_if(rs.begin(), rs.end(),
                             [] (const testpp::Result& r) { return r.m_success; });
   auto total = static_cast<decltype(numPassed)>(rs.size());
-  cout << numPassed << "/" << total
-       << " tests passed." << endl;
-
-  auto numFailed = total - numPassed;
-  return numFailed;
+  return total - numPassed;
 }
