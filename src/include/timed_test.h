@@ -1,8 +1,10 @@
 #pragma once
 
+#include "output.h"
+
 #include <chrono>
-#include <iostream>
 #include <memory>
+#include <sstream>
 
 namespace testpp
 {
@@ -17,16 +19,16 @@ namespace testpp
     {
     }
 
-    void check(std::size_t N = 100, bool quiet = true)
+    void check(std::size_t N, const Outputter* outputter)
     {
-      m_internal->check(N, quiet);
+      m_internal->check(N, outputter);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual void check(std::size_t N, bool quiet) = 0;
+      virtual void check(std::size_t N, const Outputter*) = 0;
     };
 
     template <typename U>
@@ -34,7 +36,8 @@ namespace testpp
     {
       Internal(const U& u) : m_u(u) {}
 
-      virtual void check(std::size_t N, bool quiet)
+      virtual void check(std::size_t N,
+                         const Outputter* op)
       {
         m_u(); // warm the cache
         auto t1 = std::chrono::high_resolution_clock::now();
@@ -47,11 +50,10 @@ namespace testpp
           (t2 - t1).count();
         auto n = decltype(nanos)(N);
 
-        if (!quiet)
-        {
-          std::cout << n << " tests run in " << nanos << "ns ("
-                    << (nanos/n) << " ns per test)." << std::endl;
-        }
+        std::ostringstream s;
+        s << m_u.name() << ": " << n << " tests run in " << nanos << "ns ("
+          << (nanos/n) << " ns per test).";
+        op->diagnostic(s.str());
       }
 
       U m_u;
@@ -76,19 +78,15 @@ namespace testpp
     virtual bool Setup(const testpp::RunParams& params)    \
     {                                                      \
       m_numChecks = params.m_numPropertyChecks;            \
-      m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;  \
       return true;                                         \
     }                                                      \
     virtual bool Run()                                     \
     {                                                      \
       testpp::TimedTest p(*this);                          \
-      if (!m_quiet)                                        \
-        std::cout << m_name << ": ";                       \
-      p.check(m_numChecks, m_quiet);                       \
+      p.check(m_numChecks, m_op);                          \
       return true;                                         \
     }                                                      \
     void operator()() const;                               \
     size_t m_numChecks;                                    \
-    bool m_quiet;                                          \
   } s_##SUITE##NAME##_TimedTest;                           \
   void SUITE##NAME##TimedTest::operator()() const

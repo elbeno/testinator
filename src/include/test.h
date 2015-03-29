@@ -2,6 +2,7 @@
 
 #include "output.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -10,27 +11,17 @@ namespace testpp
   //------------------------------------------------------------------------------
   enum RunFlags : uint32_t
   {
-    NONE = 0,
-
-    // COLOR means use ANSI color coded output: red for fail, green for pass.
-    COLOR = 1 << 0,
+    RF_NONE = 0,
 
     // ALPHA_ORDER means run tests in alphabetical order (default is random
     // order).
-    ALPHA_ORDER = 1 << 1,
-
-    // QUIET_SUCCESS means output for failing tests only.
-    QUIET_SUCCESS = 1 << 2,
+    RF_ALPHA_ORDER = 0 << 1,
   };
 
   //------------------------------------------------------------------------------
   struct RunParams
   {
-    RunParams(const Outputter& o)
-      : m_outputter(o)
-    {}
-    const Outputter& m_outputter;
-    uint32_t m_flags = COLOR | QUIET_SUCCESS;
+    uint32_t m_flags = RF_NONE;
     size_t m_numPropertyChecks = 100;
     unsigned long m_randomSeed = 0;
   };
@@ -41,7 +32,6 @@ namespace testpp
     std::string m_suiteName;
     std::string m_testName;
     bool m_success;
-    std::string m_message;
   };
 
   using Results = std::vector<Result>;
@@ -57,33 +47,33 @@ namespace testpp
     virtual void Teardown() {}
     virtual bool Run() { return true; }
 
-    Result RunWrapper()
+    Result RunWrapper(const Outputter* outputter)
     {
       Result r;
+      m_op = outputter;
       r.m_success = Run() && m_success;
-      r.m_message = m_message;
       return r;
     }
 
     const std::string& name() const { return m_name; }
-    bool success() const { return m_success; }
 
   protected:
     bool m_success = true;
     std::string m_name;
     std::string m_message;
+    const Outputter* m_op;
   };
 }
 
 //------------------------------------------------------------------------------
-#define DECLARE_TEST(NAME, SUITE)               \
-  class SUITE##NAME : public testpp::Test       \
-  {                                             \
-  public:                                       \
-    SUITE##NAME()                               \
-      : testpp::Test(#NAME, #SUITE) {}          \
-    virtual bool Run() override;                \
-  } s_##SUITE##NAME##_Test;                     \
+#define DECLARE_TEST(NAME, SUITE)                         \
+  class SUITE##NAME : public testpp::Test                 \
+  {                                                       \
+  public:                                                 \
+    SUITE##NAME()                                         \
+      : testpp::Test(#NAME, #SUITE) {}                    \
+    virtual bool Run() override;                          \
+  } s_##SUITE##NAME##_Test;                               \
   bool SUITE##NAME::Run()
 
 //------------------------------------------------------------------------------
@@ -92,19 +82,32 @@ namespace testpp
 namespace testpp
 {
   //------------------------------------------------------------------------------
-  inline Results RunAllTests(const RunParams& params)
+  inline Results RunAllTests(const RunParams& params = RunParams(),
+                             const Outputter* outputter = nullptr)
   {
-    return GetTestRegistry().RunAllTests(params);
+    return GetTestRegistry().RunAllTests(
+        params,
+        outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
   }
 
-  inline Results RunSuite(const std::string& suiteName, const RunParams& params)
+  inline Results RunSuite(const std::string& suiteName,
+                          const RunParams& params = RunParams(),
+                          const Outputter* outputter = nullptr)
   {
-    return GetTestRegistry().RunSuite(suiteName, params);
+    return GetTestRegistry().RunSuite(
+        suiteName,
+        params,
+        outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
   }
 
-  inline Results RunTest(const std::string& testName, const RunParams& params)
+  inline Results RunTest(const std::string& testName,
+                         const RunParams& params = RunParams(),
+                         const Outputter* outputter = nullptr)
   {
-    return GetTestRegistry().RunTest(testName, params);
+    return GetTestRegistry().RunTest(
+        testName,
+        params,
+        outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
   }
 
   //------------------------------------------------------------------------------

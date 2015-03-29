@@ -7,10 +7,10 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
-#include <iostream>
 #include <memory>
 #include <numeric>
 #include <random>
+#include <sstream>
 
 namespace testpp
 {
@@ -170,20 +170,21 @@ namespace testpp
   {                                                                     \
   public:                                                               \
     SUITE##NAME##ComplexityProperty()                                   \
-      : testpp::PropertyTest(#NAME "ComplexityProperty", #SUITE)        \
-    {}                                                                  \
+      : testpp::PropertyTest(#NAME "ComplexityProperty", #SUITE) {}     \
     virtual bool Run() override                                         \
     {                                                                   \
       testpp::ComplexityProperty p(*this);                              \
       int order = p.check(m_numChecks);                                 \
       bool success = (order <= testpp::ORDER);                          \
-      if (!m_quiet || !success)                                         \
+      if (!success)                                                     \
       {                                                                 \
-        std::cout << m_name << ": ";                                    \
-        std::cout << "expected "                                        \
-                  << testpp::ComplexityProperty::Order(testpp::ORDER)   \
-                  << ", actually "                                      \
-                  << testpp::ComplexityProperty::Order(order);          \
+        std::ostringstream s;                                           \
+        s << m_name << ": ";                                            \
+        s << "expected "                                                \
+          << testpp::ComplexityProperty::Order(testpp::ORDER)           \
+          << ", actually "                                              \
+          << testpp::ComplexityProperty::Order(order);                  \
+        m_op->diagnostic(s.str());                                      \
       }                                                                 \
       return success;                                                   \
     }                                                                   \

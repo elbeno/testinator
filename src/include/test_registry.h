@@ -55,16 +55,19 @@ namespace testpp
     }
 
     //------------------------------------------------------------------------------
-    Results RunAllTests(const RunParams& params)
+    Results RunAllTests(const RunParams& params,
+                        const Outputter* outputter)
     {
       TestMap localMap;
       localMap.swap(m_tests);
-      Results rs = RunTests(localMap, params);
+      Results rs = RunTests(localMap, params, outputter);
       m_tests.swap(localMap);
       return rs;
     }
 
-    Results RunSuite(const std::string& suiteName, const RunParams& params)
+    Results RunSuite(const std::string& suiteName,
+                     const RunParams& params,
+                     const Outputter* outputter)
     {
       TestMap localMap;
       auto range = m_testsBySuite.equal_range(suiteName);
@@ -72,10 +75,12 @@ namespace testpp
       {
         localMap.insert({m_testNames[i->second], i->second});
       }
-      return RunTests(localMap, params);
+      return RunTests(localMap, params, outputter);
     }
 
-    Results RunTest(const std::string& testName, const RunParams& params)
+    Results RunTest(const std::string& testName,
+                    const RunParams& params,
+                    const Outputter* outputter)
     {
       auto i = m_tests.find(testName);
       if (i == m_tests.end())
@@ -83,11 +88,10 @@ namespace testpp
 
       TestMap localMap;
       localMap.insert({testName, i->second});
-      return RunTests(localMap, params);
+      return RunTests(localMap, params, outputter);
     }
 
     std::mt19937& RNG() { return m_generator; }
-    const Outputter& GetOutputter() const { return *m_outputter; }
 
   private:
     // Map of all tests.
@@ -100,9 +104,11 @@ namespace testpp
     // Reverse mapping of tests to suite names.
     using TestSuiteNameMap = std::map<Test*, std::string>;
 
-    Results RunTests(TestMap& m, const RunParams& params)
+    Results RunTests(TestMap& m,
+                     const RunParams& params,
+                     const Outputter* outputter)
     {
-      params.m_outputter.startRun(m.size());
+      outputter->startRun(m.size());
       int numSuccesses = 0;
 
       // Make a vector of test names, shuffle them if necessary.
@@ -112,7 +118,7 @@ namespace testpp
       {
         testNames.push_back(&i.first);
       }
-      if (!(params.m_flags & testpp::ALPHA_ORDER))
+      if (!(params.m_flags & testpp::RF_ALPHA_ORDER))
       {
         std::shuffle(testNames.begin(), testNames.end(), m_generator);
       }
@@ -123,29 +129,30 @@ namespace testpp
       for (auto& i : testNames)
       {
         Test* test = m[*i];
-        Result r = RunTest(test, params);
+        Result r = RunTest(test, params, outputter);
         if (r.m_success) ++numSuccesses;
         rs.push_back(std::move(r));
       }
 
-      params.m_outputter.endRun(m.size(), numSuccesses);
+      outputter->endRun(m.size(), numSuccesses);
       return rs;
     }
 
-    Result RunTest(Test* test, const RunParams& params)
+    Result RunTest(Test* test,
+                   const RunParams& params,
+                   const Outputter* outputter)
     {
-      m_outputter = &params.m_outputter;
       Result r;
       if (test->Setup(params))
       {
-        params.m_outputter.startTest(test->name());
-        r = test->RunWrapper();
-        params.m_outputter.endTest(test->name(), test->success());
+        outputter->startTest(test->name());
+        r = test->RunWrapper(outputter);
+        outputter->endTest(test->name(), r.m_success);
         test->Teardown();
       }
       else
       {
-        m_outputter->skipTest(test->name(), std::string());
+        outputter->skipTest(test->name(), std::string());
       }
       return r;
     }
@@ -156,7 +163,6 @@ namespace testpp
     TestSuiteNameMap m_suiteNames;
 
     std::mt19937 m_generator;
-    const Outputter* m_outputter;
   };
 
   //------------------------------------------------------------------------------

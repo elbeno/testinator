@@ -4,9 +4,10 @@
 #include "function_traits.h"
 #include "test.h"
 
-#include <iostream>
+#include <algorithm>
 #include <memory>
 #include <random>
+#include <sstream>
 
 namespace testpp
 {
@@ -21,16 +22,17 @@ namespace testpp
     {
     }
 
-    bool check(std::size_t N, bool quiet)
+    bool check(std::size_t N, const Outputter* outputter)
     {
-      return m_internal->check(N, quiet);
+      return m_internal->check(N, outputter);
     }
 
   private:
     struct InternalBase
     {
       virtual ~InternalBase() {}
-      virtual bool check(std::size_t N, bool quiet) = 0;
+      virtual bool check(std::size_t N,
+                         const Outputter*) = 0;
     };
 
     template <typename U>
@@ -40,7 +42,8 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual bool check(std::size_t N, bool quiet)
+      virtual bool check(std::size_t N,
+                         const Outputter* op)
       {
         m_failedResults.clear();
         m_failedSeeds.clear();
@@ -49,20 +52,23 @@ namespace testpp
 
         for (size_t i = 0; i < m_failedResults.size(); ++i)
         {
-          std::cout << "Failed: " << m_failedResults[i];
+          std::ostringstream s;
+          s << "Failed: " << m_failedResults[i];
           if (i < m_failedSeeds.size())
           {
-            std::cout << " (seed=" << m_failedSeeds[i] << ")";
+            s << " (seed=" << m_failedSeeds[i] << ")";
           }
-          std::cout << std::endl;
+          op->diagnostic(s.str());
         }
 
         if (!m_failedResults.empty())
-          std::cout << N << " checks, " << m_failedResults.size() << " failures." << std::endl;
-        else if (!quiet)
-          std::cout << N << " checks passed." << std::endl;
+        {
+          std::ostringstream s;
+          s << N << " checks, " << m_failedResults.size() << " failures.";
+          op->diagnostic(s.str());
+        }
 
-        return (m_failedResults.empty());
+        return m_failedResults.empty();
       }
 
       void checkInternal(std::size_t N)
@@ -82,24 +88,17 @@ namespace testpp
 
       bool checkSingle(const paramType& p)
       {
-        if (!m_u(p))
-        {
-          m_failedResults.push_back(p);
-          std::vector<paramType> v = Arbitrary<paramType>::shrink(p);
-          if (!v.empty())
-            return checkMulti(v);
-          return false;
-        }
-        return true;
-      }
+        if (m_u(p)) return true;
 
-      bool checkMulti(const std::vector<paramType>& v)
-      {
-        bool pass = true;
-        std::for_each(v.begin(), v.end(), [&] (const paramType& p) {
-            pass = pass && checkSingle(p);
-          });
-        return pass;
+        m_failedResults.push_back(p);
+        std::vector<paramType> v = Arbitrary<paramType>::shrink(p);
+        if (!v.empty())
+        {
+          return std::all_of(v.cbegin(), v.cend(),
+                             [this] (const paramType& pt)
+                             { return checkSingle(pt); });
+        }
+        return false;
       }
 
       U m_u;
@@ -124,7 +123,6 @@ namespace testpp
     virtual bool Setup(const testpp::RunParams& params) override
     {
       m_numChecks = params.m_numPropertyChecks;
-      m_quiet = (params.m_flags & testpp::QUIET_SUCCESS) != 0;
       m_randomSeed = params.m_randomSeed;
       if (m_randomSeed == 0)
       {
@@ -136,7 +134,6 @@ namespace testpp
     }
 
     size_t m_numChecks = 1;
-    bool m_quiet = false;
     unsigned long m_randomSeed = 0;
   };
 }
@@ -147,14 +144,11 @@ namespace testpp
   {                                                         \
   public:                                                   \
     SUITE##NAME##Property()                                 \
-      : testpp::PropertyTest(#NAME "Property", #SUITE)      \
-    {}                                                      \
+      : testpp::PropertyTest(#NAME "Property", #SUITE) {}   \
     virtual bool Run() override                             \
     {                                                       \
       testpp::Property p(*this);                            \
-      if (!m_quiet)                                         \
-        std::cout << m_name << ": ";                        \
-      return p.check(m_numChecks, m_quiet);                 \
+      return p.check(m_numChecks, m_op);                    \
     }                                                       \
     bool operator()(ARG) const;                             \
   } s_##SUITE##NAME##_Property;                             \

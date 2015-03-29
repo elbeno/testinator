@@ -18,10 +18,8 @@ public:
 
   virtual bool Run()
   {
-    ostringstream oss;
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
     testpp::Test myTest("call_test");
-    testpp::Results rs = testpp::RunTest("call_test", p);
+    testpp::Results rs = testpp::RunTest("call_test");
     return !rs.empty() && rs.front().m_success;
   }
 };
@@ -87,10 +85,8 @@ public:
 
   virtual bool Run()
   {
-    ostringstream oss;
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
     TestTeardownAfterwardsInternal myTest("teardown_test");
-    testpp::RunTest("teardown_test", p);
+    testpp::RunTest("teardown_test");
     return myTest.m_teardownCalled;
   }
 };
@@ -105,10 +101,8 @@ public:
 
   virtual bool Run()
   {
-    ostringstream oss;
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
     TestTeardownAfterwardsInternal myTest("teardown_test", true);
-    testpp::RunTest("teardown_test", p);
+    testpp::RunTest("teardown_test");
     return myTest.m_teardownCalled;
   }
 };
@@ -143,9 +137,7 @@ public:
   {
     TestRunMultipleInternal test0("test0");
     TestRunMultipleInternal test1("test1");
-    ostringstream oss;
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
-    testpp::Results rs = testpp::RunAllTests(p);
+    testpp::Results rs = testpp::RunAllTests();
     return test0.m_runCalled && test1.m_runCalled;
   }
 };
@@ -179,10 +171,7 @@ public:
   {
     TestReportResultsInternal test0("expected_fail", true);
     TestReportResultsInternal test1("expected_pass", false);
-    ostringstream oss;
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
-    testpp::Results rs = testpp::RunAllTests(p);
-
+    testpp::Results rs = testpp::RunAllTests();
     auto numPassed = count_if(rs.begin(), rs.end(),
                               [] (const testpp::Result& r) { return r.m_success; });
     auto total = decltype(numPassed)(rs.size());
@@ -203,10 +192,7 @@ public:
   {
     testpp::Test myTest1("test1", "suite1");
     testpp::Test myTest2("test2", "suite2");
-    ostringstream oss;
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
-    testpp::Results rs = testpp::RunSuite("suite1", p);
-
+    testpp::Results rs = testpp::RunSuite("suite1");
     auto numPassed = count_if(rs.begin(), rs.end(),
                               [] (const testpp::Result& r) { return r.m_success; });
     return numPassed == 1;
@@ -242,12 +228,13 @@ public:
   virtual bool Run()
   {
     ostringstream oss;
+    std::unique_ptr<testpp::DefaultOutputter> op =
+      make_unique<testpp::DefaultOutputter>(oss);
     TestCheckMacroInternal myTestA("A", true);
-    testpp::RunParams p{testpp::DefaultOutputter(oss)};
-    testpp::Results rs = testpp::RunAllTests(p);
+    testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
 
     static string expected =
-      "EXPECT_NOT FAILED: build/debug/test/main.cpp:227 (m_fail)";
+      "EXPECT_NOT FAILED: build/debug/test/main.cpp:213 (m_fail)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
@@ -274,13 +261,25 @@ DECLARE_PROPERTY(NumChecks, Property, int)
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  string outputterName;
   string testName;
   string suiteName;
-  testpp::RunParams p{testpp::DefaultOutputter()};
+  testpp::RunParams p;
+  p.m_flags = testpp::RF_ALPHA_ORDER;
+  auto oflags = testpp::OF_COLOR|testpp::OF_QUIET_SUCCESS;
 
   for (int i = 1; i < argc; ++i)
   {
     string s = argv[i];
+
+    {
+      string option = "--output=";
+      if (s.compare(0, option.size(), option) == 0)
+      {
+        outputterName = s.substr(option.size());
+        continue;
+      }
+    }
 
     {
       string option = "--testName=";
@@ -324,7 +323,7 @@ int main(int argc, char* argv[])
       string option = "--alpha";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_flags |= testpp::ALPHA_ORDER;
+        p.m_flags |= testpp::RF_ALPHA_ORDER;
         continue;
       }
     }
@@ -333,10 +332,30 @@ int main(int argc, char* argv[])
       string option = "--verbose";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_flags &= ~(static_cast<unsigned int>(testpp::QUIET_SUCCESS));
+        oflags &= ~(static_cast<underlying_type_t<testpp::OutputFlags>>(
+                        testpp::OF_QUIET_SUCCESS));
         continue;
       }
     }
+
+    {
+      string option = "--nocolor";
+      if (s.compare(0, option.size(), option) == 0)
+      {
+        oflags &= ~(static_cast<underlying_type_t<testpp::OutputFlags>>(
+                        testpp::OF_COLOR));
+        continue;
+      }
+    }
+
+    {
+      string option = "--output";
+      if (s.compare(0, option.size(), option) == 0)
+      {
+        continue;
+      }
+    }
+
   }
 
   s_numPropertyChecks = p.m_numPropertyChecks;
@@ -350,12 +369,15 @@ int main(int argc, char* argv[])
   TestCheckMacro test7("TestCheckMacro");
   testpp::Results rs;
 
+  std::unique_ptr<testpp::Outputter> op = testpp::MakeOutputter(
+      outputterName, static_cast<testpp::OutputFlags>(oflags));
+
   if (!testName.empty())
-    rs = testpp::RunTest(testName, p);
+    rs = testpp::RunTest(testName, p, op.get());
   else if (!suiteName.empty())
-    rs = testpp::RunSuite(suiteName, p);
+    rs = testpp::RunSuite(suiteName, p, op.get());
   else
-    rs = testpp::RunAllTests(p);
+    rs = testpp::RunAllTests(p, op.get());
 
   auto numPassed = count_if(rs.begin(), rs.end(),
                             [] (const testpp::Result& r) { return r.m_success; });
