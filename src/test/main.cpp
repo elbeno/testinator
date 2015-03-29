@@ -265,7 +265,6 @@ int main(int argc, char* argv[])
   string testName;
   string suiteName;
   testpp::RunParams p;
-  p.m_flags = testpp::RF_ALPHA_ORDER;
   auto oflags = testpp::OF_COLOR|testpp::OF_QUIET_SUCCESS;
 
   for (int i = 1; i < argc; ++i)

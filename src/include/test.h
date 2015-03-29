@@ -15,7 +15,7 @@ namespace testpp
 
     // ALPHA_ORDER means run tests in alphabetical order (default is random
     // order).
-    RF_ALPHA_ORDER = 0 << 1,
+    RF_ALPHA_ORDER = 1 << 0,
   };
 
   //------------------------------------------------------------------------------
