@@ -122,5 +122,3 @@ namespace testpp
     GetTestRegistry().Unregister(this);
   }
 }
-
-#include "test_macros.h"

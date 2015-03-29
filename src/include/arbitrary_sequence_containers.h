@@ -1,7 +1,9 @@
 #pragma once
 
 #include "arbitrary.h"
+
 #include <algorithm>
+#include <cstddef>
 #include <deque>
 #include <forward_list>
 #include <list>

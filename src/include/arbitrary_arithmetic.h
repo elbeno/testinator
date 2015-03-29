@@ -1,6 +1,8 @@
 #pragma once
 
 #include "arbitrary.h"
+
+#include <cstddef>
 #include <limits>
 #include <random>
 

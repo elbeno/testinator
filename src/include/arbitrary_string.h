@@ -1,7 +1,9 @@
 #pragma once
 
 #include "arbitrary.h"
+
 #include <algorithm>
+#include <cstddef>
 #include <string>
 
 namespace testpp

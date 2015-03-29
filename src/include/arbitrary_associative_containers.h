@@ -1,7 +1,9 @@
 #pragma once
 
 #include "arbitrary.h"
+
 #include <algorithm>
+#include <cstddef>
 #include <map>
 #include <set>
 #include <unordered_set>

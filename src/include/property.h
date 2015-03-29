@@ -5,9 +5,13 @@
 #include "test.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <random>
 #include <sstream>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace testpp
 {

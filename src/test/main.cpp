@@ -1,6 +1,4 @@
-#include <output.h>
-#include <property.h>
-#include <test.h>
+#include <testpp.h>
 
 using namespace std;
 
@@ -234,7 +232,7 @@ public:
     testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
 
     static string expected =
-      "EXPECT_NOT FAILED: build/debug/test/main.cpp:213 (m_fail)";
+      "EXPECT_NOT FAILED: build/debug/test/main.cpp:211 (m_fail)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
