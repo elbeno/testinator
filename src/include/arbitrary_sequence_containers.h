@@ -44,11 +44,11 @@ namespace testpp
         std::vector<C> v;
         if (c.size() < 2)
           return v;
-        auto it = c.begin() + c.size()/2;
+        auto it = c.cbegin() + c.size()/2;
         v.push_back(C());
-        copy(c.begin(), it, std::back_inserter(v[0]));
+        copy(c.cbegin(), it, std::back_inserter(v[0]));
         v.push_back(C());
-        copy(it, c.end(), std::back_inserter(v[1]));
+        copy(it, c.cend(), std::back_inserter(v[1]));
         return v;
       }
     };
@@ -93,12 +93,12 @@ namespace testpp
       std::vector<std::list<T>> v;
       if (t.size() < 2)
         return v;
-      auto it = t.begin();
+      auto it = t.cbegin();
       v.push_back(std::list<T>());
       for (std::size_t count = 0; count < t.size()/2; count++, it++)
-        v[0].push_front(*it);
+        v[0].push_back(*it);
       v.push_back(std::list<T>());
-      copy(it, t.end(), std::front_inserter(v[1]));
+      copy(it, t.cend(), std::back_inserter(v[1]));
       return v;
     }
   };
@@ -131,17 +131,16 @@ namespace testpp
     static std::vector<std::forward_list<T>> shrink(const std::forward_list<T>& t)
     {
       std::vector<std::forward_list<T>> v;
-      std::size_t len = 0;
-      for (auto it = t.begin(); it != t.end(); ++it, ++len);
+      auto len = std::distance(t.cbegin(), t.cend());
       if (len < 2)
         return v;
 
-      auto it = t.begin();
+      auto it = t.cbegin();
       v.push_back(std::forward_list<T>());
-      for (std::size_t count = 0; count < len/2; count++, it++)
+      for (auto count = 0; count < len/2; count++, it++)
         v[0].push_front(*it);
       v.push_back(std::forward_list<T>());
-      copy(it, t.end(), std::front_inserter(v[1]));
+      copy(it, t.cend(), std::front_inserter(v[1]));
       return v;
     }
   };

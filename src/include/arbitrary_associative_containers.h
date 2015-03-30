@@ -46,12 +46,12 @@ namespace testpp
         std::vector<C> v;
         if (c.size() < 2)
           return v;
-        auto it = c.begin();
+        auto it = c.cbegin();
         v.push_back(C());
         for (std::size_t count = 0; count < c.size()/2; count++, it++)
           v[0].insert(*it);
         v.push_back(C());
-        copy(it, c.end(), std::inserter(v[1], v[1].begin()));
+        copy(it, c.cend(), std::inserter(v[1], v[1].begin()));
         return v;
       }
     };

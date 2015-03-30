@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
   else
     rs = testpp::RunAllTests(p, op.get());
 
-  auto numPassed = count_if(rs.begin(), rs.end(),
+  auto numPassed = count_if(rs.cbegin(), rs.cend(),
                             [] (const testpp::Result& r) { return r.m_success; });
   auto total = static_cast<decltype(numPassed)>(rs.size());
   return total - numPassed;

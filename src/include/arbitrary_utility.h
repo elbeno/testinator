@@ -32,9 +32,9 @@ namespace testpp
       std::vector<T1> v1 = Arbitrary<T1>::shrink(t.first);
       std::vector<T2> v2 = Arbitrary<T2>::shrink(t.second);
       std::vector<std::pair<T1, T2>> v;
-      auto it1 = v1.begin();
-      auto it2 = v2.begin();
-      for (; it1 != v1.end() && it2 != v2.end(); ++it1, ++it2)
+      auto it1 = v1.cbegin();
+      auto it2 = v2.cbegin();
+      for (; it1 != v1.cend() && it2 != v2.cend(); ++it1, ++it2)
         v.push_back(std::pair<T1, T2>(*it1, *it2));
       return v;
     }
