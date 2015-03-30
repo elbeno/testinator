@@ -1,5 +1,7 @@
 #pragma once
 
+#include "capture-et.h"
+
 #include <sstream>
 #include <string>
 #include <utility>
@@ -58,49 +60,43 @@ namespace testpp
   }
 
   // -----------------------------------------------------------------------------
-  // Log: decorate with file and line, and recurse
+  // Stringify a diagnostic
   template <typename ConsT>
   __attribute__((__noinline__))
   std::string Diagnostic(ConsT&& t) noexcept
   {
     std::ostringstream s;
+    s << std::boolalpha;
     LogR(s, std::forward<typename ConsT::type>(t.m_list));
-    return s.str();
-  }
-
-  // -----------------------------------------------------------------------------
-  inline std::string FailureMessage(
-      const char* type,
-      const char* failureText,
-      const char* file,
-      int line)
-  {
-    std::ostringstream s;
-    s << type << " FAILED: "
-      << file << ":" << line
-      << " (" << failureText << ")";
     return s.str();
   }
 }
 
-#define EXPECT_AUX(type, cond, file, line)                              \
-  if (!(cond))                                                          \
-  {                                                                     \
-    m_op->diagnostic(                                                   \
-        testpp::FailureMessage(type, #cond, file, line));               \
-    m_success = false;                                                  \
-  }
-#define EXPECT(cond) EXPECT_AUX("EXPECT", cond, __FILE__, __LINE__)
-
-#define EXPECT_NOT_AUX(type, cond, file, line)                          \
-  if (cond)                                                             \
-  {                                                                     \
-    m_op->diagnostic(                                                   \
-        testpp::FailureMessage(type, #cond, file, line));               \
-    m_success = false;                                                  \
-  }
-#define EXPECT_NOT(cond) EXPECT_NOT_AUX("EXPECT_NOT", cond, __FILE__, __LINE__)
-
+// -----------------------------------------------------------------------------
 #define DIAGNOSTIC(msg)                                       \
   (m_op->diagnostic(testpp::Diagnostic(                       \
                         testpp::Cons<testpp::Nil>() << msg)))
+
+// -----------------------------------------------------------------------------
+#define EXPECT(x)                                                       \
+  {                                                                     \
+    auto cap = testpp::Capture<testpp::Nothing>() ->* x;                \
+    if (!testpp::Eval(cap))                                             \
+    {                                                                   \
+      auto diag =                                                       \
+        testpp::Cons<testpp::Nil>() << "EXPECT FAILED: " __FILE__ ":"   \
+                                    << __LINE__                         \
+                                    << " (" #x " => " << LHS(cap);      \
+      if (RelOp(cap)[0] != 0)                                           \
+      {                                                                 \
+        m_op->diagnostic(testpp::Diagnostic(                            \
+                             std::move(diag) << " " << RelOp(cap)       \
+                             << " " << RHS(cap) << ")"));               \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        m_op->diagnostic(testpp::Diagnostic(std::move(diag) << ")"));   \
+      }                                                                 \
+      m_success = false;                                                \
+    }                                                                   \
+  }

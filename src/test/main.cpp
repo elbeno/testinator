@@ -208,7 +208,7 @@ public:
   virtual bool Run()
   {
     bool fail = true;
-    EXPECT(!fail);
+    EXPECT(!fail == fail);
     return true;
   }
 };
@@ -230,7 +230,7 @@ public:
     testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
 
     static string expected =
-      "EXPECT FAILED: build/debug/test/main.cpp:211 (!fail)";
+      "EXPECT FAILED: build/debug/test/main.cpp:211 (!fail == fail => false == true)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
