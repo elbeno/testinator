@@ -240,6 +240,43 @@ public:
 };
 
 //------------------------------------------------------------------------------
+class TestDiagnosticInternal : public testpp::Test
+{
+public:
+  TestDiagnosticInternal(const string& name)
+    : testpp::Test(name)
+  {}
+
+  virtual bool Run()
+  {
+    DIAGNOSTIC("Hello world " << 42);
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestDiagnostic : public testpp::Test
+{
+public:
+  TestDiagnostic(const string& name)
+    : testpp::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    ostringstream oss;
+    std::unique_ptr<testpp::DefaultOutputter> op =
+      make_unique<testpp::DefaultOutputter>(oss);
+    TestDiagnosticInternal myTestA("A");
+    testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
+
+    static string expected = "Hello world 42";
+    return !rs.empty() && rs.front().m_success
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
 DECLARE_TEST(Macro, Test)
 {
   return true;
@@ -375,6 +412,7 @@ int main(int argc, char* argv[])
   TestReportResults test5("TestReportResults");
   TestRunSuite test6("TestRunSuite");
   TestCheckMacro test7("TestCheckMacro");
+  TestDiagnostic test8("TestDiagnostic");
   testpp::Results rs;
 
   std::unique_ptr<testpp::Outputter> op = testpp::MakeOutputter(
