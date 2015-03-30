@@ -201,18 +201,16 @@ public:
 class TestCheckMacroInternal : public testpp::Test
 {
 public:
-  TestCheckMacroInternal(const string& name, bool fail)
+  TestCheckMacroInternal(const string& name)
     : testpp::Test(name)
-    , m_fail(fail)
   {}
 
   virtual bool Run()
   {
-    EXPECT_NOT(m_fail);
+    bool fail = true;
+    EXPECT(!fail);
     return true;
   }
-private:
-  bool m_fail;
 };
 
 //------------------------------------------------------------------------------
@@ -228,11 +226,11 @@ public:
     ostringstream oss;
     std::unique_ptr<testpp::DefaultOutputter> op =
       make_unique<testpp::DefaultOutputter>(oss);
-    TestCheckMacroInternal myTestA("A", true);
+    TestCheckMacroInternal myTestA("A");
     testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
 
     static string expected =
-      "EXPECT_NOT FAILED: build/debug/test/main.cpp:211 (m_fail)";
+      "EXPECT FAILED: build/debug/test/main.cpp:211 (!fail)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
