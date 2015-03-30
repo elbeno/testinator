@@ -3,6 +3,7 @@
 #include "arbitrary.h"
 #include "function_traits.h"
 #include "test.h"
+#include "test_macros.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -46,68 +47,43 @@ namespace testpp
 
       Internal(const U& u) : m_u(u) {}
 
-      virtual bool check(std::size_t N,
-                         const Outputter* op)
-      {
-        m_failedResults.clear();
-        m_failedSeeds.clear();
-
-        checkInternal(N);
-
-        for (size_t i = 0; i < m_failedResults.size(); ++i)
-        {
-          std::ostringstream s;
-          s << "Failed: " << m_failedResults[i];
-          if (i < m_failedSeeds.size())
-          {
-            s << " (seed=" << m_failedSeeds[i] << ")";
-          }
-          op->diagnostic(s.str());
-        }
-
-        if (!m_failedResults.empty())
-        {
-          std::ostringstream s;
-          s << N << " checks, " << m_failedResults.size() << " failures.";
-          op->diagnostic(s.str());
-        }
-
-        return m_failedResults.empty();
-      }
-
-      void checkInternal(std::size_t N)
+      virtual bool check(std::size_t N, const Outputter* op)
       {
         auto seed = m_u.m_randomSeed;
         for (std::size_t i = 0; i < N; ++i)
         {
           paramType p = Arbitrary<paramType>::generate(N, seed);
-          if (!checkSingle(p))
+          if (!checkSingle(p, op))
           {
-            m_failedSeeds.push_back(seed);
-            return;
+            op->diagnostic(
+                Diagnostic(testpp::Cons<testpp::Nil>()
+                           << "Reproduce failure with --seed=" << seed));
+            return false;
           }
           seed = GetTestRegistry().RNG()();
         }
+        return true;
       }
 
-      bool checkSingle(const paramType& p)
+      bool checkSingle(const paramType& p, const Outputter* op)
       {
         if (m_u(p)) return true;
 
-        m_failedResults.push_back(p);
+        op->diagnostic(
+            Diagnostic(testpp::Cons<testpp::Nil>()
+                       << "Failed: " << p));
+
         std::vector<paramType> v = Arbitrary<paramType>::shrink(p);
         if (!v.empty())
         {
           return std::all_of(v.cbegin(), v.cend(),
-                             [this] (const paramType& pt)
-                             { return checkSingle(pt); });
+                             [this, op] (const paramType& pt)
+                             { return checkSingle(pt, op); });
         }
         return false;
       }
 
       U m_u;
-      std::vector<paramType> m_failedResults;
-      std::vector<unsigned long int> m_failedSeeds;
     };
 
     std::unique_ptr<InternalBase> m_internal;

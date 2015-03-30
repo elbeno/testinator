@@ -3,6 +3,7 @@
 #include "arbitrary.h"
 #include "function_traits.h"
 #include "property.h"
+#include "test_macros.h"
 
 #include <algorithm>
 #include <chrono>
@@ -178,13 +179,13 @@ namespace testpp
       bool success = (order <= testpp::ORDER);                          \
       if (!success)                                                     \
       {                                                                 \
-        std::ostringstream s;                                           \
-        s << m_name << ": ";                                            \
-        s << "expected "                                                \
-          << testpp::ComplexityProperty::Order(testpp::ORDER)           \
-          << ", actually "                                              \
-          << testpp::ComplexityProperty::Order(order);                  \
-        m_op->diagnostic(s.str());                                      \
+        m_op->diagnostic(                                               \
+            testpp::Diagnostic(                                         \
+                testpp::Cons<testpp::Nil>()                             \
+                << m_name << ": expected "                              \
+                << testpp::ComplexityProperty::Order(testpp::ORDER)     \
+                << ", actually "                                        \
+                << testpp::ComplexityProperty::Order(order)));          \
       }                                                                 \
       return success;                                                   \
     }                                                                   \
