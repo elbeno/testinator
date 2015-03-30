@@ -344,6 +344,26 @@ int main(int argc, char* argv[])
         continue;
       }
     }
+
+    {
+      std::string option = "--help";
+      if (s.compare(0, option.size(), option) == 0)
+      {
+        std::cout << "Usage: testpp [OPTION]..." << std::endl
+                  << "Run all tests in randomized order by default." << std::endl
+                  << std::endl
+                  << "--testName=NAME    run only the named test" << std::endl
+                  << "--suiteName=NAME   run only the tests in the named suite" << std::endl
+                  << "--alpha            run tests in alphabetical order" << std::endl
+                  << "--output=FORMAT    use the specified output formatter, e.g. TAP" << std::endl
+                  << "--verbose          give verbose output (according to formatter)" << std::endl
+                  << "--nocolor          output without ANSI color codes (according to formatter)"
+                  << std::endl
+                  << "--numChecks=N      number of checks to use for property tests" << std::endl
+                  << "--seed=SEED        use SEED for property test randomization" << std::endl;
+        return 0;
+      }
+    }
   }
 
   s_numPropertyChecks = p.m_numPropertyChecks;
