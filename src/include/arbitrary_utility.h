@@ -2,6 +2,7 @@
 
 #include "arbitrary.h"
 
+#include <tuple>
 #include <utility>
 
 namespace testpp
@@ -27,16 +28,31 @@ namespace testpp
           Arbitrary<T2>::generate_n(n, randomSeed));
     }
 
-    static std::vector<std::pair<T1, T2>> shrink(const std::pair<T1, T2>& t)
+    static std::vector<std::pair<T1, T2>> shrink(const std::pair<T1, T2>&)
     {
-      std::vector<T1> v1 = Arbitrary<T1>::shrink(t.first);
-      std::vector<T2> v2 = Arbitrary<T2>::shrink(t.second);
-      std::vector<std::pair<T1, T2>> v;
-      auto it1 = v1.cbegin();
-      auto it2 = v2.cbegin();
-      for (; it1 != v1.cend() && it2 != v2.cend(); ++it1, ++it2)
-        v.push_back(std::pair<T1, T2>(*it1, *it2));
-      return v;
+      return std::vector<std::pair<T1, T2>>{};
+    }
+  };
+
+  //------------------------------------------------------------------------------
+  // specialization for tuple
+  //------------------------------------------------------------------------------
+  template <typename ...Ts>
+  struct Arbitrary<std::tuple<Ts...>>
+  {
+    static std::tuple<Ts...> generate(std::size_t generation, unsigned long int randomSeed)
+    {
+      return std::make_tuple(Arbitrary<Ts>::generate(generation, randomSeed)...);
+    }
+
+    static std::tuple<Ts...> generate_n(std::size_t n, unsigned long int randomSeed)
+    {
+      return std::make_tuple(Arbitrary<Ts>::generate_n(n, randomSeed)...);
+    }
+
+    static std::vector<std::tuple<Ts...>> shrink(const std::tuple<Ts...>&)
+    {
+      return std::vector<std::tuple<Ts...>>{};
     }
   };
 

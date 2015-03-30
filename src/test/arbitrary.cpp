@@ -273,6 +273,15 @@ DECLARE_TEST(pair, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
+DECLARE_TEST(tuple, Arbitrary)
+{
+  testpp::Arbitrary<tuple<int, float>> a;
+  tuple<int, float> v = a.generate(0,0);
+  a.shrink(v);
+  return true;
+}
+
+//------------------------------------------------------------------------------
 DECLARE_TEST(map, Arbitrary)
 {
   testpp::Arbitrary<map<int, float>> a;
