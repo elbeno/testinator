@@ -89,14 +89,6 @@ int main(int argc, char* argv[])
         continue;
       }
     }
-
-    {
-      std::string option = "--output";
-      if (s.compare(0, option.size(), option) == 0)
-      {
-        continue;
-      }
-    }
   }
 
   std::unique_ptr<testpp::Outputter> op = testpp::MakeOutputter(

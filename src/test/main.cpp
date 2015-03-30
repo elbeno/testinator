@@ -344,15 +344,6 @@ int main(int argc, char* argv[])
         continue;
       }
     }
-
-    {
-      string option = "--output";
-      if (s.compare(0, option.size(), option) == 0)
-      {
-        continue;
-      }
-    }
-
   }
 
   s_numPropertyChecks = p.m_numPropertyChecks;
