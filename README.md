@@ -1,11 +1,35 @@
 # TestPP
 
-Experiments with testing in C++. TestPP is a unit testing framework partially
-inspired by Haskell's QuickCheck.
+Experiments with testing in C++. TestPP is a unit testing framework.
 
-## Simple Tests
+## Basic setup
 
-To use ordinary tests like any other testing framework, `#include <test.h>`.
+TestPP is a header-only library. To use it in the simplest way, a complete
+program is:
+
+```cpp
+#define TESTPP_MAIN
+#include <testpp.h>
+```
+
+This includes everything you need and provides a main function with some command
+line parameters:
+
+```
+Usage: testpp [OPTION]...
+Run all tests in randomized order by default.
+
+--testName=NAME    run only the named test
+--suiteName=NAME   run only the tests in the named suite
+--alpha            run tests in alphabetical order
+--output=FORMAT    use the specified output formatter, e.g. TAP
+--verbose          give verbose output (according to formatter)
+--nocolor          output without ANSI color codes (according to formatter)
+--numChecks=N      number of checks to use for property tests
+--seed=SEED        use SEED for property test randomization
+```
+
+## Simple usage
 
 Ordinary unit tests are grouped into suites and declared with a macro
 (arguments: test name and suite name) and function body which should return
@@ -19,18 +43,32 @@ DECLARE_TEST(TestName, SuiteName)
 }
 ```
 
-You can use the macros `EXPECT` and `EXPECT_NOT` (from `test_macros.h`) to test
-conditions in a way that will output the condition on failure.
+You can use the `EXPECT` macro to test conditions in a way that will output the
+condition on failure:
+
+```cpp
+bool b = true;
+EXPECT(!b == b);
+```
+
+Produces the output:
+
+```
+EXPECT FAILED: <file>:<line> (!b == b => false == true)
+```
+
+The `DIAGNOSTIC` macro produces arbitrary diagnostic output:
+
+```cpp
+DIAGNOSTIC("Hello world " << 42);
+```
 
 ## Properties
 
-TestPP is different from most C++ unit testing frameworks because it also
-supports **properties**: invariants that hold true for your algorithms.
+TestPP also supports **properties**: invariants that hold true for your
+algorithms.
 
-To use properties, `#include <property.h>`.
-
-Properties are also declared with macros and function bodies, slightly
-differently.
+Properties are declared the same way as tests, just with a different macro and an additional parameter that is the function argument.
 
 ```cpp
 DECLARE_PROPERTY(StringReverse, Algos, const string& s)
@@ -43,7 +81,7 @@ DECLARE_PROPERTY(StringReverse, Algos, const string& s)
 ```
 
 The third argument to `DECLARE_PROPERTY` is the function argument. TestPP will
-generate arbitrary values of this type and feed them to your property checker.
+generate arbitrary values of this type and feed them to your test function.
 
 ## Arbitrary
 
@@ -65,7 +103,7 @@ your type.
   types that don't make sense to shrink, `shrink` should return an empty vector.
   It should also return an empty vector if the argument has been shrunk enough.
 
-Both `generate` and `generate_n` take an argument that can be used to seed an
+Both `generate` and `generate_n` take an argument that will be used to seed an
 RNG. On failure, the failing seed will be reported so that you can reproduce the
 test.
 
@@ -74,13 +112,13 @@ If TestPP finds that a property fails to hold for a given value, it will call
 For example, a test on a string that breaks if 'A' is present may produce:
 
 ```
-BrokenStringProperty: Failed: ~+9Sbh~"D q`A%:-\_+G (seed=1419143051)
+Failed: ~+9Sbh~"D q`A%:-\_+G
 Failed: q`A%:-\_+G
 Failed: q`A%:
 Failed: A%:
 Failed: A
-100 checks, 5 failures.
-FAIL: Property::BrokenStringProperty
+Reproduce failure with --seed=1419143051
+FAIL: BrokenStringProperty
 ```
 
 Examples of usage can be found in `property.cpp`.
@@ -91,8 +129,6 @@ Sometimes you want to time tests. You can set up a timed test easily, just like
 a regular test. There is no return value, because it's assumed the test exists
 so you can see what time it takes.
 
-To use timed tests, `#include <timed_test.h>`.
-
 ```cpp
 DECLARE_TIMED_TEST(TestName, SuiteName)
 {
@@ -100,9 +136,9 @@ DECLARE_TIMED_TEST(TestName, SuiteName)
 }
 ```
 
-And you will see (verbose) output like:
+And you will see output like:
 
-`Simple: 100 tests run in 1206146ns (12061 ns per test).`
+`TestName: 100 tests run in 1206146ns (12061 ns per test).`
 
 ## Complexity
 
@@ -111,8 +147,6 @@ complexity of my algorithm? You might want to do this to get some kind of
 guarantee your algorithm will scale, for example. You can use an algorithmic
 complexity property, similar to a property, but with an extra "expected
 complexity".
-
-To use complexity properties, `#include <complexity.h>`.
 
 ```cpp
 DECLARE_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
@@ -125,4 +159,13 @@ Generating values for use in complexity properties will call `generate_n` on the
 `Arbitrary` class.
 
 If the complexity test comes in *under* the expected complexity, it will be
-considered a pass. Complexity results will be reported in verbose output.
+considered a pass.
+
+## Output Formatters
+
+The default output formatter uses ANSI coloring (use `--nocolor` to turn it off)
+and normally omits output from passing tests (use `--verbose` to show the output
+of all tests).
+
+An output formatter for the Test Anything Protocol is also available (use
+`--output=TAP`).
