@@ -1,22 +1,22 @@
-# TestPP
+# Testinator
 
-Experiments with testing in C++. TestPP is a unit testing framework.
+Experiments with testing in C++. Testinator is a unit testing framework.
 
 ## Basic setup
 
-TestPP is a header-only library. To use it in the simplest way, a complete
+Testinator is a header-only library. To use it in the simplest way, a complete
 program is:
 
 ```cpp
-#define TESTPP_MAIN
-#include <testpp.h>
+#define TESTINATOR_MAIN
+#include <testinator.h>
 ```
 
 This includes everything you need and provides a main function with some command
 line parameters:
 
 ```
-Usage: testpp [OPTION]...
+Usage: testinator [OPTION]...
 Run all tests in randomized order by default.
 
 --testName=NAME    run only the named test
@@ -65,7 +65,7 @@ DIAGNOSTIC("Hello world " << 42);
 
 ## Properties
 
-TestPP also supports **properties**: invariants that hold true for your
+Testinator also supports **properties**: invariants that hold true for your
 algorithms.
 
 Properties are declared the same way as tests, just with a different macro and an additional parameter that is the function argument.
@@ -80,16 +80,16 @@ DECLARE_PROPERTY(StringReverse, Algos, const string& s)
 }
 ```
 
-The third argument to `DECLARE_PROPERTY` is the function argument. TestPP will
-generate arbitrary values of this type and feed them to your test function.
+The third argument to `DECLARE_PROPERTY` is the function argument. Testinator
+will generate arbitrary values of this type and feed them to your test function.
 
 ## Arbitrary
 
-TestPP knows how to generate values of standard types, but if you have a type
-that you've defined, you may need to tell TestPP how to generate it. To do this,
-specialize the `Arbitrary` template. Examples are in `arbitrary_*.h` and
-`property.cpp`. The output operator, `operator<<`, should also be available for
-your type.
+Testinator knows how to generate values of standard types, but if you have a
+type that you've defined, you may need to tell Testinator how to generate it. To
+do this, specialize the `Arbitrary` template. Examples are in `arbitrary_*.h`
+and `property.cpp`. The output operator, `operator<<`, should also be available
+for your type.
 
 `Arbitrary` supplies three static functions:
 
@@ -107,9 +107,10 @@ Both `generate` and `generate_n` take an argument that will be used to seed an
 RNG. On failure, the failing seed will be reported so that you can reproduce the
 test.
 
-If TestPP finds that a property fails to hold for a given value, it will call
-`shrink` in an attempt to find the smallest test case that breaks the property.
-For example, a test on a string that breaks if 'A' is present may produce:
+If Testinator finds that a property fails to hold for a given value, it will
+call `shrink` in an attempt to find the smallest test case that breaks the
+property. For example, a test on a string that breaks if 'A' is present may
+produce:
 
 ```
 Failed: ~+9Sbh~"D q`A%:-\_+G

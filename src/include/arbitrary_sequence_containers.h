@@ -9,7 +9,7 @@
 #include <list>
 #include <vector>
 
-namespace testpp
+namespace testinator
 {
 
   namespace

@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-namespace testpp
+namespace testinator
 {
 #define RED "\033[31;1m"
 #define GREEN "\033[32;1m"
@@ -143,9 +143,9 @@ namespace testpp
   {
     std::unique_ptr<Outputter> op;
     if (name == "TAP")
-      op = std::make_unique<testpp::TAPOutputter>();
+      op = std::make_unique<TAPOutputter>();
     else
-      op = std::make_unique<testpp::DefaultOutputter>(std::cout, flags);
+      op = std::make_unique<DefaultOutputter>(std::cout, flags);
     return op;
   }
 

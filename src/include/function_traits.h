@@ -1,6 +1,6 @@
 #pragma once
 
-namespace testpp
+namespace testinator
 {
 
   //------------------------------------------------------------------------------

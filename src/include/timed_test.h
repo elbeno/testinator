@@ -6,7 +6,7 @@
 #include <memory>
 #include <sstream>
 
-namespace testpp
+namespace testinator
 {
 
   //------------------------------------------------------------------------------
@@ -68,21 +68,21 @@ namespace testpp
 
 //------------------------------------------------------------------------------
 #define DECLARE_TIMED_TEST(NAME, SUITE)                    \
-  class SUITE##NAME##TimedTest : public testpp::Test       \
+  class SUITE##NAME##TimedTest : public testinator::Test   \
   {                                                        \
   public:                                                  \
     SUITE##NAME##TimedTest()                               \
-      : testpp::Test(#NAME, #SUITE)                        \
+      : testinator::Test(#NAME, #SUITE)                    \
       , m_numChecks(1)                                     \
     {}                                                     \
-    virtual bool Setup(const testpp::RunParams& params)    \
+    virtual bool Setup(const testinator::RunParams& params)\
     {                                                      \
       m_numChecks = params.m_numPropertyChecks;            \
       return true;                                         \
     }                                                      \
     virtual bool Run()                                     \
     {                                                      \
-      testpp::TimedTest p(*this);                          \
+      testinator::TimedTest p(*this);                      \
       p.check(m_numChecks, m_op);                          \
       return true;                                         \
     }                                                      \

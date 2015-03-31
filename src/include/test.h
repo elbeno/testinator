@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace testpp
+namespace testinator
 {
   //------------------------------------------------------------------------------
   enum RunFlags : uint32_t
@@ -67,11 +67,11 @@ namespace testpp
 
 //------------------------------------------------------------------------------
 #define DECLARE_TEST(NAME, SUITE)                         \
-  class SUITE##NAME : public testpp::Test                 \
+  class SUITE##NAME : public testinator::Test                 \
   {                                                       \
   public:                                                 \
     SUITE##NAME()                                         \
-      : testpp::Test(#NAME, #SUITE) {}                    \
+      : testinator::Test(#NAME, #SUITE) {}                    \
     virtual bool Run() override;                          \
   } s_##SUITE##NAME##_Test;                               \
   bool SUITE##NAME::Run()
@@ -79,7 +79,7 @@ namespace testpp
 //------------------------------------------------------------------------------
 #include "test_registry.h"
 
-namespace testpp
+namespace testinator
 {
   //------------------------------------------------------------------------------
   inline Results RunAllTests(const RunParams& params = RunParams(),

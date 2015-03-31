@@ -3,7 +3,7 @@
 #include <ostream>
 #include <utility>
 
-namespace testpp
+namespace testinator
 {
 
   // -----------------------------------------------------------------------------

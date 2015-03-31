@@ -6,7 +6,7 @@
 #include <limits>
 #include <random>
 
-namespace testpp
+namespace testinator
 {
 
   namespace

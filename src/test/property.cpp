@@ -14,8 +14,8 @@ struct TestFunctor
 DECLARE_TEST(Functor, Property)
 {
   TestFunctor f;
-  testpp::Property p(f);
-  testpp::Outputter op;
+  testinator::Property p(f);
+  testinator::Outputter op;
   return p.check(0, &op);
 }
 
@@ -29,7 +29,7 @@ struct FuncTraitsStruct
 
 DECLARE_TEST(FunctorTraits, Property)
 {
-  typedef testpp::function_traits<FuncTraitsStruct> traits;
+  using traits = testinator::function_traits<FuncTraitsStruct>;
 
   return std::is_same<int, traits::argType>::value;
 }
@@ -101,7 +101,7 @@ ostream& operator<<(ostream& s, const MyBoundedType& m)
 }
 
 template <>
-struct testpp::Arbitrary<MyBoundedType>
+struct testinator::Arbitrary<MyBoundedType>
 {
   static MyBoundedType generate(std::size_t generation, unsigned long int /*randomSeed*/)
   { return MyBoundedType(generation % MyBoundedType::MAX_VAL); }

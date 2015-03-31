@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace testpp
+namespace testinator
 {
 
   //------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace testpp
           if (!checkSingle(p, op))
           {
             op->diagnostic(
-                Diagnostic(testpp::Cons<testpp::Nil>()
+                Diagnostic(Cons<Nil>()
                            << "Reproduce failure with --seed=" << seed));
             return false;
           }
@@ -70,7 +70,7 @@ namespace testpp
         if (m_u(p)) return true;
 
         op->diagnostic(
-            Diagnostic(testpp::Cons<testpp::Nil>()
+            Diagnostic(Cons<Nil>()
                        << "Failed: " << p));
 
         std::vector<paramType> v = Arbitrary<paramType>::shrink(p);
@@ -89,10 +89,7 @@ namespace testpp
     std::unique_ptr<InternalBase> m_internal;
   };
 
-}
-
-namespace testpp
-{
+  //------------------------------------------------------------------------------
   class PropertyTest : public Test
   {
   public:
@@ -100,7 +97,7 @@ namespace testpp
       : Test(name, suiteName)
     {}
 
-    virtual bool Setup(const testpp::RunParams& params) override
+    virtual bool Setup(const RunParams& params) override
     {
       m_numChecks = params.m_numPropertyChecks;
       m_randomSeed = params.m_randomSeed;
@@ -120,14 +117,14 @@ namespace testpp
 
 //------------------------------------------------------------------------------
 #define DECLARE_PROPERTY(NAME, SUITE, ARG)                  \
-  class SUITE##NAME##Property : public testpp::PropertyTest \
+  class SUITE##NAME##Property : public testinator::PropertyTest \
   {                                                         \
   public:                                                   \
     SUITE##NAME##Property()                                 \
-      : testpp::PropertyTest(#NAME "Property", #SUITE) {}   \
+      : testinator::PropertyTest(#NAME "Property", #SUITE) {} \
     virtual bool Run() override                             \
     {                                                       \
-      testpp::Property p(*this);                            \
+      testinator::Property p(*this);                        \
       return p.check(m_numChecks, m_op);                    \
     }                                                       \
     bool operator()(ARG) const;                             \

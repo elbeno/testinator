@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace testpp
+namespace testinator
 {
 
   //------------------------------------------------------------------------------

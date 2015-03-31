@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace testpp
+namespace testinator
 {
 
   namespace

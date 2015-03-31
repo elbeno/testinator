@@ -5,7 +5,7 @@
 #include <tuple>
 #include <utility>
 
-namespace testpp
+namespace testinator
 {
 
   //------------------------------------------------------------------------------

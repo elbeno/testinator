@@ -1,5 +1,5 @@
-#define TESTPP_MAIN
-#include <testpp.h>
+#define TESTINATOR_MAIN
+#include <testinator.h>
 
 DECLARE_TEST(Foo, Bar)
 {

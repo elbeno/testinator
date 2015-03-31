@@ -1,4 +1,4 @@
-#include <testpp.h>
+#include <testinator.h>
 
 using namespace std;
 
@@ -9,29 +9,29 @@ namespace
 }
 
 //------------------------------------------------------------------------------
-class TestCallTest : public testpp::Test
+class TestCallTest : public testinator::Test
 {
 public:
-  TestCallTest(const string& name) : testpp::Test(name, s_suiteName) {}
+  TestCallTest(const string& name) : testinator::Test(name, s_suiteName) {}
 
   virtual bool Run()
   {
-    testpp::Test myTest("call_test");
-    testpp::Results rs = testpp::RunTest("call_test");
+    testinator::Test myTest("call_test");
+    testinator::Results rs = testinator::RunTest("call_test");
     return !rs.empty() && rs.front().m_success;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestSetupFirst : public testpp::Test
+class TestSetupFirst : public testinator::Test
 {
 public:
   TestSetupFirst(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
     , m_setupCalled(false)
   {}
 
-  virtual bool Setup(const testpp::RunParams&)
+  virtual bool Setup(const testinator::RunParams&)
   {
     m_setupCalled = true;
     return true;
@@ -47,11 +47,11 @@ private:
 };
 
 //------------------------------------------------------------------------------
-class TestTeardownAfterwardsInternal : public testpp::Test
+class TestTeardownAfterwardsInternal : public testinator::Test
 {
 public:
   TestTeardownAfterwardsInternal(const string& name, bool forceFail = false)
-    : testpp::Test(name)
+    : testinator::Test(name)
     , m_runCalled(false)
     , m_teardownCalled(false)
     , m_forceFail(forceFail)
@@ -74,43 +74,43 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestTeardownAfterwards : public testpp::Test
+class TestTeardownAfterwards : public testinator::Test
 {
 public:
   TestTeardownAfterwards(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     TestTeardownAfterwardsInternal myTest("teardown_test");
-    testpp::RunTest("teardown_test");
+    testinator::RunTest("teardown_test");
     return myTest.m_teardownCalled;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestTeardownAfterFail : public testpp::Test
+class TestTeardownAfterFail : public testinator::Test
 {
 public:
   TestTeardownAfterFail(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     TestTeardownAfterwardsInternal myTest("teardown_test", true);
-    testpp::RunTest("teardown_test");
+    testinator::RunTest("teardown_test");
     return myTest.m_teardownCalled;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestRunMultipleInternal : public testpp::Test
+class TestRunMultipleInternal : public testinator::Test
 {
 public:
   TestRunMultipleInternal(const string& name)
-    : testpp::Test(name)
+    : testinator::Test(name)
     , m_runCalled(false)
   {}
 
@@ -124,28 +124,28 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestRunMultiple : public testpp::Test
+class TestRunMultiple : public testinator::Test
 {
 public:
   TestRunMultiple(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     TestRunMultipleInternal test0("test0");
     TestRunMultipleInternal test1("test1");
-    testpp::Results rs = testpp::RunAllTests();
+    testinator::Results rs = testinator::RunAllTests();
     return test0.m_runCalled && test1.m_runCalled;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestReportResultsInternal : public testpp::Test
+class TestReportResultsInternal : public testinator::Test
 {
 public:
   TestReportResultsInternal(const string& name, bool fail)
-    : testpp::Test(name)
+    : testinator::Test(name)
     , m_fail(fail)
   {}
 
@@ -158,20 +158,20 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestReportResults : public testpp::Test
+class TestReportResults : public testinator::Test
 {
 public:
   TestReportResults(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     TestReportResultsInternal test0("expected_fail", true);
     TestReportResultsInternal test1("expected_pass", false);
-    testpp::Results rs = testpp::RunAllTests();
+    testinator::Results rs = testinator::RunAllTests();
     auto numPassed = count_if(rs.begin(), rs.end(),
-                              [] (const testpp::Result& r) { return r.m_success; });
+                              [] (const testinator::Result& r) { return r.m_success; });
     auto total = decltype(numPassed)(rs.size());
     auto numFailed = total - numPassed;
     return numPassed == 1 && numFailed == 1;
@@ -179,30 +179,30 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestRunSuite : public testpp::Test
+class TestRunSuite : public testinator::Test
 {
 public:
   TestRunSuite(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
-    testpp::Test myTest1("test1", "suite1");
-    testpp::Test myTest2("test2", "suite2");
-    testpp::Results rs = testpp::RunSuite("suite1");
+    testinator::Test myTest1("test1", "suite1");
+    testinator::Test myTest2("test2", "suite2");
+    testinator::Results rs = testinator::RunSuite("suite1");
     auto numPassed = count_if(rs.begin(), rs.end(),
-                              [] (const testpp::Result& r) { return r.m_success; });
+                              [] (const testinator::Result& r) { return r.m_success; });
     return numPassed == 1;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestCheckMacroInternal : public testpp::Test
+class TestCheckMacroInternal : public testinator::Test
 {
 public:
   TestCheckMacroInternal(const string& name)
-    : testpp::Test(name)
+    : testinator::Test(name)
   {}
 
   virtual bool Run()
@@ -214,20 +214,20 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestCheckMacro : public testpp::Test
+class TestCheckMacro : public testinator::Test
 {
 public:
   TestCheckMacro(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     ostringstream oss;
-    std::unique_ptr<testpp::DefaultOutputter> op =
-      make_unique<testpp::DefaultOutputter>(oss);
+    std::unique_ptr<testinator::DefaultOutputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
     TestCheckMacroInternal myTestA("A");
-    testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
       "EXPECT FAILED: build/debug/test/main.cpp:211 (!fail == fail => false == true)";
@@ -238,11 +238,11 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestDiagnosticInternal : public testpp::Test
+class TestDiagnosticInternal : public testinator::Test
 {
 public:
   TestDiagnosticInternal(const string& name)
-    : testpp::Test(name)
+    : testinator::Test(name)
   {}
 
   virtual bool Run()
@@ -253,20 +253,20 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestDiagnostic : public testpp::Test
+class TestDiagnostic : public testinator::Test
 {
 public:
   TestDiagnostic(const string& name)
-    : testpp::Test(name, s_suiteName)
+    : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
     ostringstream oss;
-    std::unique_ptr<testpp::DefaultOutputter> op =
-      make_unique<testpp::DefaultOutputter>(oss);
+    std::unique_ptr<testinator::DefaultOutputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
     TestDiagnosticInternal myTestA("A");
-    testpp::Results rs = testpp::RunAllTests(testpp::RunParams(), op.get());
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected = "Hello world 42";
     return !rs.empty() && rs.front().m_success
@@ -297,8 +297,8 @@ int main(int argc, char* argv[])
   string outputterName;
   string testName;
   string suiteName;
-  testpp::RunParams p;
-  auto oflags = testpp::OF_COLOR|testpp::OF_QUIET_SUCCESS;
+  testinator::RunParams p;
+  auto oflags = testinator::OF_COLOR|testinator::OF_QUIET_SUCCESS;
 
   for (int i = 1; i < argc; ++i)
   {
@@ -355,7 +355,7 @@ int main(int argc, char* argv[])
       string option = "--alpha";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_flags |= testpp::RF_ALPHA_ORDER;
+        p.m_flags |= testinator::RF_ALPHA_ORDER;
         continue;
       }
     }
@@ -364,8 +364,8 @@ int main(int argc, char* argv[])
       string option = "--verbose";
       if (s.compare(0, option.size(), option) == 0)
       {
-        oflags &= ~(static_cast<underlying_type_t<testpp::OutputFlags>>(
-                        testpp::OF_QUIET_SUCCESS));
+        oflags &= ~(static_cast<underlying_type_t<testinator::OutputFlags>>(
+                        testinator::OF_QUIET_SUCCESS));
         continue;
       }
     }
@@ -374,8 +374,8 @@ int main(int argc, char* argv[])
       string option = "--nocolor";
       if (s.compare(0, option.size(), option) == 0)
       {
-        oflags &= ~(static_cast<underlying_type_t<testpp::OutputFlags>>(
-                        testpp::OF_COLOR));
+        oflags &= ~(static_cast<underlying_type_t<testinator::OutputFlags>>(
+                        testinator::OF_COLOR));
         continue;
       }
     }
@@ -384,7 +384,7 @@ int main(int argc, char* argv[])
       std::string option = "--help";
       if (s.compare(0, option.size(), option) == 0)
       {
-        std::cout << "Usage: testpp [OPTION]..." << std::endl
+        std::cout << "Usage: testinator [OPTION]..." << std::endl
                   << "Run all tests in randomized order by default." << std::endl
                   << std::endl
                   << "--testName=NAME    run only the named test" << std::endl
@@ -411,20 +411,20 @@ int main(int argc, char* argv[])
   TestRunSuite test6("TestRunSuite");
   TestCheckMacro test7("TestCheckMacro");
   TestDiagnostic test8("TestDiagnostic");
-  testpp::Results rs;
+  testinator::Results rs;
 
-  std::unique_ptr<testpp::Outputter> op = testpp::MakeOutputter(
-      outputterName, static_cast<testpp::OutputFlags>(oflags));
+  std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(
+      outputterName, static_cast<testinator::OutputFlags>(oflags));
 
   if (!testName.empty())
-    rs = testpp::RunTest(testName, p, op.get());
+    rs = testinator::RunTest(testName, p, op.get());
   else if (!suiteName.empty())
-    rs = testpp::RunSuite(suiteName, p, op.get());
+    rs = testinator::RunSuite(suiteName, p, op.get());
   else
-    rs = testpp::RunAllTests(p, op.get());
+    rs = testinator::RunAllTests(p, op.get());
 
   auto numPassed = count_if(rs.begin(), rs.end(),
-                            [] (const testpp::Result& r) { return r.m_success; });
+                            [] (const testinator::Result& r) { return r.m_success; });
   auto total = static_cast<decltype(numPassed)>(rs.size());
   return total - numPassed;
 }

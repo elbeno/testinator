@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace testpp
+namespace testinator
 {
   //------------------------------------------------------------------------------
   class TestRegistry
@@ -120,7 +120,7 @@ namespace testpp
       {
         testNames.push_back(&i.first);
       }
-      if (!(params.m_flags & testpp::RF_ALPHA_ORDER))
+      if (!(params.m_flags & RF_ALPHA_ORDER))
       {
         std::shuffle(testNames.begin(), testNames.end(), m_generator);
       }

@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-namespace testpp
+namespace testinator
 {
 #pragma once
 
@@ -73,29 +73,28 @@ namespace testpp
 }
 
 // -----------------------------------------------------------------------------
-#define DIAGNOSTIC(msg)                                       \
-  (m_op->diagnostic(testpp::Diagnostic(                       \
-                        testpp::Cons<testpp::Nil>() << msg)))
+#define DIAGNOSTIC(msg)                                               \
+  (m_op->diagnostic(testinator::Diagnostic(                           \
+                        testinator::Cons<testinator::Nil>() << msg)))
 
 // -----------------------------------------------------------------------------
 #define EXPECT(x)                                                       \
   {                                                                     \
-    auto cap = testpp::Capture<testpp::Nothing>() ->* x;                \
-    if (!testpp::Eval(cap))                                             \
+    auto cap = testinator::Capture<testinator::Nothing>() ->* x;        \
+    if (!testinator::Eval(cap))                                         \
     {                                                                   \
-      auto diag =                                                       \
-        testpp::Cons<testpp::Nil>() << "EXPECT FAILED: " __FILE__ ":"   \
-                                    << __LINE__                         \
-                                    << " (" #x " => " << LHS(cap);      \
+      auto diag = testinator::Cons<testinator::Nil>()                   \
+        << "EXPECT FAILED: " __FILE__ ":"  << __LINE__                  \
+        << " (" #x " => " << LHS(cap);                                  \
       if (RelOp(cap)[0] != 0)                                           \
       {                                                                 \
-        m_op->diagnostic(testpp::Diagnostic(                            \
+        m_op->diagnostic(testinator::Diagnostic(                        \
                              std::move(diag) << " " << RelOp(cap)       \
                              << " " << RHS(cap) << ")"));               \
       }                                                                 \
       else                                                              \
       {                                                                 \
-        m_op->diagnostic(testpp::Diagnostic(std::move(diag) << ")"));   \
+        m_op->diagnostic(testinator::Diagnostic(std::move(diag) << ")")); \
       }                                                                 \
       m_success = false;                                                \
     }                                                                   \

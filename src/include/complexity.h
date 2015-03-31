@@ -13,7 +13,7 @@
 #include <random>
 #include <sstream>
 
-namespace testpp
+namespace testinator
 {
 
   enum
@@ -167,25 +167,25 @@ namespace testpp
 
 //------------------------------------------------------------------------------
 #define DECLARE_COMPLEXITY_PROPERTY(NAME, SUITE, ARG, ORDER)            \
-  class SUITE##NAME##ComplexityProperty : public testpp::PropertyTest   \
+  class SUITE##NAME##ComplexityProperty : public testinator::PropertyTest \
   {                                                                     \
   public:                                                               \
     SUITE##NAME##ComplexityProperty()                                   \
-      : testpp::PropertyTest(#NAME "ComplexityProperty", #SUITE) {}     \
+      : testinator::PropertyTest(#NAME "ComplexityProperty", #SUITE) {} \
     virtual bool Run() override                                         \
     {                                                                   \
-      testpp::ComplexityProperty p(*this);                              \
+      testinator::ComplexityProperty p(*this);                          \
       int order = p.check(m_numChecks);                                 \
-      bool success = (order <= testpp::ORDER);                          \
+      bool success = (order <= testinator::ORDER);                      \
       if (!success)                                                     \
       {                                                                 \
         m_op->diagnostic(                                               \
-            testpp::Diagnostic(                                         \
-                testpp::Cons<testpp::Nil>()                             \
+            testinator::Diagnostic(                                     \
+                testinator::Cons<testinator::Nil>()                     \
                 << m_name << ": expected "                              \
-                << testpp::ComplexityProperty::Order(testpp::ORDER)     \
+                << testinator::ComplexityProperty::Order(testinator::ORDER) \
                 << ", actually "                                        \
-                << testpp::ComplexityProperty::Order(order)));          \
+                << testinator::ComplexityProperty::Order(order)));      \
       }                                                                 \
       return success;                                                   \
     }                                                                   \

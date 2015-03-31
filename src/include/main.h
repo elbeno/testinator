@@ -1,14 +1,14 @@
 #pragma once
 
-#ifdef TESTPP_MAIN
+#ifdef TESTINATOR_MAIN
 
 int main(int argc, char* argv[])
 {
   std::string outputterName;
   std::string testName;
   std::string suiteName;
-  testpp::RunParams p;
-  auto oflags = testpp::OF_COLOR|testpp::OF_QUIET_SUCCESS;
+  testinator::RunParams p;
+  auto oflags = testinator::OF_COLOR|testinator::OF_QUIET_SUCCESS;
 
   for (int i = 1; i < argc; ++i)
   {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
       std::string option = "--alpha";
       if (s.compare(0, option.size(), option) == 0)
       {
-        p.m_flags |= testpp::RF_ALPHA_ORDER;
+        p.m_flags |= testinator::RF_ALPHA_ORDER;
         continue;
       }
     }
@@ -74,8 +74,8 @@ int main(int argc, char* argv[])
       std::string option = "--verbose";
       if (s.compare(0, option.size(), option) == 0)
       {
-        oflags &= ~(static_cast<std::underlying_type_t<testpp::OutputFlags>>(
-                        testpp::OF_QUIET_SUCCESS));
+        oflags &= ~(static_cast<std::underlying_type_t<testinator::OutputFlags>>(
+                        testinator::OF_QUIET_SUCCESS));
         continue;
       }
     }
@@ -84,8 +84,8 @@ int main(int argc, char* argv[])
       std::string option = "--nocolor";
       if (s.compare(0, option.size(), option) == 0)
       {
-        oflags &= ~(static_cast<std::underlying_type_t<testpp::OutputFlags>>(
-                        testpp::OF_COLOR));
+        oflags &= ~(static_cast<std::underlying_type_t<testinator::OutputFlags>>(
+                        testinator::OF_COLOR));
         continue;
       }
     }
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
       std::string option = "--help";
       if (s.compare(0, option.size(), option) == 0)
       {
-        std::cout << "Usage: testpp [OPTION]..." << std::endl
+        std::cout << "Usage: testinator [OPTION]..." << std::endl
                   << "Run all tests in randomized order by default." << std::endl
                   << std::endl
                   << "--testName=NAME    run only the named test" << std::endl
@@ -112,19 +112,19 @@ int main(int argc, char* argv[])
 
   }
 
-  std::unique_ptr<testpp::Outputter> op = testpp::MakeOutputter(
-      outputterName, static_cast<testpp::OutputFlags>(oflags));
+  std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(
+      outputterName, static_cast<testinator::OutputFlags>(oflags));
 
-  testpp::Results rs;
+  testinator::Results rs;
   if (!testName.empty())
-    rs = testpp::RunTest(testName, p, op.get());
+    rs = testinator::RunTest(testName, p, op.get());
   else if (!suiteName.empty())
-    rs = testpp::RunSuite(suiteName, p, op.get());
+    rs = testinator::RunSuite(suiteName, p, op.get());
   else
-    rs = testpp::RunAllTests(p, op.get());
+    rs = testinator::RunAllTests(p, op.get());
 
   auto numPassed = count_if(rs.cbegin(), rs.cend(),
-                            [] (const testpp::Result& r) { return r.m_success; });
+                            [] (const testinator::Result& r) { return r.m_success; });
   auto total = static_cast<decltype(numPassed)>(rs.size());
   return total - numPassed;
 }

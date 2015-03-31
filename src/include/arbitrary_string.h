@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <string>
 
-namespace testpp
+namespace testinator
 {
 
   //------------------------------------------------------------------------------

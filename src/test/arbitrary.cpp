@@ -5,7 +5,7 @@ using namespace std;
 //------------------------------------------------------------------------------
 DECLARE_TEST(bool, Arbitrary)
 {
-  testpp::Arbitrary<bool> a;
+  testinator::Arbitrary<bool> a;
   bool v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -14,7 +14,7 @@ DECLARE_TEST(bool, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(char, Arbitrary)
 {
-  testpp::Arbitrary<char> a;
+  testinator::Arbitrary<char> a;
   char v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -23,7 +23,7 @@ DECLARE_TEST(char, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(signedchar, Arbitrary)
 {
-  testpp::Arbitrary<signed char> a;
+  testinator::Arbitrary<signed char> a;
   signed char v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -32,7 +32,7 @@ DECLARE_TEST(signedchar, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unsignedchar, Arbitrary)
 {
-  testpp::Arbitrary<unsigned char> a;
+  testinator::Arbitrary<unsigned char> a;
   unsigned char v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -41,7 +41,7 @@ DECLARE_TEST(unsignedchar, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(wchar_t, Arbitrary)
 {
-  testpp::Arbitrary<wchar_t> a;
+  testinator::Arbitrary<wchar_t> a;
   wchar_t v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -50,7 +50,7 @@ DECLARE_TEST(wchar_t, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(char16_t, Arbitrary)
 {
-  testpp::Arbitrary<char16_t> a;
+  testinator::Arbitrary<char16_t> a;
   char16_t v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -59,7 +59,7 @@ DECLARE_TEST(char16_t, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(char32_t, Arbitrary)
 {
-  testpp::Arbitrary<char32_t> a;
+  testinator::Arbitrary<char32_t> a;
   char32_t v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -68,7 +68,7 @@ DECLARE_TEST(char32_t, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(short, Arbitrary)
 {
-  testpp::Arbitrary<short> a;
+  testinator::Arbitrary<short> a;
   short v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -77,7 +77,7 @@ DECLARE_TEST(short, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unsignedshort, Arbitrary)
 {
-  testpp::Arbitrary<unsigned short> a;
+  testinator::Arbitrary<unsigned short> a;
   unsigned short v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -86,7 +86,7 @@ DECLARE_TEST(unsignedshort, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(int, Arbitrary)
 {
-  testpp::Arbitrary<int> a;
+  testinator::Arbitrary<int> a;
   int v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -95,7 +95,7 @@ DECLARE_TEST(int, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unsignedint, Arbitrary)
 {
-  testpp::Arbitrary<unsigned int> a;
+  testinator::Arbitrary<unsigned int> a;
   unsigned int v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -104,7 +104,7 @@ DECLARE_TEST(unsignedint, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(long, Arbitrary)
 {
-  testpp::Arbitrary<long> a;
+  testinator::Arbitrary<long> a;
   long v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -113,7 +113,7 @@ DECLARE_TEST(long, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unsignedlong, Arbitrary)
 {
-  testpp::Arbitrary<unsigned long> a;
+  testinator::Arbitrary<unsigned long> a;
   unsigned long v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -122,7 +122,7 @@ DECLARE_TEST(unsignedlong, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(longlong, Arbitrary)
 {
-  testpp::Arbitrary<long long> a;
+  testinator::Arbitrary<long long> a;
   long long v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -131,7 +131,7 @@ DECLARE_TEST(longlong, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unsignedlonglong, Arbitrary)
 {
-  testpp::Arbitrary<unsigned long long> a;
+  testinator::Arbitrary<unsigned long long> a;
   unsigned long long v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -140,7 +140,7 @@ DECLARE_TEST(unsignedlonglong, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(float, Arbitrary)
 {
-  testpp::Arbitrary<float> a;
+  testinator::Arbitrary<float> a;
   float v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -149,7 +149,7 @@ DECLARE_TEST(float, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(double, Arbitrary)
 {
-  testpp::Arbitrary<double> a;
+  testinator::Arbitrary<double> a;
   double v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -158,7 +158,7 @@ DECLARE_TEST(double, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(longdouble, Arbitrary)
 {
-  testpp::Arbitrary<long double> a;
+  testinator::Arbitrary<long double> a;
   long double v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -167,7 +167,7 @@ DECLARE_TEST(longdouble, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(vector, Arbitrary)
 {
-  testpp::Arbitrary<vector<int>> a;
+  testinator::Arbitrary<vector<int>> a;
   vector<int> v = a.generate(0,0);
   vector<vector<int>> vv = a.shrink(v);
   return vv.size() == 2
@@ -178,7 +178,7 @@ DECLARE_TEST(vector, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(string, Arbitrary)
 {
-  testpp::Arbitrary<string> a;
+  testinator::Arbitrary<string> a;
   string v = a.generate(0,0);
   vector<string> vv = a.shrink(v);
   return vv.size() == 2
@@ -189,7 +189,7 @@ DECLARE_TEST(string, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(deque, Arbitrary)
 {
-  testpp::Arbitrary<deque<int>> a;
+  testinator::Arbitrary<deque<int>> a;
   deque<int> v = a.generate(0,0);
   vector<deque<int>> vv = a.shrink(v);
   return vv.size() == 2
@@ -200,7 +200,7 @@ DECLARE_TEST(deque, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(list, Arbitrary)
 {
-  testpp::Arbitrary<list<int>> a;
+  testinator::Arbitrary<list<int>> a;
   list<int> v = a.generate(0,0);
   vector<list<int>> vv = a.shrink(v);
   return vv.size() == 2
@@ -211,7 +211,7 @@ DECLARE_TEST(list, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(forward_list, Arbitrary)
 {
-  testpp::Arbitrary<forward_list<int>> a;
+  testinator::Arbitrary<forward_list<int>> a;
   forward_list<int> v = a.generate(0,0);
   vector<forward_list<int>> vv = a.shrink(v);
 
@@ -233,7 +233,7 @@ DECLARE_TEST(forward_list, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(set, Arbitrary)
 {
-  testpp::Arbitrary<set<int>> a;
+  testinator::Arbitrary<set<int>> a;
   set<int> v = a.generate(0,0);
   vector<set<int>> vv = a.shrink(v);
   return vv.size() == 2
@@ -244,7 +244,7 @@ DECLARE_TEST(set, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(multiset, Arbitrary)
 {
-  testpp::Arbitrary<multiset<int>> a;
+  testinator::Arbitrary<multiset<int>> a;
   multiset<int> v = a.generate(0,0);
   vector<multiset<int>> vv = a.shrink(v);
   return vv.size() == 2
@@ -255,7 +255,7 @@ DECLARE_TEST(multiset, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unordered_set, Arbitrary)
 {
-  testpp::Arbitrary<unordered_set<int>> a;
+  testinator::Arbitrary<unordered_set<int>> a;
   unordered_set<int> v = a.generate(0,0);
   vector<unordered_set<int>> vv = a.shrink(v);
   return vv.size() == 2
@@ -266,7 +266,7 @@ DECLARE_TEST(unordered_set, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(pair, Arbitrary)
 {
-  testpp::Arbitrary<pair<int, float>> a;
+  testinator::Arbitrary<pair<int, float>> a;
   pair<int, float> v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -275,7 +275,7 @@ DECLARE_TEST(pair, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(tuple, Arbitrary)
 {
-  testpp::Arbitrary<tuple<int, float>> a;
+  testinator::Arbitrary<tuple<int, float>> a;
   tuple<int, float> v = a.generate(0,0);
   a.shrink(v);
   return true;
@@ -284,7 +284,7 @@ DECLARE_TEST(tuple, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(map, Arbitrary)
 {
-  testpp::Arbitrary<map<int, float>> a;
+  testinator::Arbitrary<map<int, float>> a;
   map<int, float> v = a.generate(0,0);
   vector<map<int, float>> vv = a.shrink(v);
   return vv.size() == 2
@@ -295,7 +295,7 @@ DECLARE_TEST(map, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(multimap, Arbitrary)
 {
-  testpp::Arbitrary<multimap<int, float>> a;
+  testinator::Arbitrary<multimap<int, float>> a;
   multimap<int, float> v = a.generate(0,0);
   vector<multimap<int, float>> vv = a.shrink(v);
   return vv.size() == 2
@@ -306,7 +306,7 @@ DECLARE_TEST(multimap, Arbitrary)
 //------------------------------------------------------------------------------
 DECLARE_TEST(unordered_map, Arbitrary)
 {
-  testpp::Arbitrary<unordered_map<int, float>> a;
+  testinator::Arbitrary<unordered_map<int, float>> a;
   unordered_map<int, float> v = a.generate(0,0);
   vector<unordered_map<int, float>> vv = a.shrink(v);
   return vv.size() == 2
