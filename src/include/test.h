@@ -56,9 +56,11 @@ namespace testinator
     }
 
     const std::string& GetName() const { return m_name; }
+    bool skipped() const { return m_skipped; }
 
   protected:
     bool m_success = true;
+    bool m_skipped = false;
     std::string m_name;
     std::string m_message;
     const Outputter* m_op;

@@ -84,6 +84,13 @@ namespace testinator
     testinator::GetTestRegistry().Abort();                            \
   }
 
+#define SKIP(msg)                                                     \
+  {                                                                   \
+    m_op->skipTest(GetName(), testinator::Diagnostic(                 \
+                    testinator::Cons<testinator::Nil>() << msg));     \
+    m_skipped = true;                                                 \
+  }
+
 // -----------------------------------------------------------------------------
 #define EXPECT(x)                                                       \
   {                                                                     \

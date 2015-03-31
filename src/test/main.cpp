@@ -165,7 +165,7 @@ public:
   virtual bool Run()
   {
     ostringstream oss;
-    std::unique_ptr<testinator::DefaultOutputter> op =
+    std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
     TestCheckMacroInternal myTestA("A");
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
@@ -204,7 +204,7 @@ public:
   virtual bool Run()
   {
     ostringstream oss;
-    std::unique_ptr<testinator::DefaultOutputter> op =
+    std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
     TestDiagnosticInternal myTestA("A");
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
@@ -244,7 +244,7 @@ public:
   virtual bool Run()
   {
     ostringstream oss;
-    std::unique_ptr<testinator::DefaultOutputter> op =
+    std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
     TestAbortInternal myTestA("A");
     TestAbortInternal myTestB("B");
@@ -293,7 +293,7 @@ public:
   virtual bool Run()
   {
     ostringstream oss;
-    std::unique_ptr<testinator::DefaultOutputter> op =
+    std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
     TestRegionsInternal myTestA("A");
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
@@ -301,6 +301,43 @@ public:
     static string expected =
       "no region\nregion (export/debug/include/region.h:271)\nno region\nregion B";
     return !rs.empty() && rs.front().m_success
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestSkipInternal : public testinator::Test
+{
+public:
+  TestSkipInternal(const string& name)
+    : testinator::Test(name)
+  {}
+
+  virtual bool Run()
+  {
+    SKIP("Hello world " << 42);
+    return false;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestSkip : public testinator::Test
+{
+public:
+  TestSkip(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::TAPOutputter>(oss);
+    TestSkipInternal myTestA("A");
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    static string expected = "# skip Hello world 42";
+    return myTestA.skipped()
       && oss.str().find(expected) != string::npos;
   }
 };
@@ -441,6 +478,7 @@ int main(int argc, char* argv[])
   TestCheckMacro test7("TestCheckMacro");
   TestDiagnostic test8("TestDiagnostic");
   TestRegions test9("TestRegions");
+  TestSkip test10("TestSkip");
   testinator::Results rs;
 
   std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(

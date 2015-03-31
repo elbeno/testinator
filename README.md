@@ -68,7 +68,19 @@ DIAGNOSTIC("Hello world " << 42);
 ## Critical failures
 
 Ordinarily, a test should return `true` or `false` to indicate success or
-failure. If a test has such a problem that no other tests are likely to succeed,
+failure. If a test has a problem that means it should be skipped, you can use
+`SKIP` to skip that test:
+
+```cpp
+DEF_TEST(TestName, SuiteName)
+{
+  // this test went wrong in some deep way
+  SKIP("Something bad happened");
+  return true;
+}
+```
+
+And if a test has such a problem that no other tests are likely to succeed,
 you can use `ABORT` to bail out completely:
 
 ```cpp
@@ -76,8 +88,11 @@ DEF_TEST(TestName, SuiteName)
 {
   // critical failure, don't run any more tests
   ABORT("Self destruct");
+  return true;
 }
 ```
+
+After `SKIP` or `ABORT` it doesn't matter what is returned.
 
 ## Regions
 

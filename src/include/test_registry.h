@@ -155,7 +155,8 @@ namespace testinator
       {
         outputter->startTest(test->GetName());
         r = test->RunWrapper(outputter);
-        outputter->endTest(test->GetName(), r.m_success);
+        if (!test->skipped())
+          outputter->endTest(test->GetName(), r.m_success);
       }
       else
       {

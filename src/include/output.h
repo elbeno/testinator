@@ -89,18 +89,22 @@ namespace testinator
   //------------------------------------------------------------------------------
   struct TAPOutputter : public Outputter
   {
+    TAPOutputter(std::ostream& os = std::cout)
+      : m_os(os)
+    {}
+
     virtual void startRun(int numTests) const override
     {
       m_numTests = 0;
-      std::cout << "1.." << numTests << std::endl;
+      m_os << "1.." << numTests << std::endl;
     }
 
     virtual void skipTest(const std::string& name, const std::string& msg) const override
     {
-      std::cout << "ok "
-                << ++m_numTests
-                << ' ' << name
-                << " # skip " << msg << std::endl;
+      m_os << "ok "
+           << ++m_numTests
+           << ' ' << name
+           << " # skip " << msg << std::endl;
     }
 
     virtual void startTest(const std::string&) const override
@@ -109,25 +113,27 @@ namespace testinator
 
     virtual void diagnostic(const std::string& msg) const override
     {
-      std::cout << "# " << msg << std::endl;
+      m_os << "# " << msg << std::endl;
     }
 
     virtual void endTest(const std::string& name, bool success) const override
     {
-      std::cout << (success ? "ok " : "not ok ")
-                << ++m_numTests
-                << ' ' << name << std::endl;
+      m_os << (success ? "ok " : "not ok ")
+           << ++m_numTests
+           << ' ' << name << std::endl;
     }
 
     virtual void abort(const std::string& msg) const override
     {
-      std::cout << "Bail out! " << msg << std::endl;
+      m_os << "Bail out! " << msg << std::endl;
     }
 
     virtual void endRun(int, int) const override
     {
     }
 
+  private:
+    std::ostream& m_os;
     mutable int m_numTests;
   };
 
