@@ -75,6 +75,7 @@ name may be retrieved with `REGION_NAME`. For example:
 DEF_TEST(TestName, SuiteName)
 {
   // some common setup here...
+  bool success = true;
 
   DEF_REGION(A)
   {
@@ -96,6 +97,9 @@ Regions may be nested if further common structure is required; the test will run
 as many times as necessary to visit all the "leaf" regions. If Regions are not
 explicitly named, `REGION_NAME` will be automatically provided with filename and
 line information.
+
+Tests should not return early from within Regions: this will cause subsequent
+Regions to be skipped.
 
 ## Properties
 
@@ -196,8 +200,8 @@ DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
 Generating values for use in complexity properties will call `generate_n` on the
 `Arbitrary` class.
 
-If the complexity test comes in *under* the expected complexity, it will be
-considered a pass.
+If the complexity test comes in at or *under* the expected complexity, it will
+be considered a pass.
 
 ## Output Formatters
 
