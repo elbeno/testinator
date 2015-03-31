@@ -63,6 +63,20 @@ The `DIAGNOSTIC` macro produces arbitrary diagnostic output:
 DIAGNOSTIC("Hello world " << 42);
 ```
 
+## Critical failures
+
+Ordinarily, a test should return `true` or `false` to indicate success or
+failure. If a test has such a problem that no other tests are likely to succeed,
+you can use `ABORT` to bail out completely:
+
+```cpp
+DEF_TEST(TestName, SuiteName)
+{
+  // critical failure, don't run any more tests
+  ABORT("Self destruct");
+}
+```
+
 ## Regions
 
 Instead of exposing fixtures or setup/teardown functionality, Testinator uses
@@ -98,8 +112,8 @@ as many times as necessary to visit all the "leaf" regions. If Regions are not
 explicitly named, `REGION_NAME` will be automatically provided with filename and
 line information.
 
-Tests should not return early from within Regions: this will cause subsequent
-Regions to be skipped.
+If a test returns early (assumedly with a failure, returning `false`) from
+within a Region, this will cause subsequent Regions to be skipped.
 
 ## Properties
 

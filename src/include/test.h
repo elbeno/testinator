@@ -66,12 +66,12 @@ namespace testinator
 }
 
 //------------------------------------------------------------------------------
-#define DEF_TEST(NAME, SUITE)                         \
-  class SUITE##NAME : public testinator::Test                 \
+#define DEF_TEST(NAME, SUITE)                             \
+  class SUITE##NAME : public testinator::Test             \
   {                                                       \
   public:                                                 \
     SUITE##NAME()                                         \
-      : testinator::Test(#NAME, #SUITE) {}                    \
+      : testinator::Test(#NAME, #SUITE) {}                \
     virtual bool Run() override;                          \
   } s_##SUITE##NAME##_Test;                               \
   bool SUITE##NAME::Run()

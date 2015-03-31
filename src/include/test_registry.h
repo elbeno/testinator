@@ -94,6 +94,7 @@ namespace testinator
     }
 
     std::mt19937& RNG() { return m_generator; }
+    void Abort() { m_abort = true; }
 
   private:
     // Map of all tests.
@@ -134,6 +135,11 @@ namespace testinator
         Result r = RunTest(test, params, outputter);
         if (r.m_success) ++numSuccesses;
         rs.push_back(std::move(r));
+        if (m_abort)
+        {
+          m_abort = false;
+          break;
+        }
       }
 
       outputter->endRun(m.size(), numSuccesses);
@@ -164,6 +170,7 @@ namespace testinator
     TestSuiteNameMap m_suiteNames;
 
     std::mt19937 m_generator;
+    bool m_abort = false;
   };
 
   //------------------------------------------------------------------------------

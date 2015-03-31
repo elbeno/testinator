@@ -77,6 +77,13 @@ namespace testinator
   (m_op->diagnostic(testinator::Diagnostic(                           \
                         testinator::Cons<testinator::Nil>() << msg)))
 
+#define ABORT(msg)                                                    \
+  {                                                                   \
+    m_op->abort(testinator::Diagnostic(                               \
+                    testinator::Cons<testinator::Nil>() << msg));     \
+    testinator::GetTestRegistry().Abort();                            \
+  }
+
 // -----------------------------------------------------------------------------
 #define EXPECT(x)                                                       \
   {                                                                     \

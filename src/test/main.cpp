@@ -216,6 +216,47 @@ public:
 };
 
 //------------------------------------------------------------------------------
+class TestAbortInternal : public testinator::Test
+{
+public:
+  TestAbortInternal(const string& name)
+    : testinator::Test(name)
+  {}
+
+  virtual bool Run()
+  {
+    m_runCalled = true;
+    ABORT("Hello world " << 42);
+    return true;
+  }
+
+  bool m_runCalled = false;
+};
+
+//------------------------------------------------------------------------------
+class TestAbort : public testinator::Test
+{
+public:
+  TestAbort(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    ostringstream oss;
+    std::unique_ptr<testinator::DefaultOutputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+    TestAbortInternal myTestA("A");
+    TestAbortInternal myTestB("B");
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    static string expected = "ABORT (Hello world 42)";
+    return !myTestB.m_runCalled
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
 class TestRegionsInternal : public testinator::Test
 {
 public:
@@ -258,7 +299,7 @@ public:
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "no region\nregion (export/debug/include/region.h:230)\nno region\nregion B";
+      "no region\nregion (export/debug/include/region.h:271)\nno region\nregion B";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
