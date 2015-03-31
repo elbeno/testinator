@@ -51,7 +51,7 @@ namespace testinator
         auto n = decltype(nanos)(N);
 
         std::ostringstream s;
-        s << m_u.name() << ": " << n << " tests run in " << nanos << "ns ("
+        s << m_u.GetName() << ": " << n << " tests run in " << nanos << "ns ("
           << (nanos/n) << " ns per test).";
         op->diagnostic(s.str());
       }
@@ -67,7 +67,7 @@ namespace testinator
 #include "test.h"
 
 //------------------------------------------------------------------------------
-#define DECLARE_TIMED_TEST(NAME, SUITE)                    \
+#define DEF_TIMED_TEST(NAME, SUITE)                    \
   class SUITE##NAME##TimedTest : public testinator::Test   \
   {                                                        \
   public:                                                  \

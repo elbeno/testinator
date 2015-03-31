@@ -3,7 +3,7 @@
 using namespace std;
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(bool, Arbitrary)
+DEF_TEST(bool, Arbitrary)
 {
   testinator::Arbitrary<bool> a;
   bool v = a.generate(0,0);
@@ -12,7 +12,7 @@ DECLARE_TEST(bool, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(char, Arbitrary)
+DEF_TEST(char, Arbitrary)
 {
   testinator::Arbitrary<char> a;
   char v = a.generate(0,0);
@@ -21,7 +21,7 @@ DECLARE_TEST(char, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(signedchar, Arbitrary)
+DEF_TEST(signedchar, Arbitrary)
 {
   testinator::Arbitrary<signed char> a;
   signed char v = a.generate(0,0);
@@ -30,7 +30,7 @@ DECLARE_TEST(signedchar, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unsignedchar, Arbitrary)
+DEF_TEST(unsignedchar, Arbitrary)
 {
   testinator::Arbitrary<unsigned char> a;
   unsigned char v = a.generate(0,0);
@@ -39,7 +39,7 @@ DECLARE_TEST(unsignedchar, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(wchar_t, Arbitrary)
+DEF_TEST(wchar_t, Arbitrary)
 {
   testinator::Arbitrary<wchar_t> a;
   wchar_t v = a.generate(0,0);
@@ -48,7 +48,7 @@ DECLARE_TEST(wchar_t, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(char16_t, Arbitrary)
+DEF_TEST(char16_t, Arbitrary)
 {
   testinator::Arbitrary<char16_t> a;
   char16_t v = a.generate(0,0);
@@ -57,7 +57,7 @@ DECLARE_TEST(char16_t, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(char32_t, Arbitrary)
+DEF_TEST(char32_t, Arbitrary)
 {
   testinator::Arbitrary<char32_t> a;
   char32_t v = a.generate(0,0);
@@ -66,7 +66,7 @@ DECLARE_TEST(char32_t, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(short, Arbitrary)
+DEF_TEST(short, Arbitrary)
 {
   testinator::Arbitrary<short> a;
   short v = a.generate(0,0);
@@ -75,7 +75,7 @@ DECLARE_TEST(short, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unsignedshort, Arbitrary)
+DEF_TEST(unsignedshort, Arbitrary)
 {
   testinator::Arbitrary<unsigned short> a;
   unsigned short v = a.generate(0,0);
@@ -84,7 +84,7 @@ DECLARE_TEST(unsignedshort, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(int, Arbitrary)
+DEF_TEST(int, Arbitrary)
 {
   testinator::Arbitrary<int> a;
   int v = a.generate(0,0);
@@ -93,7 +93,7 @@ DECLARE_TEST(int, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unsignedint, Arbitrary)
+DEF_TEST(unsignedint, Arbitrary)
 {
   testinator::Arbitrary<unsigned int> a;
   unsigned int v = a.generate(0,0);
@@ -102,7 +102,7 @@ DECLARE_TEST(unsignedint, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(long, Arbitrary)
+DEF_TEST(long, Arbitrary)
 {
   testinator::Arbitrary<long> a;
   long v = a.generate(0,0);
@@ -111,7 +111,7 @@ DECLARE_TEST(long, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unsignedlong, Arbitrary)
+DEF_TEST(unsignedlong, Arbitrary)
 {
   testinator::Arbitrary<unsigned long> a;
   unsigned long v = a.generate(0,0);
@@ -120,7 +120,7 @@ DECLARE_TEST(unsignedlong, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(longlong, Arbitrary)
+DEF_TEST(longlong, Arbitrary)
 {
   testinator::Arbitrary<long long> a;
   long long v = a.generate(0,0);
@@ -129,7 +129,7 @@ DECLARE_TEST(longlong, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unsignedlonglong, Arbitrary)
+DEF_TEST(unsignedlonglong, Arbitrary)
 {
   testinator::Arbitrary<unsigned long long> a;
   unsigned long long v = a.generate(0,0);
@@ -138,7 +138,7 @@ DECLARE_TEST(unsignedlonglong, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(float, Arbitrary)
+DEF_TEST(float, Arbitrary)
 {
   testinator::Arbitrary<float> a;
   float v = a.generate(0,0);
@@ -147,7 +147,7 @@ DECLARE_TEST(float, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(double, Arbitrary)
+DEF_TEST(double, Arbitrary)
 {
   testinator::Arbitrary<double> a;
   double v = a.generate(0,0);
@@ -156,7 +156,7 @@ DECLARE_TEST(double, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(longdouble, Arbitrary)
+DEF_TEST(longdouble, Arbitrary)
 {
   testinator::Arbitrary<long double> a;
   long double v = a.generate(0,0);
@@ -165,7 +165,7 @@ DECLARE_TEST(longdouble, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(vector, Arbitrary)
+DEF_TEST(vector, Arbitrary)
 {
   testinator::Arbitrary<vector<int>> a;
   vector<int> v = a.generate(0,0);
@@ -176,7 +176,7 @@ DECLARE_TEST(vector, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(string, Arbitrary)
+DEF_TEST(string, Arbitrary)
 {
   testinator::Arbitrary<string> a;
   string v = a.generate(0,0);
@@ -187,7 +187,7 @@ DECLARE_TEST(string, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(deque, Arbitrary)
+DEF_TEST(deque, Arbitrary)
 {
   testinator::Arbitrary<deque<int>> a;
   deque<int> v = a.generate(0,0);
@@ -198,7 +198,7 @@ DECLARE_TEST(deque, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(list, Arbitrary)
+DEF_TEST(list, Arbitrary)
 {
   testinator::Arbitrary<list<int>> a;
   list<int> v = a.generate(0,0);
@@ -209,7 +209,7 @@ DECLARE_TEST(list, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(forward_list, Arbitrary)
+DEF_TEST(forward_list, Arbitrary)
 {
   testinator::Arbitrary<forward_list<int>> a;
   forward_list<int> v = a.generate(0,0);
@@ -231,7 +231,7 @@ DECLARE_TEST(forward_list, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(set, Arbitrary)
+DEF_TEST(set, Arbitrary)
 {
   testinator::Arbitrary<set<int>> a;
   set<int> v = a.generate(0,0);
@@ -242,7 +242,7 @@ DECLARE_TEST(set, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(multiset, Arbitrary)
+DEF_TEST(multiset, Arbitrary)
 {
   testinator::Arbitrary<multiset<int>> a;
   multiset<int> v = a.generate(0,0);
@@ -253,7 +253,7 @@ DECLARE_TEST(multiset, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unordered_set, Arbitrary)
+DEF_TEST(unordered_set, Arbitrary)
 {
   testinator::Arbitrary<unordered_set<int>> a;
   unordered_set<int> v = a.generate(0,0);
@@ -264,7 +264,7 @@ DECLARE_TEST(unordered_set, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(pair, Arbitrary)
+DEF_TEST(pair, Arbitrary)
 {
   testinator::Arbitrary<pair<int, float>> a;
   pair<int, float> v = a.generate(0,0);
@@ -273,7 +273,7 @@ DECLARE_TEST(pair, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(tuple, Arbitrary)
+DEF_TEST(tuple, Arbitrary)
 {
   testinator::Arbitrary<tuple<int, float>> a;
   tuple<int, float> v = a.generate(0,0);
@@ -282,7 +282,7 @@ DECLARE_TEST(tuple, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(map, Arbitrary)
+DEF_TEST(map, Arbitrary)
 {
   testinator::Arbitrary<map<int, float>> a;
   map<int, float> v = a.generate(0,0);
@@ -293,7 +293,7 @@ DECLARE_TEST(map, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(multimap, Arbitrary)
+DEF_TEST(multimap, Arbitrary)
 {
   testinator::Arbitrary<multimap<int, float>> a;
   multimap<int, float> v = a.generate(0,0);
@@ -304,7 +304,7 @@ DECLARE_TEST(multimap, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(unordered_map, Arbitrary)
+DEF_TEST(unordered_map, Arbitrary)
 {
   testinator::Arbitrary<unordered_map<int, float>> a;
   unordered_map<int, float> v = a.generate(0,0);

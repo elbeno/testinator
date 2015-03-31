@@ -94,8 +94,8 @@ namespace testinator
   class PropertyTest : public Test
   {
   public:
-    PropertyTest(const std::string& name, const std::string& suiteName)
-      : Test(name, suiteName)
+    PropertyTest(const std::string& n, const std::string& s)
+      : Test(n, s)
     {}
 
     virtual bool Setup(const RunParams& params) override
@@ -117,7 +117,7 @@ namespace testinator
 }
 
 //------------------------------------------------------------------------------
-#define DECLARE_PROPERTY(NAME, SUITE, ARG)                  \
+#define DEF_PROPERTY(NAME, SUITE, ARG)                  \
   class SUITE##NAME##Property : public testinator::PropertyTest \
   {                                                         \
   public:                                                   \

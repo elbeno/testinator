@@ -42,7 +42,7 @@ namespace testinator
       std::vector<std::basic_string<T>> v;
       if (t.size() < 2)
         return v;
-      size_t l = t.size() / 2;
+      auto l = t.size() / 2;
       v.push_back(t.substr(0, l));
       v.push_back(t.substr(l));
       return v;

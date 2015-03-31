@@ -147,14 +147,14 @@ namespace testinator
       Result r;
       if (test->Setup(params))
       {
-        outputter->startTest(test->name());
+        outputter->startTest(test->GetName());
         r = test->RunWrapper(outputter);
-        outputter->endTest(test->name(), r.m_success);
+        outputter->endTest(test->GetName(), r.m_success);
         test->Teardown();
       }
       else
       {
-        outputter->skipTest(test->name(), std::string());
+        outputter->skipTest(test->GetName(), std::string());
       }
       return r;
     }

@@ -11,7 +11,7 @@ struct TestFunctor
   unsigned long m_randomSeed = 0;
 };
 
-DECLARE_TEST(Functor, Property)
+DEF_TEST(Functor, Property)
 {
   TestFunctor f;
   testinator::Property p(f);
@@ -27,7 +27,7 @@ struct FuncTraitsStruct
   void operator()(int);
 };
 
-DECLARE_TEST(FunctorTraits, Property)
+DEF_TEST(FunctorTraits, Property)
 {
   using traits = testinator::function_traits<FuncTraitsStruct>;
 
@@ -37,7 +37,7 @@ DECLARE_TEST(FunctorTraits, Property)
 //------------------------------------------------------------------------------
 // A simple test of string reversal invariant
 
-DECLARE_PROPERTY(StringReverse, Property, const string& s)
+DEF_PROPERTY(StringReverse, Property, const string& s)
 {
   string r(s);
   reverse(r.begin(), r.end());
@@ -49,7 +49,7 @@ DECLARE_PROPERTY(StringReverse, Property, const string& s)
 // This is supposed to fail to demonstrate how shrinking finds the minimal
 // failure
 
-DECLARE_PROPERTY(FailTriggersShrink, Property, const string& s)
+DEF_PROPERTY(FailTriggersShrink, Property, const string& s)
 {
   return s.find('A') == s.npos;
 }
@@ -68,19 +68,19 @@ ostream& operator<<(ostream& s, const MyType& m)
   return s << m.m_val;
 }
 
-DECLARE_PROPERTY(MyType, Property, const MyType& m)
+DEF_PROPERTY(MyType, Property, const MyType& m)
 {
   return m.m_val == 1337;
 }
 
 //------------------------------------------------------------------------------
-DECLARE_PROPERTY(ConstInt, Property, const int)
+DEF_PROPERTY(ConstInt, Property, const int)
 {
   return true;
 }
 
 //------------------------------------------------------------------------------
-DECLARE_PROPERTY(ConstChar, Property, const char)
+DEF_PROPERTY(ConstChar, Property, const char)
 {
   return true;
 }
@@ -100,17 +100,20 @@ ostream& operator<<(ostream& s, const MyBoundedType& m)
   return s << "MyBoundedType(" << m.m_val << ")";
 }
 
-template <>
-struct testinator::Arbitrary<MyBoundedType>
+namespace testinator
 {
-  static MyBoundedType generate(std::size_t generation, unsigned long int /*randomSeed*/)
-  { return MyBoundedType(generation % MyBoundedType::MAX_VAL); }
+  template <>
+  struct Arbitrary<MyBoundedType>
+  {
+    static MyBoundedType generate(std::size_t generation, unsigned long int /*randomSeed*/)
+    { return MyBoundedType(generation % MyBoundedType::MAX_VAL); }
 
-  static vector<MyBoundedType> shrink(const MyBoundedType&)
-  { return vector<MyBoundedType>(); }
-};
+    static vector<MyBoundedType> shrink(const MyBoundedType&)
+    { return vector<MyBoundedType>(); }
+  };
+}
 
-DECLARE_PROPERTY(Bounded, Property, const MyBoundedType& m)
+DEF_PROPERTY(Bounded, Property, const MyBoundedType& m)
 {
   return m.m_val < MyBoundedType::MAX_VAL;
 }

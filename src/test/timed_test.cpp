@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-DECLARE_TIMED_TEST(Simple, Timed)
+DEF_TIMED_TEST(Simple, Timed)
 {
   string s = "Hello, world!";
   for (int i = 0; i < 100; ++i)

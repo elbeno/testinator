@@ -44,11 +44,10 @@ namespace testinator
         std::vector<C> v;
         if (c.size() < 2)
           return v;
-        auto it = c.cbegin() + c.size()/2;
-        v.push_back(C());
-        copy(c.cbegin(), it, std::back_inserter(v[0]));
-        v.push_back(C());
-        copy(it, c.cend(), std::back_inserter(v[1]));
+        auto it = c.cbegin();
+        std::advance(it, c.size()/2);
+        v.push_back(C{c.cbegin(), it});
+        v.push_back(C{it, c.cend()});
         return v;
       }
     };

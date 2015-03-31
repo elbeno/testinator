@@ -9,7 +9,7 @@
 namespace testinator
 {
 
-  namespace
+  namespace detail
   {
     template <typename T>
     struct Arbitrary_Arithmetic
@@ -122,52 +122,52 @@ namespace testinator
   // specializations for arithmetic types
   //------------------------------------------------------------------------------
   template <>
-  struct Arbitrary<signed char> : public Arbitrary_Arithmetic_IntCast<signed char> {};
+  struct Arbitrary<signed char> : public detail::Arbitrary_Arithmetic_IntCast<signed char> {};
 
   template <>
-  struct Arbitrary<unsigned char> : public Arbitrary_Arithmetic_IntCast<unsigned char> {};
+  struct Arbitrary<unsigned char> : public detail::Arbitrary_Arithmetic_IntCast<unsigned char> {};
 
   template <>
-  struct Arbitrary<wchar_t> : public Arbitrary_Arithmetic_IntCast<wchar_t> {};
+  struct Arbitrary<wchar_t> : public detail::Arbitrary_Arithmetic_IntCast<wchar_t> {};
 
   template <>
-  struct Arbitrary<char16_t> : public Arbitrary_Arithmetic<char16_t> {};
+  struct Arbitrary<char16_t> : public detail::Arbitrary_Arithmetic<char16_t> {};
 
   template <>
-  struct Arbitrary<char32_t> : public Arbitrary_Arithmetic<char32_t> {};
+  struct Arbitrary<char32_t> : public detail::Arbitrary_Arithmetic<char32_t> {};
 
   template <>
-  struct Arbitrary<short> : public Arbitrary_Arithmetic<short> {};
+  struct Arbitrary<short> : public detail::Arbitrary_Arithmetic<short> {};
 
   template <>
-  struct Arbitrary<unsigned short> : public Arbitrary_Arithmetic<unsigned short> {};
+  struct Arbitrary<unsigned short> : public detail::Arbitrary_Arithmetic<unsigned short> {};
 
   template <>
-  struct Arbitrary<int> : public Arbitrary_Arithmetic<int> {};
+  struct Arbitrary<int> : public detail::Arbitrary_Arithmetic<int> {};
 
   template <>
-  struct Arbitrary<unsigned int> : public Arbitrary_Arithmetic<unsigned int> {};
+  struct Arbitrary<unsigned int> : public detail::Arbitrary_Arithmetic<unsigned int> {};
 
   template <>
-  struct Arbitrary<long> : public Arbitrary_Arithmetic<long> {};
+  struct Arbitrary<long> : public detail::Arbitrary_Arithmetic<long> {};
 
   template <>
-  struct Arbitrary<unsigned long> : public Arbitrary_Arithmetic<unsigned long> {};
+  struct Arbitrary<unsigned long> : public detail::Arbitrary_Arithmetic<unsigned long> {};
 
   template <>
-  struct Arbitrary<long long> : public Arbitrary_Arithmetic<long long> {};
+  struct Arbitrary<long long> : public detail::Arbitrary_Arithmetic<long long> {};
 
   template <>
-  struct Arbitrary<unsigned long long> : public Arbitrary_Arithmetic<unsigned long long> {};
+  struct Arbitrary<unsigned long long> : public detail::Arbitrary_Arithmetic<unsigned long long> {};
 
   template <>
-  struct Arbitrary<float> : public Arbitrary_Arithmetic_Real<float> {};
+  struct Arbitrary<float> : public detail::Arbitrary_Arithmetic_Real<float> {};
 
   template <>
-  struct Arbitrary<double> : public Arbitrary_Arithmetic_Real<double> {};
+  struct Arbitrary<double> : public detail::Arbitrary_Arithmetic_Real<double> {};
 
   template <>
-  struct Arbitrary<long double> : public Arbitrary_Arithmetic_Real<long double> {};
+  struct Arbitrary<long double> : public detail::Arbitrary_Arithmetic_Real<long double> {};
 
   //------------------------------------------------------------------------------
   // specialization for bool

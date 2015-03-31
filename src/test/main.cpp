@@ -275,7 +275,7 @@ public:
 };
 
 //------------------------------------------------------------------------------
-DECLARE_TEST(Macro, Test)
+DEF_TEST(Macro, Test)
 {
   return true;
 }
@@ -286,7 +286,7 @@ namespace
   size_t s_numPropertyChecks = 0;
 }
 
-DECLARE_PROPERTY(NumChecks, Property, int)
+DEF_PROPERTY(NumChecks, Property, int)
 {
   return m_numChecks == s_numPropertyChecks;
 }

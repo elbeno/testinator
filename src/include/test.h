@@ -55,7 +55,7 @@ namespace testinator
       return r;
     }
 
-    const std::string& name() const { return m_name; }
+    const std::string& GetName() const { return m_name; }
 
   protected:
     bool m_success = true;
@@ -66,7 +66,7 @@ namespace testinator
 }
 
 //------------------------------------------------------------------------------
-#define DECLARE_TEST(NAME, SUITE)                         \
+#define DEF_TEST(NAME, SUITE)                         \
   class SUITE##NAME : public testinator::Test                 \
   {                                                       \
   public:                                                 \
@@ -111,10 +111,10 @@ namespace testinator
   }
 
   //------------------------------------------------------------------------------
-  inline Test::Test(const std::string& name, const std::string& suite)
-    : m_name(name)
+  inline Test::Test(const std::string& n, const std::string& s)
+    : m_name(n)
   {
-    GetTestRegistry().Register(this, name, suite);
+    GetTestRegistry().Register(this, n, s);
   }
 
   inline Test::~Test()

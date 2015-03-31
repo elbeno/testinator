@@ -166,7 +166,7 @@ namespace testinator
 }
 
 //------------------------------------------------------------------------------
-#define DECLARE_COMPLEXITY_PROPERTY(NAME, SUITE, ARG, ORDER)            \
+#define DEF_COMPLEXITY_PROPERTY(NAME, SUITE, ARG, ORDER)            \
   class SUITE##NAME##ComplexityProperty : public testinator::PropertyTest \
   {                                                                     \
   public:                                                               \
