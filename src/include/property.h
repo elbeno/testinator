@@ -2,6 +2,7 @@
 
 #include "arbitrary.h"
 #include "function_traits.h"
+#include "prettyprint.h"
 #include "test.h"
 #include "test_macros.h"
 
@@ -71,7 +72,7 @@ namespace testinator
 
         op->diagnostic(
             Diagnostic(Cons<Nil>()
-                       << "Failed: " << p));
+                       << "Failed: " << prettyprint(p)));
 
         std::vector<paramType> v = Arbitrary<paramType>::shrink(p);
         if (!v.empty())

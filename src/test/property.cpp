@@ -97,7 +97,7 @@ struct MyBoundedType
 
 ostream& operator<<(ostream& s, const MyBoundedType& m)
 {
-  return s << m.m_val;
+  return s << "MyBoundedType(" << m.m_val << ")";
 }
 
 template <>

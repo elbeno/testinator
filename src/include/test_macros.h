@@ -1,6 +1,7 @@
 #pragma once
 
 #include "capture-et.h"
+#include "prettyprint.h"
 
 #include <sstream>
 #include <string>
@@ -66,7 +67,6 @@ namespace testinator
   std::string Diagnostic(ConsT&& t) noexcept
   {
     std::ostringstream s;
-    s << std::boolalpha;
     LogR(s, std::forward<typename ConsT::type>(t.m_list));
     return s.str();
   }
@@ -85,12 +85,13 @@ namespace testinator
     {                                                                   \
       auto diag = testinator::Cons<testinator::Nil>()                   \
         << "EXPECT FAILED: " __FILE__ ":"  << __LINE__                  \
-        << " (" #x " => " << LHS(cap);                                  \
+        << " (" #x " => " << testinator::prettyprint(LHS(cap));         \
       if (RelOp(cap)[0] != 0)                                           \
       {                                                                 \
-        m_op->diagnostic(testinator::Diagnostic(                        \
-                             std::move(diag) << " " << RelOp(cap)       \
-                             << " " << RHS(cap) << ")"));               \
+        m_op->diagnostic(                                               \
+            testinator::Diagnostic(                                     \
+                std::move(diag) << " " << RelOp(cap) << " "             \
+                << testinator::prettyprint(RHS(cap)) << ")"));          \
       }                                                                 \
       else                                                              \
       {                                                                 \
