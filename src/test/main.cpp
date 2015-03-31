@@ -47,65 +47,6 @@ private:
 };
 
 //------------------------------------------------------------------------------
-class TestTeardownAfterwardsInternal : public testinator::Test
-{
-public:
-  TestTeardownAfterwardsInternal(const string& name, bool forceFail = false)
-    : testinator::Test(name)
-    , m_runCalled(false)
-    , m_teardownCalled(false)
-    , m_forceFail(forceFail)
-  {}
-
-  virtual void Teardown()
-  {
-    m_teardownCalled = m_runCalled;
-  }
-
-  virtual bool Run()
-  {
-    m_runCalled = true;
-    return !m_forceFail;
-  }
-
-  bool m_runCalled;
-  bool m_teardownCalled;
-  bool m_forceFail;
-};
-
-//------------------------------------------------------------------------------
-class TestTeardownAfterwards : public testinator::Test
-{
-public:
-  TestTeardownAfterwards(const string& name)
-    : testinator::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    TestTeardownAfterwardsInternal myTest("teardown_test");
-    testinator::RunTest("teardown_test");
-    return myTest.m_teardownCalled;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestTeardownAfterFail : public testinator::Test
-{
-public:
-  TestTeardownAfterFail(const string& name)
-    : testinator::Test(name, s_suiteName)
-  {}
-
-  virtual bool Run()
-  {
-    TestTeardownAfterwardsInternal myTest("teardown_test", true);
-    testinator::RunTest("teardown_test");
-    return myTest.m_teardownCalled;
-  }
-};
-
-//------------------------------------------------------------------------------
 class TestRunMultipleInternal : public testinator::Test
 {
 public:
@@ -230,7 +171,7 @@ public:
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "EXPECT FAILED: build/debug/test/main.cpp:211 (!fail == fail => false == true)";
+      "EXPECT FAILED: build/debug/test/main.cpp:152 (!fail == fail => false == true)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
@@ -269,6 +210,55 @@ public:
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected = "Hello world 42";
+    return !rs.empty() && rs.front().m_success
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestRegionsInternal : public testinator::Test
+{
+public:
+  TestRegionsInternal(const string& name)
+    : testinator::Test(name)
+  {}
+
+  virtual bool Run()
+  {
+    DIAGNOSTIC("no region");
+
+    DEF_REGION()
+    {
+      DIAGNOSTIC("region " << REGION_NAME);
+    }
+
+    DEF_REGION(B)
+    {
+      DIAGNOSTIC("region " << REGION_NAME);
+    }
+
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestRegions : public testinator::Test
+{
+public:
+  TestRegions(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    ostringstream oss;
+    std::unique_ptr<testinator::DefaultOutputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+    TestRegionsInternal myTestA("A");
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    static string expected =
+      "no region\nregion (export/debug/include/region.h:230)\nno region\nregion B";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
@@ -404,13 +394,12 @@ int main(int argc, char* argv[])
   s_numPropertyChecks = p.m_numPropertyChecks;
   TestCallTest test0("TestCallTest");
   TestSetupFirst test1("TestSetupFirst");
-  TestTeardownAfterwards test2("TestTeardownAfterwards");
-  TestTeardownAfterFail test3("TestTeardownAfterFail");
   TestRunMultiple test4("TestRunMultiple");
   TestReportResults test5("TestReportResults");
   TestRunSuite test6("TestRunSuite");
   TestCheckMacro test7("TestCheckMacro");
   TestDiagnostic test8("TestDiagnostic");
+  TestRegions test9("TestRegions");
   testinator::Results rs;
 
   std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(

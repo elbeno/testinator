@@ -31,12 +31,12 @@ Run all tests in randomized order by default.
 
 ## Simple usage
 
-Ordinary unit tests are grouped into suites and declared with a macro
+Ordinary unit tests are grouped into suites and defined with a macro
 (arguments: test name and suite name) and function body which should return
 `true` if the test is successful, `false` otherwise.
 
 ```cpp
-DECLARE_TEST(TestName, SuiteName)
+DEF_TEST(TestName, SuiteName)
 {
   // your logic here...
   return success;
@@ -63,15 +63,48 @@ The `DIAGNOSTIC` macro produces arbitrary diagnostic output:
 DIAGNOSTIC("Hello world " << 42);
 ```
 
+## Regions
+
+Instead of exposing fixtures or setup/teardown functionality, Testinator uses
+the idea of Regions. Regions are subsections of tests that will be executed on
+successive runs of the test. This allows fixtures to be replaced with more
+natural scoping. Regions are introduced with the `DEF_REGION` macro and their
+name may be retrieved with `REGION_NAME`. For example:
+
+```cpp
+DEF_TEST(TestName, SuiteName)
+{
+  // some common setup here...
+
+  DEF_REGION(A)
+  {
+    // this executes first time around
+    DIAGNOSTIC("In region " << REGION_NAME);
+  }
+
+  DEF_REGION(B)
+  {
+    // this executes second time around
+    DIAGNOSTIC("In region " << REGION_NAME);
+  }
+}
+```
+
+Regions may be nested if further common structure is required; the test will run
+as many times as necessary to visit all the "leaf" regions. If Regions are not
+explicitly named, `REGION_NAME` will be automatically provided with filename and
+line information.
+
 ## Properties
 
 Testinator also supports **properties**: invariants that hold true for your
 algorithms.
 
-Properties are declared the same way as tests, just with a different macro and an additional parameter that is the function argument.
+Properties are defined the same way as tests, just with a different macro and
+an additional parameter that is the function argument.
 
 ```cpp
-DECLARE_PROPERTY(StringReverse, Algos, const string& s)
+DEF_PROPERTY(StringReverse, Algos, const string& s)
 {
   string r(s);
   reverse(r.begin(), r.end());
@@ -80,7 +113,7 @@ DECLARE_PROPERTY(StringReverse, Algos, const string& s)
 }
 ```
 
-The third argument to `DECLARE_PROPERTY` is the function argument. Testinator
+The third argument to `DEF_PROPERTY` is the function argument. Testinator
 will generate arbitrary values of this type and feed them to your test function.
 
 ## Arbitrary
@@ -131,7 +164,7 @@ a regular test. There is no return value, because it's assumed the test exists
 so you can see what time it takes.
 
 ```cpp
-DECLARE_TIMED_TEST(TestName, SuiteName)
+DEF_TIMED_TEST(TestName, SuiteName)
 {
   // your logic here...
 }
@@ -150,7 +183,7 @@ complexity property, similar to a property, but with an extra "expected
 complexity".
 
 ```cpp
-DECLARE_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
+DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
 {
   max_element(s.begin(), s.end());
 }

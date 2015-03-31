@@ -44,14 +44,14 @@ namespace testinator
     virtual ~Test();
 
     virtual bool Setup(const RunParams&) { return true; }
-    virtual void Teardown() {}
     virtual bool Run() { return true; }
+    bool RunWithRegions();
 
     Result RunWrapper(const Outputter* outputter)
     {
       Result r;
       m_op = outputter;
-      r.m_success = Run() && m_success;
+      r.m_success = RunWithRegions() && m_success;
       return r;
     }
 
@@ -77,6 +77,7 @@ namespace testinator
   bool SUITE##NAME::Run()
 
 //------------------------------------------------------------------------------
+#include "region.h"
 #include "test_registry.h"
 
 namespace testinator
