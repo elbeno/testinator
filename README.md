@@ -87,6 +87,8 @@ DEF_TEST(TestName, SuiteName)
     // this executes second time around
     DIAGNOSTIC("In region " << REGION_NAME);
   }
+
+  return success;
 }
 ```
 
@@ -180,7 +182,9 @@ Sometimes timing isn't enough, and what you really want to test is: what is the
 complexity of my algorithm? You might want to do this to get some kind of
 guarantee your algorithm will scale, for example. You can use an algorithmic
 complexity property, similar to a property, but with an extra "expected
-complexity".
+complexity" value (`ORDER_1`, `ORDER_LOG_N`, `ORDER_N`, `ORDER_N_LOG_N`, or
+`ORDER_N2`). Once again, there is no return value because the test exists only
+to measure complexity.
 
 ```cpp
 DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
