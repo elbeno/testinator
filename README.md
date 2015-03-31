@@ -1,6 +1,8 @@
 # Testinator
 
-Experiments with testing in C++. Testinator is a unit testing framework.
+Experiments with testing in C++. Testinator is a unit testing framework. It is
+known to work with:
+ * clang 3.5
 
 ## Basic setup
 
