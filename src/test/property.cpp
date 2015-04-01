@@ -86,6 +86,12 @@ DEF_PROPERTY(ConstChar, Property, const char)
 }
 
 //------------------------------------------------------------------------------
+DEF_PROPERTY(pair, Property, const std::pair<int, float>&)
+{
+  return true;
+}
+
+//------------------------------------------------------------------------------
 // A user-defined type can also be used to produce a bounded type
 
 struct MyBoundedType

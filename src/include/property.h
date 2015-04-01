@@ -117,17 +117,17 @@ namespace testinator
 }
 
 //------------------------------------------------------------------------------
-#define DEF_PROPERTY(NAME, SUITE, ARG)                  \
+#define DEF_PROPERTY(NAME, SUITE, ...)                          \
   class SUITE##NAME##Property : public testinator::PropertyTest \
-  {                                                         \
-  public:                                                   \
-    SUITE##NAME##Property()                                 \
-      : testinator::PropertyTest(#NAME "Property", #SUITE) {} \
-    virtual bool Run() override                             \
-    {                                                       \
-      testinator::Property p(*this);                        \
-      return p.check(m_numChecks, m_op);                    \
-    }                                                       \
-    bool operator()(ARG) const;                             \
-  } s_##SUITE##NAME##_Property;                             \
-  bool SUITE##NAME##Property::operator()(ARG) const
+  {                                                             \
+  public:                                                       \
+    SUITE##NAME##Property()                                     \
+      : testinator::PropertyTest(#NAME "Property", #SUITE) {}   \
+    virtual bool Run() override                                 \
+    {                                                           \
+      testinator::Property p(*this);                            \
+      return p.check(m_numChecks, m_op);                        \
+    }                                                           \
+    bool operator()(__VA_ARGS__) const;                         \
+  } s_##SUITE##NAME##_Property;                                 \
+  bool SUITE##NAME##Property::operator()(__VA_ARGS__) const

@@ -222,7 +222,7 @@ complexity" value (`ORDER_1`, `ORDER_LOG_N`, `ORDER_N`, `ORDER_N_LOG_N`, or
 to measure complexity.
 
 ```cpp
-DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, const string& s, ORDER_N)
+DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, ORDER_N, const string& s)
 {
   max_element(s.begin(), s.end());
 }

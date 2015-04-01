@@ -166,7 +166,7 @@ namespace testinator
 }
 
 //------------------------------------------------------------------------------
-#define DEF_COMPLEXITY_PROPERTY(NAME, SUITE, ARG, ORDER)            \
+#define DEF_COMPLEXITY_PROPERTY(NAME, SUITE, ORDER, ...)                \
   class SUITE##NAME##ComplexityProperty : public testinator::PropertyTest \
   {                                                                     \
   public:                                                               \
@@ -189,6 +189,6 @@ namespace testinator
       }                                                                 \
       return success;                                                   \
     }                                                                   \
-    void operator()(ARG) const;                                         \
+    void operator()(__VA_ARGS__) const;                                 \
   } s_##SUITE##NAME##_ComplexityProperty;                               \
-  void SUITE##NAME##ComplexityProperty::operator()(ARG) const
+  void SUITE##NAME##ComplexityProperty::operator()(__VA_ARGS__) const
