@@ -36,8 +36,8 @@ env.Append(CCFLAGS = ["-pedantic"
                       , "-Werror"
                       , "-Wno-unused"])
 
-compiler = 'clang++'
-#compiler = 'g++'
+#compiler = 'clang++'
+compiler = 'g++'
 
 if compiler == 'clang++':
     env.Append(CCFLAGS = "-stdlib=libc++")

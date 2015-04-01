@@ -2,7 +2,8 @@
 
 Experiments with testing in C++. Testinator is a unit testing framework. It is
 known to work with:
- * clang 3.5
+ * Clang 3.5/libc++
+ * GCC 4.9.1/libstdc++
 
 ## Basic setup
 

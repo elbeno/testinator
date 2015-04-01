@@ -52,8 +52,13 @@ namespace detail
 {
 
   // ---------------------------------------------------------------------------
+#ifdef __clang__
   template <typename...>
   using void_t = void;
+#else
+  template<class...> struct voider { using type = void; };
+  template<class... Args> using void_t = typename voider<Args...>::type;
+#endif
 
   // ---------------------------------------------------------------------------
   // Is the type iterable (has begin() and end())?
@@ -174,23 +179,23 @@ namespace detail
   // The way we want to treat a type, in preference order.
   template <typename T>
   using stringifier_tag = std::conditional_t<
-    is_outputtable<T>::value,
-    is_outputtable_tag,
+    std::is_enum<T>::value,
+    is_enum_tag,
     std::conditional_t<
-      is_callable<T>::value,
-      is_callable_tag,
+      is_outputtable<T>::value,
+      is_outputtable_tag,
       std::conditional_t<
-        is_iterable<T>::value,
-        is_iterable_tag,
+        is_callable<T>::value,
+        is_callable_tag,
         std::conditional_t<
-          is_pair<T>::value,
-          is_pair_tag,
+          is_iterable<T>::value,
+          is_iterable_tag,
           std::conditional_t<
-            is_tuple<T>::value,
-            is_tuple_tag,
+            is_pair<T>::value,
+            is_pair_tag,
             std::conditional_t<
-              std::is_enum<T>::value,
-              is_enum_tag,
+              is_tuple<T>::value,
+              is_tuple_tag,
               std::conditional_t<
                 is_unprintable<T>::value,
                 is_unprintable_tag,
