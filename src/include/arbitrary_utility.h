@@ -2,6 +2,7 @@
 
 #include "arbitrary.h"
 
+#include "prettyprint.h"
 #include <tuple>
 #include <utility>
 
@@ -30,6 +31,7 @@ namespace testinator
 
     static std::vector<std::pair<T1, T2>> shrink(const std::pair<T1, T2>&)
     {
+      // TODO: cartesian product?
       return std::vector<std::pair<T1, T2>>{};
     }
   };
@@ -37,6 +39,18 @@ namespace testinator
   //------------------------------------------------------------------------------
   // specialization for tuple
   //------------------------------------------------------------------------------
+  template <typename ...Ts, std::size_t ...Is>
+  auto tuple_tail(const std::tuple<Ts...>& t, std::index_sequence<Is...>)
+  {
+    return std::make_tuple(std::get<Is + 1>(t)...);
+  }
+
+  template <typename ...Ts>
+  auto tuple_tail(const std::tuple<Ts...>& t)
+  {
+    return tuple_tail(t, std::make_index_sequence<sizeof...(Ts) - 1>());
+  }
+
   template <typename ...Ts>
   struct Arbitrary<std::tuple<Ts...>>
   {
@@ -50,9 +64,17 @@ namespace testinator
       return std::make_tuple(Arbitrary<Ts>::generate_n(n, randomSeed)...);
     }
 
-    static std::vector<std::tuple<Ts...>> shrink(const std::tuple<Ts...>&)
+    static std::vector<std::tuple<Ts...>> shrink(const std::tuple<Ts...>& t)
     {
-      return std::vector<std::tuple<Ts...>>{};
+      std::vector<std::tuple<Ts...>> ret{};
+      // TODO: cartesian product?
+      using T = std::tuple_element_t<0, std::tuple<Ts...>>;
+      std::vector<T> v = Arbitrary<T>::shrink(std::get<0>(t));
+      for (auto&& e : v)
+      {
+        ret.push_back(std::tuple_cat(std::tuple<T>{e}, tuple_tail(t)));
+      }
+      return ret;
     }
   };
 

@@ -208,7 +208,7 @@ template <typename T, typename F, typename TAG>
 struct stringifier_select;
 
 template <typename T, typename F>
-using stringifier = stringifier_select<T, F, detail::stringifier_tag<T>>;
+using stringifier = stringifier_select<T, F, detail::stringifier_tag<std::remove_cv_t<T>>>;
 
 template <typename T, typename F>
 inline std::ostream& operator<<(std::ostream& s, const stringifier<T, F>& t)

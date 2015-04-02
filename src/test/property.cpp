@@ -31,7 +31,7 @@ DEF_TEST(FunctorTraits, Property)
 {
   using traits = testinator::function_traits<FuncTraitsStruct>;
 
-  return std::is_same<int, traits::argType>::value;
+  return std::is_same<std::tuple<int>, traits::argTuple>::value;
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +87,12 @@ DEF_PROPERTY(ConstChar, Property, const char)
 
 //------------------------------------------------------------------------------
 DEF_PROPERTY(pair, Property, const std::pair<int, float>&)
+{
+  return true;
+}
+
+//------------------------------------------------------------------------------
+DEF_PROPERTY(twoargs, Property, int, float)
 {
   return true;
 }

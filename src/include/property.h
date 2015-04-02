@@ -44,7 +44,7 @@ namespace testinator
     template <typename U>
     struct Internal : public InternalBase
     {
-      using paramType = std::decay_t<typename function_traits<U>::argType>;
+      using argTuple = typename function_traits<U>::argTuple;
 
       Internal(const U& u) : m_u(u) {}
 
@@ -53,8 +53,8 @@ namespace testinator
         auto seed = m_u.m_randomSeed;
         for (std::size_t i = 0; i < N; ++i)
         {
-          paramType p = Arbitrary<paramType>::generate(N, seed);
-          if (!checkSingle(p, op))
+          auto t = Arbitrary<argTuple>::generate(N, seed);
+          if (!checkSingle(t, op))
           {
             op->diagnostic(
                 Diagnostic(Cons<Nil>()
@@ -66,20 +66,20 @@ namespace testinator
         return true;
       }
 
-      bool checkSingle(const paramType& p, const Outputter* op)
+      bool checkSingle(const argTuple& t, const Outputter* op)
       {
-        if (m_u(p)) return true;
+        if (function_traits<U>::apply(m_u, t)) return true;
 
         op->diagnostic(
             Diagnostic(Cons<Nil>()
-                       << "Failed: " << prettyprint(p)));
+                       << "Failed " << prettyprint(t)));
 
-        std::vector<paramType> v = Arbitrary<paramType>::shrink(p);
+        std::vector<argTuple> v = Arbitrary<argTuple>::shrink(t);
         if (!v.empty())
         {
-          return std::all_of(v.cbegin(), v.cend(),
-                             [this, op] (const paramType& pt)
-                             { return checkSingle(pt, op); });
+          return std::all_of(v.begin(), v.end(),
+                             [this, op] (const argTuple& st)
+                             { return checkSingle(st, op); });
         }
         return false;
       }

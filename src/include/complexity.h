@@ -123,7 +123,7 @@ namespace testinator
     template <typename U>
     struct Internal : public InternalBase
     {
-      using paramType = std::decay_t<typename function_traits<U>::argType>;
+      using argTuple = typename function_traits<U>::argTuple;
 
       Internal(const U& u) : m_u(u) {}
 
@@ -145,12 +145,11 @@ namespace testinator
           std::size_t num, std::size_t N)
       {
         auto seed = GetTestRegistry().RNG()();
-        paramType p = Arbitrary<paramType>::generate_n(N, seed);
-        m_u(p); // warm the cache
+        auto t = Arbitrary<argTuple>::generate_n(N, seed);
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < num; ++i)
         {
-          m_u(p);
+          function_traits<U>::apply(m_u, t);
         }
         auto t2 = std::chrono::high_resolution_clock::now();
         return std::chrono::duration_cast<std::chrono::nanoseconds>
