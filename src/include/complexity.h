@@ -141,7 +141,7 @@ namespace testinator
         return CalculateOrder(countsN, countsMultN, NUM_ITER, N, MULTIPLIER);
       }
 
-      int64_t checkInternal(
+      auto checkInternal(
           std::size_t num, std::size_t N)
       {
         auto seed = GetTestRegistry().RNG()();
