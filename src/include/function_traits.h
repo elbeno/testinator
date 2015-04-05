@@ -20,26 +20,26 @@ namespace testinator
 
     // apply a function to a tuple of arguments
     template <typename F>
-    static R apply(const F& f, const argTuple& t)
+    static R apply(F& f, const argTuple& t)
     {
       return unpackApply(f, t, std::index_sequence_for<A...>());
     }
 
     template <typename F, std::size_t... Is>
-    static R unpackApply(const F& f, const argTuple& t, std::index_sequence<Is...>)
+    static R unpackApply(F& f, const argTuple& t, std::index_sequence<Is...>)
     {
       return f(std::get<Is>(t)...);
     }
 
     // apply a function to a tuple of arguments, timing num invocations
     template <typename F>
-    static auto apply_timed(std::size_t num, const F& f, argTuple&& t)
+    static auto apply_timed(std::size_t num, F& f, argTuple&& t)
     {
       return unpackApply_timed(num, f, std::move(t), std::index_sequence_for<A...>());
     }
 
     template <typename F, std::size_t... Is>
-    static auto unpackApply_timed(std::size_t num, const F& f,
+    static auto unpackApply_timed(std::size_t num, F& f,
                                   argTuple&& t, std::index_sequence<Is...>)
     {
       auto t1 = std::chrono::high_resolution_clock::now();

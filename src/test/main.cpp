@@ -349,6 +349,13 @@ DEF_TEST(Macro, Test)
 }
 
 //------------------------------------------------------------------------------
+DEF_TEST(NonConstMacros, Test)
+{
+  EXPECT(true);
+  return true;
+}
+
+//------------------------------------------------------------------------------
 namespace
 {
   size_t s_numPropertyChecks = 0;

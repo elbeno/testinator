@@ -174,13 +174,13 @@ namespace testinator
         m_op->diagnostic(                                               \
             testinator::Diagnostic(                                     \
                 testinator::Cons<testinator::Nil>()                     \
-                << m_name << ": expected "                              \
+                << GetName() << ": expected "                           \
                 << testinator::ComplexityProperty::Order(testinator::ORDER) \
                 << ", actually "                                        \
                 << testinator::ComplexityProperty::Order(order)));      \
       }                                                                 \
       return success;                                                   \
     }                                                                   \
-    void operator()(__VA_ARGS__) const;                                 \
+    void operator()(__VA_ARGS__);                                       \
   } s_##SUITE##NAME##_ComplexityProperty;                               \
-  void SUITE##NAME##ComplexityProperty::operator()(__VA_ARGS__) const
+  void SUITE##NAME##ComplexityProperty::operator()(__VA_ARGS__)

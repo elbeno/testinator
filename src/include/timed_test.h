@@ -87,7 +87,7 @@ namespace testinator
       p.check(m_numChecks, m_op);                          \
       return true;                                         \
     }                                                      \
-    void operator()() const;                               \
+    void operator()();                                     \
     size_t m_numChecks;                                    \
   } s_##SUITE##NAME##_TimedTest;                           \
-  void SUITE##NAME##TimedTest::operator()() const
+  void SUITE##NAME##TimedTest::operator()()

@@ -129,6 +129,6 @@ namespace testinator
       testinator::Property p(*this);                            \
       return p.check(m_numChecks, m_op);                        \
     }                                                           \
-    bool operator()(__VA_ARGS__) const;                         \
+    bool operator()(__VA_ARGS__);                               \
   } s_##SUITE##NAME##_Property;                                 \
-  bool SUITE##NAME##Property::operator()(__VA_ARGS__) const
+  bool SUITE##NAME##Property::operator()(__VA_ARGS__)

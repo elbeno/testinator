@@ -61,7 +61,7 @@ namespace testinator
   protected:
     bool m_success = true;
     bool m_skipped = false;
-    std::string m_name;
+    const std::string m_name;
     const Outputter* m_op;
   };
 }
