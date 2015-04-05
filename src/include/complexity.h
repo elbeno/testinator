@@ -11,7 +11,6 @@
 #include <memory>
 #include <numeric>
 #include <random>
-#include <sstream>
 
 namespace testinator
 {

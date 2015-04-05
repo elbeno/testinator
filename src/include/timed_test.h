@@ -68,7 +68,7 @@ namespace testinator
 #include "test.h"
 
 //------------------------------------------------------------------------------
-#define DEF_TIMED_TEST(NAME, SUITE)                    \
+#define DEF_TIMED_TEST(NAME, SUITE)                        \
   class SUITE##NAME##TimedTest : public testinator::Test   \
   {                                                        \
   public:                                                  \
