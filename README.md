@@ -139,7 +139,8 @@ Testinator also supports **properties**: invariants that hold true for your
 algorithms.
 
 Properties are defined the same way as tests, just with a different macro and
-an additional parameter that is the function argument.
+additional parameters that are the function arguments. (One argument is the
+usual case, shown here.)
 
 ```cpp
 DEF_PROPERTY(StringReverse, Algos, const string& s)
@@ -151,8 +152,8 @@ DEF_PROPERTY(StringReverse, Algos, const string& s)
 }
 ```
 
-The third argument to `DEF_PROPERTY` is the function argument. Testinator
-will generate arbitrary values of this type and feed them to your test function.
+Testinator will generate arbitrary values of the arguments and feed them to your
+test.
 
 ## Arbitrary
 
