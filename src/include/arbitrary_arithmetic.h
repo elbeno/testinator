@@ -1,6 +1,7 @@
 #pragma once
 
 #include "arbitrary.h"
+#include "test.h"
 
 #include <cstddef>
 #include <limits>
@@ -27,7 +28,8 @@ namespace testinator
 
           default:
           {
-            std::mt19937 gen(randomSeed);
+            std::mt19937& gen = testinator::GetTestRegistry().RNG();
+            gen.seed(randomSeed);
             std::uniform_int_distribution<T> dis(
                 std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return dis(gen);
@@ -62,7 +64,8 @@ namespace testinator
 
           default:
           {
-            std::mt19937 gen(randomSeed);
+            std::mt19937& gen = testinator::GetTestRegistry().RNG();
+            gen.seed(randomSeed);
             std::uniform_int_distribution<int> dis(
                 std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return static_cast<T>(dis(gen));
@@ -97,7 +100,8 @@ namespace testinator
 
           default:
           {
-            std::mt19937 gen(randomSeed);
+            std::mt19937& gen = testinator::GetTestRegistry().RNG();
+            gen.seed(randomSeed);
             std::uniform_real_distribution<T> dis(
                 std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return dis(gen);
@@ -199,7 +203,8 @@ namespace testinator
   {
     static char generate(std::size_t, unsigned long int randomSeed)
     {
-      std::mt19937 gen(randomSeed);
+      std::mt19937& gen = testinator::GetTestRegistry().RNG();
+      gen.seed(randomSeed);
       std::uniform_int_distribution<int> dis(32, 126);
       return static_cast<char>(dis(gen));
     }
