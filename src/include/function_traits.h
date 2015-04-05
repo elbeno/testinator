@@ -42,16 +42,10 @@ namespace testinator
     static auto unpackApply_timed(std::size_t num, const F& f,
                                   argTuple&& t, std::index_sequence<Is...>)
     {
-      return apply_timed_unpacked(num, f, std::get<Is>(std::move(t))...);
-    }
-
-    template <typename F, typename...Ts>
-    static auto apply_timed_unpacked(std::size_t num, const F& f, Ts&&... ts)
-    {
       auto t1 = std::chrono::high_resolution_clock::now();
       for (std::size_t i = 0; i < num; ++i)
       {
-        f(std::forward<Ts>(ts)...);
+        f(std::get<Is>(std::move(t))...);
       }
       auto t2 = std::chrono::high_resolution_clock::now();
       return t2 - t1;
