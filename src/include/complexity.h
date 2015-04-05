@@ -146,14 +146,8 @@ namespace testinator
       {
         auto seed = GetTestRegistry().RNG()();
         auto t = Arbitrary<argTuple>::generate_n(N, seed);
-        auto t1 = std::chrono::high_resolution_clock::now();
-        for (std::size_t i = 0; i < num; ++i)
-        {
-          function_traits<U>::apply(m_u, t);
-        }
-        auto t2 = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration_cast<std::chrono::nanoseconds>
-          (t2 - t1).count();
+        auto d = function_traits<U>::apply_timed(num, m_u, t);
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(d).count();
       }
 
       U m_u;
