@@ -1,6 +1,7 @@
 #pragma once
 
 #include "output.h"
+#include "test_macros.h"
 
 #include <chrono>
 #include <memory>
@@ -39,7 +40,6 @@ namespace testinator
       virtual void check(std::size_t N,
                          const Outputter* op)
       {
-        m_u(); // warm the cache
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < N; ++i)
         {
@@ -50,10 +50,11 @@ namespace testinator
           (t2 - t1).count();
         auto n = decltype(nanos)(N);
 
-        std::ostringstream s;
-        s << m_u.GetName() << ": " << n << " tests run in " << nanos << "ns ("
-          << (nanos/n) << " ns per test).";
-        op->diagnostic(s.str());
+        op->diagnostic(
+            testinator::Diagnostic(
+                testinator::Cons<testinator::Nil>()
+                << m_u.GetName() << ": " << n << " tests run in " << nanos << "ns ("
+                << (nanos/n) << " ns per test)."));
       }
 
       U m_u;
