@@ -146,7 +146,7 @@ namespace testinator
       {
         auto seed = GetTestRegistry().RNG()();
         auto t = Arbitrary<argTuple>::generate_n(N, seed);
-        auto d = function_traits<U>::apply_timed(num, m_u, t);
+        auto d = function_traits<U>::apply_timed(num, m_u, std::move(t));
         return std::chrono::duration_cast<std::chrono::nanoseconds>(d).count();
       }
 

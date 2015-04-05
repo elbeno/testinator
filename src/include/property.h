@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <random>
 #include <sstream>
@@ -54,7 +55,7 @@ namespace testinator
         for (std::size_t i = 0; i < N; ++i)
         {
           auto t = Arbitrary<argTuple>::generate(N, seed);
-          if (!checkSingle(t, op))
+          if (!checkSingle(std::move(t), op))
           {
             op->diagnostic(
                 Diagnostic(Cons<Nil>()
@@ -66,7 +67,7 @@ namespace testinator
         return true;
       }
 
-      bool checkSingle(const argTuple& t, const Outputter* op)
+      bool checkSingle(argTuple&& t, const Outputter* op)
       {
         if (function_traits<U>::apply(m_u, t)) return true;
 
@@ -74,12 +75,13 @@ namespace testinator
             Diagnostic(Cons<Nil>()
                        << "Failed " << prettyprint(t)));
 
-        std::vector<argTuple> v = Arbitrary<argTuple>::shrink(t);
+        std::vector<argTuple> v = Arbitrary<argTuple>::shrink(std::move(t));
         if (!v.empty())
         {
-          return std::all_of(v.begin(), v.end(),
-                             [this, op] (const argTuple& st)
-                             { return checkSingle(st, op); });
+          return std::all_of(std::make_move_iterator(v.begin()),
+                             std::make_move_iterator(v.end()),
+                             [this, op] (argTuple&& st)
+                             { return checkSingle(std::move(st), op); });
         }
         return false;
       }
