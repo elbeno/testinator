@@ -37,16 +37,16 @@ namespace testinator
     std::string m_name;
 
   public:
-    Branch(int id, const char* name)
+    Branch(int line, const char* file, const char* name)
       : m_complete(false)
       , m_canRunChild(true)
-      , m_id(id)
+      , m_id(line)
       , m_name(name)
     {
       if (m_name.empty())
       {
         std::ostringstream oss;
-        oss << "(" __FILE__ ":" << std::to_string(id) << ")";
+        oss << "(" << file << ":" << std::to_string(line) << ")";
         m_name = oss.str();
       }
     }
@@ -81,13 +81,13 @@ namespace testinator
       m_canRunChild = b;
     }
 
-    Branch& pushChild(int id, const char* name)
+    Branch& pushChild(int line, const char* file, const char* name)
     {
       auto i = std::find_if(m_children.begin(), m_children.end(),
-                            [=] (const Branch& r) { return r.m_id == id; });
+                            [=] (const Branch& r) { return r.m_id == line; });
       if (i != m_children.end()) return *i;
 
-      m_children.emplace_back(id, name);
+      m_children.emplace_back(line, file, name);
       return m_children.back();
     }
 
@@ -106,9 +106,9 @@ namespace testinator
   class BranchScope
   {
   public:
-    BranchScope(int id, const char* name)
+    BranchScope(int line, const char* file, const char* name)
       : m_parent(Branch::currentParent())
-      , m_child(m_parent.pushChild(id, name))
+      , m_child(m_parent.pushChild(line, file, name))
     {
       m_canRun = m_parent.canRunChild();
       if (!m_canRun)
@@ -145,7 +145,8 @@ namespace testinator
 #define TESTINATOR_UNIQUE_NAME(base) TESTINATOR_CAT(base, __LINE__)
 
 #define BRANCH(...)                                                     \
-  testinator::BranchScope TESTINATOR_UNIQUE_NAME(rs)(__LINE__, #__VA_ARGS__); \
+  testinator::BranchScope TESTINATOR_UNIQUE_NAME(rs)(                   \
+      __LINE__, __FILE__, #__VA_ARGS__);                                \
   if (TESTINATOR_UNIQUE_NAME(rs).canRun())                              \
     if (auto TESTINATOR_UNIQUE_NAME(rspop) = testinator::at_scope_exit( \
             [] () { testinator::Branch::getStack().pop(); }))
@@ -156,7 +157,7 @@ namespace testinator
 {
   inline bool Test::RunWithBranches()
   {
-    Branch root(-1, "(root)");
+    Branch root(-1, "", "(root)");
     Branch::getStack().push(&root);
     auto TESTINATOR_UNIQUE_NAME(rootpop) = at_scope_exit(
         [] () { Branch::getStack().pop(); });

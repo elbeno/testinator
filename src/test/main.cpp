@@ -299,7 +299,7 @@ public:
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "no branch\nbranch (export/debug/include/branch.h:271)\nno branch\nbranch B";
+      "no branch\nbranch (build/debug/test/main.cpp:271)\nno branch\nbranch B";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
