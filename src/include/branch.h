@@ -28,16 +28,16 @@ namespace testinator
   }
 
   //------------------------------------------------------------------------------
-  class Region
+  class Branch
   {
     bool m_complete;
     bool m_canRunChild;
-    std::list<Region> m_children;
+    std::list<Branch> m_children;
     int m_id;
     std::string m_name;
 
   public:
-    Region(int id, const char* name)
+    Branch(int id, const char* name)
       : m_complete(false)
       , m_canRunChild(true)
       , m_id(id)
@@ -81,33 +81,33 @@ namespace testinator
       m_canRunChild = b;
     }
 
-    Region& pushChild(int id, const char* name)
+    Branch& pushChild(int id, const char* name)
     {
       auto i = std::find_if(m_children.begin(), m_children.end(),
-                            [=] (const Region& r) { return r.m_id == id; });
+                            [=] (const Branch& r) { return r.m_id == id; });
       if (i != m_children.end()) return *i;
 
       m_children.emplace_back(id, name);
       return m_children.back();
     }
 
-    static std::stack<Region*>& getStack()
+    static std::stack<Branch*>& getStack()
     {
-      static std::stack<Region*> s;
+      static std::stack<Branch*> s;
       return s;
     }
 
-    static Region& currentParent()
+    static Branch& currentParent()
     {
       return *getStack().top();
     }
   };
 
-  class RegionScope
+  class BranchScope
   {
   public:
-    RegionScope(int id, const char* name)
-      : m_parent(Region::currentParent())
+    BranchScope(int id, const char* name)
+      : m_parent(Branch::currentParent())
       , m_child(m_parent.pushChild(id, name))
     {
       m_canRun = m_parent.canRunChild();
@@ -120,12 +120,12 @@ namespace testinator
       if (m_canRun)
       {
         m_parent.setCanRunChild(false);
-        Region::getStack().push(&m_child);
+        Branch::getStack().push(&m_child);
         m_child.setComplete(true);
       }
     }
 
-    ~RegionScope()
+    ~BranchScope()
     {
       m_parent.childComplete(m_child.isComplete());
       m_parent.setCanRunChild(true);
@@ -134,8 +134,8 @@ namespace testinator
     bool canRun() const { return m_canRun; }
 
   private:
-    Region& m_parent;
-    Region& m_child;
+    Branch& m_parent;
+    Branch& m_child;
     bool m_canRun;
   };
 }
@@ -144,22 +144,22 @@ namespace testinator
 #define TESTINATOR_CAT(a, b) TESTINATOR_XCAT(a, b)
 #define TESTINATOR_UNIQUE_NAME(base) TESTINATOR_CAT(base, __LINE__)
 
-#define DEF_REGION(...)                                                 \
-  testinator::RegionScope TESTINATOR_UNIQUE_NAME(rs)(__LINE__, #__VA_ARGS__); \
+#define BRANCH(...)                                                     \
+  testinator::BranchScope TESTINATOR_UNIQUE_NAME(rs)(__LINE__, #__VA_ARGS__); \
   if (TESTINATOR_UNIQUE_NAME(rs).canRun())                              \
     if (auto TESTINATOR_UNIQUE_NAME(rspop) = testinator::at_scope_exit( \
-            [] () { testinator::Region::getStack().pop(); }))
+            [] () { testinator::Branch::getStack().pop(); }))
 
-#define REGION_NAME (testinator::Region::getStack().top()->getName())
+#define BRANCH_NAME (testinator::Branch::getStack().top()->getName())
 
 namespace testinator
 {
-  inline bool Test::RunWithRegions()
+  inline bool Test::RunWithBranches()
   {
-    Region root(-1, "(root)");
-    Region::getStack().push(&root);
+    Branch root(-1, "(root)");
+    Branch::getStack().push(&root);
     auto TESTINATOR_UNIQUE_NAME(rootpop) = at_scope_exit(
-        [] () { Region::getStack().pop(); });
+        [] () { Branch::getStack().pop(); });
     while (!root.isComplete())
     {
       root.setComplete(true);

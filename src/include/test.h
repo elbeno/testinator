@@ -45,13 +45,13 @@ namespace testinator
 
     virtual bool Setup(const RunParams&) { return true; }
     virtual bool Run() { return true; }
-    bool RunWithRegions();
+    bool RunWithBranches();
 
     Result RunWrapper(const Outputter* outputter)
     {
       Result r;
       m_op = outputter;
-      r.m_success = RunWithRegions() && m_success;
+      r.m_success = RunWithBranches() && m_success;
       return r;
     }
 
@@ -78,7 +78,7 @@ namespace testinator
   bool SUITE##NAME::Run()
 
 //------------------------------------------------------------------------------
-#include "region.h"
+#include "branch.h"
 #include "test_registry.h"
 
 namespace testinator

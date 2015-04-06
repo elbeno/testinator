@@ -95,13 +95,13 @@ DEF_TEST(TestName, SuiteName)
 
 After `SKIP` or `ABORT` it doesn't matter what is returned.
 
-## Regions
+## Branches
 
 Instead of exposing fixtures or setup/teardown functionality, Testinator uses
-the idea of Regions. Regions are subsections of tests that will be executed on
+the idea of Branches. Branches are subsections of tests that will be executed on
 successive runs of the test. This allows fixtures to be replaced with more
-natural scoping. Regions are introduced with the `DEF_REGION` macro and their
-name may be retrieved with `REGION_NAME`. For example:
+natural scoping. Branches are introduced with the `BRANCH` macro and their
+name may be retrieved with `BRANCH_NAME`. For example:
 
 ```cpp
 DEF_TEST(TestName, SuiteName)
@@ -109,29 +109,29 @@ DEF_TEST(TestName, SuiteName)
   // some common setup here...
   bool success = true;
 
-  DEF_REGION(A)
+  BRANCH(A)
   {
     // this executes first time around
-    DIAGNOSTIC("In region " << REGION_NAME);
+    DIAGNOSTIC("In branch " << BRANCH_NAME);
   }
 
-  DEF_REGION(B)
+  BRANCH(B)
   {
     // this executes second time around
-    DIAGNOSTIC("In region " << REGION_NAME);
+    DIAGNOSTIC("In branch " << BRANCH_NAME);
   }
 
   return success;
 }
 ```
 
-Regions may be nested if further common structure is required; the test will run
-as many times as necessary to visit all the "leaf" regions. If Regions are not
-explicitly named, `REGION_NAME` will be automatically provided with filename and
+Branches may be nested if further common structure is required; the test will
+run as many times as necessary to visit all the "leaves". If Branches are not
+explicitly named, `BRANCH_NAME` will be automatically provided with filename and
 line information.
 
 If a test returns early (assumedly with a failure, returning `false`) from
-within a Region, this will cause subsequent Regions to be skipped.
+within a Branch, this will cause subsequent Branches to be skipped.
 
 ## Properties
 

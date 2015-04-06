@@ -257,25 +257,25 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestRegionsInternal : public testinator::Test
+class TestBranchInternal : public testinator::Test
 {
 public:
-  TestRegionsInternal(const string& name)
+  TestBranchInternal(const string& name)
     : testinator::Test(name)
   {}
 
   virtual bool Run()
   {
-    DIAGNOSTIC("no region");
+    DIAGNOSTIC("no branch");
 
-    DEF_REGION()
+    BRANCH()
     {
-      DIAGNOSTIC("region " << REGION_NAME);
+      DIAGNOSTIC("branch " << BRANCH_NAME);
     }
 
-    DEF_REGION(B)
+    BRANCH(B)
     {
-      DIAGNOSTIC("region " << REGION_NAME);
+      DIAGNOSTIC("branch " << BRANCH_NAME);
     }
 
     return true;
@@ -283,10 +283,10 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestRegions : public testinator::Test
+class TestBranch : public testinator::Test
 {
 public:
-  TestRegions(const string& name)
+  TestBranch(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
@@ -295,11 +295,11 @@ public:
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
-    TestRegionsInternal myTestA("A");
+    TestBranchInternal myTestA("A");
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "no region\nregion (export/debug/include/region.h:271)\nno region\nregion B";
+      "no branch\nbranch (export/debug/include/branch.h:271)\nno branch\nbranch B";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
@@ -484,7 +484,7 @@ int main(int argc, char* argv[])
   TestRunSuite test6("TestRunSuite");
   TestCheckMacro test7("TestCheckMacro");
   TestDiagnostic test8("TestDiagnostic");
-  TestRegions test9("TestRegions");
+  TestBranch test9("TestBranch");
   TestSkip test10("TestSkip");
   testinator::Results rs;
 
