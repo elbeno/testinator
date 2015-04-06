@@ -78,7 +78,7 @@ namespace testinator
   auto tuple_tail(T&& t, std::index_sequence<Is...>,
                   std::enable_if_t<is_tuple<std::decay_t<T>>::value>* = nullptr)
   {
-    return std::make_tuple(std::get<Is + 1>(t)...);
+    return std::make_tuple(std::get<Is + 1>(std::forward<T>(t))...);
   }
 
   template <typename T>
