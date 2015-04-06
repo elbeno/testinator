@@ -46,12 +46,113 @@ DEF_PROPERTY(StringReverse, Property, const string& s)
 }
 
 //------------------------------------------------------------------------------
-// This is supposed to fail to demonstrate how shrinking finds the minimal
-// failure
-
-DEF_PROPERTY(FailTriggersShrink, Property, const string& s)
+class FailTriggersShrinkAInternal : public testinator::PropertyTest
 {
-  return s.find('A') == s.npos;
+public:
+  FailTriggersShrinkAInternal(const string& name, const string& suite)
+    : testinator::PropertyTest(name, suite)
+  {}
+
+  virtual bool Run() override
+  {
+    testinator::Property p(*this);
+    return p.check(m_numChecks, m_op);
+  }
+
+  bool operator()(const string& s)
+  {
+    return s.find('A') == string::npos;
+  }
+};
+
+DEF_TEST(FailTriggersShrink, Property)
+{
+  ostringstream oss;
+  std::unique_ptr<testinator::Outputter> op =
+    make_unique<testinator::DefaultOutputter>(oss);
+  FailTriggersShrinkAInternal myTestA("A", "Property");
+
+  testinator::RunParams p;
+  p.m_randomSeed = 886871573;
+  testinator::Results rs = testinator::RunAllTests(p, op.get());
+
+  static string expected = "Failed (\"A\")";
+  return !rs.empty() && !rs.front().m_success
+    && oss.str().find(expected) != string::npos;
+}
+
+//------------------------------------------------------------------------------
+class FailTriggersShrinkBInternal : public testinator::PropertyTest
+{
+public:
+  FailTriggersShrinkBInternal(const string& name, const string& suite)
+    : testinator::PropertyTest(name, suite)
+  {}
+
+  virtual bool Run() override
+  {
+    testinator::Property p(*this);
+    return p.check(m_numChecks, m_op);
+  }
+
+  bool operator()(const string& s1, const string& s2)
+  {
+    return s1.find('A') == string::npos
+      || s2.find('B') == string::npos;
+  }
+};
+
+DEF_TEST(FailTriggersShrinkMulti, Property)
+{
+  ostringstream oss;
+  std::unique_ptr<testinator::Outputter> op =
+    make_unique<testinator::DefaultOutputter>(oss);
+  FailTriggersShrinkBInternal myTestA("A", "Property");
+
+  testinator::RunParams p;
+  p.m_randomSeed = 3358856245;
+  testinator::Results rs = testinator::RunAllTests(p, op.get());
+
+  static string expected = "Failed (\"A\",\"B\")";
+  return !rs.empty() && !rs.front().m_success
+    && oss.str().find(expected) != string::npos;
+}
+
+//------------------------------------------------------------------------------
+class FailTriggersShrinkCInternal : public testinator::PropertyTest
+{
+public:
+  FailTriggersShrinkCInternal(const string& name, const string& suite)
+    : testinator::PropertyTest(name, suite)
+  {}
+
+  virtual bool Run() override
+  {
+    testinator::Property p(*this);
+    return p.check(m_numChecks, m_op);
+  }
+
+  bool operator()(const std::pair<string, string>& p)
+  {
+    return p.first.find('A') == string::npos
+      || p.second.find('B') == string::npos;
+  }
+};
+
+DEF_TEST(FailTriggersShrinkPair, Property)
+{
+  ostringstream oss;
+  std::unique_ptr<testinator::Outputter> op =
+    make_unique<testinator::DefaultOutputter>(oss);
+  FailTriggersShrinkCInternal myTestA("A", "Property");
+
+  testinator::RunParams p;
+  p.m_randomSeed = 1226436623;
+  testinator::Results rs = testinator::RunAllTests(p, op.get());
+
+  static string expected = "Failed ((\"A\",\"B\"))";
+  return !rs.empty() && !rs.front().m_success
+    && oss.str().find(expected) != string::npos;
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +188,12 @@ DEF_PROPERTY(ConstChar, Property, const char)
 
 //------------------------------------------------------------------------------
 DEF_PROPERTY(pair, Property, const std::pair<int, float>&)
+{
+  return true;
+}
+
+//------------------------------------------------------------------------------
+DEF_PROPERTY(tuple, Property, const std::tuple<int, float>&)
 {
   return true;
 }
