@@ -135,19 +135,20 @@ namespace testinator
       std::vector<std::tuple<Ts...>> ret{};
 
       // shrink the head
-      auto head_v = Arbitrary<std::decay_t<decltype(std::get<0>(t))>>::shrink(std::get<0>(t));
-      for (auto&& e : head_v)
+      using H = std::decay_t<decltype(std::get<0>(t))>;
+      auto head_v = Arbitrary<H>::shrink(std::get<0>(t));
+      for (H& e : head_v)
       {
-        ret.push_back(tuple_cons(std::forward<decltype(e)>(e), tuple_tail(t)));
+        ret.push_back(tuple_cons(std::move(e), tuple_tail(t)));
       }
 
       // shrink the tail recursively
-      auto tail_v = Arbitrary<std::decay_t<decltype(tuple_tail(t))>>::shrink(tuple_tail(t));
-      for_each(tail_v.begin(), tail_v.end(),
-               [&ret, &t] (auto&& v)
-               {
-                 ret.push_back(tuple_cons(std::get<0>(t), std::forward<decltype(v)>(v)));
-               });
+      using T = std::decay_t<decltype(tuple_tail(t))>;
+      auto tail_v = Arbitrary<T>::shrink(tuple_tail(t));
+      for (T& e : tail_v)
+      {
+        ret.push_back(tuple_cons(std::get<0>(t), std::move(e)));
+      }
 
       return ret;
     }
