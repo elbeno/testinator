@@ -179,6 +179,53 @@ public:
 };
 
 //------------------------------------------------------------------------------
+struct CountEvals
+{
+  bool inc() { ++s_evals; return true; }
+  static int s_evals;
+};
+int CountEvals::s_evals = 0;
+
+class TestExpectEvalsOnceInternal : public testinator::Test
+{
+public:
+  TestExpectEvalsOnceInternal(const string& name)
+    : testinator::Test(name)
+  {}
+
+  virtual bool Run()
+  {
+    CountEvals c;
+    EXPECT(c.inc() == c.inc());
+    EXPECT(CountEvals::s_evals == 2);
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestExpectEvalsOnce : public testinator::Test
+{
+public:
+  TestExpectEvalsOnce(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+    TestExpectEvalsOnceInternal myTestA("A");
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    static string notexpected = "EXPECT FAILED";
+
+    return !rs.empty() && rs.front().m_success
+      && oss.str().find(notexpected) == string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
 class TestDiagnosticInternal : public testinator::Test
 {
 public:
@@ -299,7 +346,7 @@ public:
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "no branch\nbranch (build/debug/test/main.cpp:271)\nno branch\nbranch B";
+      "no branch\nbranch (build/debug/test/main.cpp:318)\nno branch\nbranch B";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
@@ -479,13 +526,14 @@ int main(int argc, char* argv[])
   s_numPropertyChecks = p.m_numPropertyChecks;
   TestCallTest test0("TestCallTest");
   TestSetupFirst test1("TestSetupFirst");
-  TestRunMultiple test4("TestRunMultiple");
-  TestReportResults test5("TestReportResults");
-  TestRunSuite test6("TestRunSuite");
-  TestCheckMacro test7("TestCheckMacro");
-  TestDiagnostic test8("TestDiagnostic");
-  TestBranch test9("TestBranch");
-  TestSkip test10("TestSkip");
+  TestRunMultiple test2("TestRunMultiple");
+  TestReportResults test3("TestReportResults");
+  TestRunSuite test4("TestRunSuite");
+  TestCheckMacro test5("TestCheckMacro");
+  TestDiagnostic test6("TestDiagnostic");
+  TestBranch test7("TestBranch");
+  TestSkip test8("TestSkip");
+  TestExpectEvalsOnce test9("TestExpectEvalsOnce");
   testinator::Results rs;
 
   std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(
