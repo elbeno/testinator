@@ -5,6 +5,8 @@ known to work with:
  * Clang 3.5/libc++
  * GCC 4.9.1/libstdc++
 
+Testinator is dsitributed under the MIT license. See LICENSE for details.
+
 ## Basic setup
 
 Testinator is a header-only library. To use it in the simplest way, a complete

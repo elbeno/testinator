@@ -1,3 +1,6 @@
+// Copyright (c) 2014, 2015 Ben Deane
+// This code is distributed under the MIT license. See LICENSE for details.
+
 #include <property.h>
 
 using namespace std;
