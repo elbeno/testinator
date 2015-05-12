@@ -56,7 +56,7 @@ namespace testinator
         auto seed = m_u.m_randomSeed;
         for (std::size_t i = 0; i < N; ++i)
         {
-          auto t = Arbitrary<argTuple>::generate(N, seed);
+          auto t = Arbitrary<argTuple>::generate(i, seed);
           if (!checkSingle(std::move(t), op))
           {
             op->diagnostic(
