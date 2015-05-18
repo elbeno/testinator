@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <functional>
+#include <initializer_list>
 #include <iostream>
 #include <iterator>
 #include <string>
@@ -623,7 +624,8 @@ namespace detail
   inline void for_each_in_tuple(const std::tuple<Ts...>& t, F f,
                                 std::index_sequence<Is...>)
   {
-    auto a { 0, (f(std::get<Is>(t), Is), 0)... };
+    using I = std::initializer_list<int>;
+    (void) I { (f(std::get<Is>(t), Is), 0)... };
   }
 
   template <typename F, typename...Ts>

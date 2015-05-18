@@ -33,8 +33,7 @@ env.Append(CCFLAGS = ["-pedantic"
                       , "-Wstrict-overflow=5"
                       , "-Wswitch-default"
                       , "-Wundef"
-                      , "-Werror"
-                      , "-Wno-unused"])
+                      , "-Werror"])
 
 compiler = 'clang++'
 #compiler = 'g++'
