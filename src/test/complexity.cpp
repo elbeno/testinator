@@ -11,12 +11,13 @@ DEF_COMPLEXITY_PROPERTY(O_1, Complexity, ORDER_1, string&&, int)
 {
 }
 
+char g_c;
+
 DEF_COMPLEXITY_PROPERTY(O_LOG_N, Complexity, ORDER_LOG_N, string&& s)
 {
-  char c;
   for (size_t i = 1, lim = s.size(); i < lim; i <<= 1)
   {
-    c = s[i];
+    g_c = s[i];
   }
 }
 
