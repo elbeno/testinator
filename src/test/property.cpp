@@ -150,7 +150,7 @@ DEF_TEST(FailTriggersShrinkPair, Property)
   FailTriggersShrinkCInternal myTestA("A", "Property");
 
   testinator::RunParams p;
-  p.m_randomSeed = 1226436623;
+  p.m_randomSeed = 1322472956;
   testinator::Results rs = testinator::RunAllTests(p, op.get());
 
   static string expected = "Failed ((\"A\",\"B\"))";
