@@ -37,11 +37,13 @@ env.Append(CCFLAGS = ["-pedantic"
 
 compiler = 'clang++'
 #compiler = 'g++'
+if 'CXX' in os.environ and os.environ['CXX']:
+  compiler = os.environ['CXX']
+env.Replace(CXX = compiler)
 
-if compiler == 'clang++':
+if compiler[:5] == 'clang':
     env.Append(CCFLAGS = "-stdlib=libc++")
     env.Append(LINKFLAGS = "-lc++")
-    env.Replace(CXX = compiler)
 
 env['PROJNAME'] = os.path.basename(Dir('.').srcnode().abspath)
 print env['PROJNAME']

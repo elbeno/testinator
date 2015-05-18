@@ -2,10 +2,13 @@
 
 Experiments with testing in C++. Testinator is a unit testing framework. It is
 known to work with:
- * Clang 3.5/libc++
- * GCC 4.9.1/libstdc++
+ * Clang 3.4/libc++
+ * GCC 4.9/libstdc++
 
-Testinator is dsitributed under the MIT license. See LICENSE for details.
+### Status
+[![Build Status](https://travis-ci.org/elbeno/testinator.svg?branch=master)](https://travis-ci.org/elbeno/testinator)
+
+Testinator is distributed under the MIT license. See LICENSE for details.
 
 ## Basic setup
 
