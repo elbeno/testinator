@@ -23,6 +23,7 @@ namespace testinator
     static std::basic_string<T> generate(
         std::size_t generation, unsigned long int randomSeed)
     {
+      if (generation == 0) return {};
       std::basic_string<T> s;
       std::size_t n = N * ((generation / 100) + 1);
       s.reserve(n);
