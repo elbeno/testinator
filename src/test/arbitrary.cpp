@@ -182,7 +182,7 @@ DEF_TEST(vector, Arbitrary)
 DEF_TEST(string, Arbitrary)
 {
   testinator::Arbitrary<string> a;
-  string v = a.generate(0,0);
+  string v = a.generate(1,0);
   vector<string> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2

@@ -23,8 +23,8 @@ namespace testinator
     static std::basic_string<T> generate(
         std::size_t generation, unsigned long int randomSeed)
     {
-      if (generation == 0) return {};
       std::basic_string<T> s;
+      if (generation == 0) return s;
       std::size_t n = N * ((generation / 100) + 1);
       s.reserve(n);
       std::generate_n(std::back_inserter(s), n,
@@ -44,11 +44,10 @@ namespace testinator
     static std::vector<std::basic_string<T>> shrink(const std::basic_string<T>& t)
     {
       std::vector<std::basic_string<T>> v;
-      if (t.size() < 2)
-        return v;
+      if (t.empty()) return v;
       auto l = t.size() / 2;
       v.push_back(t.substr(0, l));
-      v.push_back(t.substr(l));
+      if (l > 0) v.push_back(t.substr(l));
       return v;
     }
   };
