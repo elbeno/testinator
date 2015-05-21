@@ -71,19 +71,22 @@ namespace testinator
 
       bool checkSingle(argTuple&& t, const Outputter* op)
       {
-        if (function_traits<U>::apply(m_u, t)) return true;
+        bool result = function_traits<U>::apply(m_u, t);
+        if (result) return true;
 
         op->diagnostic(
             Diagnostic(Cons<Nil>()
                        << "Failed " << prettyprint(t)));
 
         std::vector<argTuple> v = Arbitrary<argTuple>::shrink(std::move(t));
+
         if (!v.empty())
         {
           return std::all_of(std::make_move_iterator(v.begin()),
                              std::make_move_iterator(v.end()),
                              [this, op] (argTuple&& st)
-                             { return checkSingle(std::move(st), op); });
+                             { return checkSingle(std::move(st), op); })
+            && result;
         }
         return false;
       }
