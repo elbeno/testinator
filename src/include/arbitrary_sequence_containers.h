@@ -26,6 +26,7 @@ namespace testinator
       static C generate(std::size_t generation, unsigned long int randomSeed)
       {
         C v;
+        if (generation == 0) return v;
         std::size_t n = N * ((generation / 100) + 1);
         std::generate_n(
             std::back_inserter(v), n,
@@ -45,12 +46,12 @@ namespace testinator
       static std::vector<C> shrink(const C& c)
       {
         std::vector<C> v;
-        if (c.size() < 2)
-          return v;
+        if (c.empty()) return v;
+        auto l = c.size() / 2;
         auto it = c.cbegin();
-        std::advance(it, c.size()/2);
+        std::advance(it, static_cast<typename C::difference_type>(l));
         v.push_back(C{c.cbegin(), it});
-        v.push_back(C{it, c.cend()});
+        if (l > 0) v.push_back(C{it, c.cend()});
         return v;
       }
     };
@@ -76,6 +77,7 @@ namespace testinator
     static std::list<T> generate(std::size_t generation, unsigned long int randomSeed)
     {
       std::list<T> v;
+      if (generation == 0) return v;
       std::size_t n = N * ((generation / 100) + 1);
       std::generate_n(std::back_inserter(v), n,
                       [&] () { return Arbitrary<T>::generate(generation++, randomSeed++); });
@@ -93,14 +95,17 @@ namespace testinator
     static std::vector<std::list<T>> shrink(const std::list<T>& t)
     {
       std::vector<std::list<T>> v;
-      if (t.size() < 2)
-        return v;
+      if (t.empty()) return v;
+      auto l = t.size() / 2;
       auto it = t.cbegin();
       v.push_back(std::list<T>());
-      for (std::size_t count = 0; count < t.size()/2; count++, it++)
+      for (decltype(l) count = 0; count < l; count++, it++)
         v[0].push_back(*it);
-      v.push_back(std::list<T>());
-      copy(it, t.cend(), std::back_inserter(v[1]));
+      if (l > 0)
+      {
+        v.push_back(std::list<T>());
+        copy(it, t.cend(), std::back_inserter(v[1]));
+      }
       return v;
     }
   };
@@ -116,6 +121,7 @@ namespace testinator
     static std::forward_list<T> generate(std::size_t generation, unsigned long int randomSeed)
     {
       std::forward_list<T> v;
+      if (generation == 0) return v;
       std::size_t n = N * ((generation / 100) + 1);
       std::generate_n(std::front_inserter(v), n,
                       [&] () { return Arbitrary<T>::generate(generation++, randomSeed++); });
@@ -133,16 +139,17 @@ namespace testinator
     static std::vector<std::forward_list<T>> shrink(const std::forward_list<T>& t)
     {
       std::vector<std::forward_list<T>> v;
-      auto len = std::distance(t.cbegin(), t.cend());
-      if (len < 2)
-        return v;
-
+      if (t.empty()) return v;
+      auto l = std::distance(t.cbegin(), t.cend()) / 2;
       auto it = t.cbegin();
       v.push_back(std::forward_list<T>());
-      for (auto count = 0; count < len/2; count++, it++)
+      for (auto count = 0; count < l; count++, it++)
         v[0].push_front(*it);
-      v.push_back(std::forward_list<T>());
-      copy(it, t.cend(), std::front_inserter(v[1]));
+      if (l > 0)
+      {
+        v.push_back(std::forward_list<T>());
+        copy(it, t.cend(), std::front_inserter(v[1]));
+      }
       return v;
     }
   };

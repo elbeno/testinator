@@ -28,6 +28,7 @@ namespace testinator
       static C generate(std::size_t generation, unsigned long int randomSeed)
       {
         C v;
+        if (generation == 0) return v;
         std::size_t n = N * ((generation / 100) + 1);
         std::generate_n(
             std::inserter(v, v.begin()), n,
@@ -47,14 +48,17 @@ namespace testinator
       static std::vector<C> shrink(const C& c)
       {
         std::vector<C> v;
-        if (c.size() < 2)
-          return v;
+        if (c.empty()) return v;
+        auto l = c.size() / 2;
         auto it = c.cbegin();
         v.push_back(C());
-        for (std::size_t count = 0; count < c.size()/2; count++, it++)
+        for (decltype(l) count = 0; count < l; count++, it++)
           v[0].insert(*it);
-        v.push_back(C());
-        copy(it, c.cend(), std::inserter(v[1], v[1].begin()));
+        if (l > 0)
+        {
+          v.push_back(C());
+          copy(it, c.cend(), std::inserter(v[1], v[1].begin()));
+        }
         return v;
       }
     };

@@ -171,7 +171,7 @@ DEF_TEST(longdouble, Arbitrary)
 DEF_TEST(vector, Arbitrary)
 {
   testinator::Arbitrary<vector<int>> a;
-  vector<int> v = a.generate(0,0);
+  vector<int> v = a.generate(1,0);
   vector<vector<int>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -193,7 +193,7 @@ DEF_TEST(string, Arbitrary)
 DEF_TEST(deque, Arbitrary)
 {
   testinator::Arbitrary<deque<int>> a;
-  deque<int> v = a.generate(0,0);
+  deque<int> v = a.generate(1,0);
   vector<deque<int>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -204,7 +204,7 @@ DEF_TEST(deque, Arbitrary)
 DEF_TEST(list, Arbitrary)
 {
   testinator::Arbitrary<list<int>> a;
-  list<int> v = a.generate(0,0);
+  list<int> v = a.generate(1,0);
   vector<list<int>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -215,7 +215,7 @@ DEF_TEST(list, Arbitrary)
 DEF_TEST(forward_list, Arbitrary)
 {
   testinator::Arbitrary<forward_list<int>> a;
-  forward_list<int> v = a.generate(0,0);
+  forward_list<int> v = a.generate(1,0);
   vector<forward_list<int>> vv = a.shrink(v);
 
   std::size_t vlen = 0;
@@ -237,7 +237,7 @@ DEF_TEST(forward_list, Arbitrary)
 DEF_TEST(set, Arbitrary)
 {
   testinator::Arbitrary<set<int>> a;
-  set<int> v = a.generate(0,0);
+  set<int> v = a.generate(1,0);
   vector<set<int>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -248,7 +248,7 @@ DEF_TEST(set, Arbitrary)
 DEF_TEST(multiset, Arbitrary)
 {
   testinator::Arbitrary<multiset<int>> a;
-  multiset<int> v = a.generate(0,0);
+  multiset<int> v = a.generate(1,0);
   vector<multiset<int>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -259,7 +259,7 @@ DEF_TEST(multiset, Arbitrary)
 DEF_TEST(unordered_set, Arbitrary)
 {
   testinator::Arbitrary<unordered_set<int>> a;
-  unordered_set<int> v = a.generate(0,0);
+  unordered_set<int> v = a.generate(1,0);
   vector<unordered_set<int>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -288,7 +288,7 @@ DEF_TEST(tuple, Arbitrary)
 DEF_TEST(map, Arbitrary)
 {
   testinator::Arbitrary<map<int, float>> a;
-  map<int, float> v = a.generate(0,0);
+  map<int, float> v = a.generate(1,0);
   vector<map<int, float>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -299,7 +299,7 @@ DEF_TEST(map, Arbitrary)
 DEF_TEST(multimap, Arbitrary)
 {
   testinator::Arbitrary<multimap<int, float>> a;
-  multimap<int, float> v = a.generate(0,0);
+  multimap<int, float> v = a.generate(1,0);
   vector<multimap<int, float>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
@@ -310,7 +310,7 @@ DEF_TEST(multimap, Arbitrary)
 DEF_TEST(unordered_map, Arbitrary)
 {
   testinator::Arbitrary<unordered_map<int, float>> a;
-  unordered_map<int, float> v = a.generate(0,0);
+  unordered_map<int, float> v = a.generate(1,0);
   vector<unordered_map<int, float>> vv = a.shrink(v);
   return vv.size() == 2
     && vv[0].size() == v.size()/2
