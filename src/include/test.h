@@ -40,9 +40,13 @@ namespace testinator
   using Results = std::vector<Result>;
 
   //------------------------------------------------------------------------------
+  class TestRegistry;
+
   class Test
   {
   public:
+    Test(TestRegistry& reg, const std::string& name,
+         const std::string& suiteName = std::string());
     Test(const std::string& name, const std::string& suiteName = std::string());
     virtual ~Test();
 
@@ -65,6 +69,7 @@ namespace testinator
     bool m_success = true;
     bool m_skipped = false;
     const std::string m_name;
+    TestRegistry& m_registry;
     const Outputter* m_op;
   };
 }
@@ -116,14 +121,20 @@ namespace testinator
   }
 
   //------------------------------------------------------------------------------
-  inline Test::Test(const std::string& n, const std::string& s)
+  inline Test::Test(TestRegistry& r, const std::string& n, const std::string& s)
     : m_name(n)
+    , m_registry(r)
   {
-    GetTestRegistry().Register(this, n, s);
+    m_registry.Register(this, n, s);
+  }
+
+  inline Test::Test(const std::string& n, const std::string& s)
+    : Test(GetTestRegistry(), n, s)
+  {
   }
 
   inline Test::~Test()
   {
-    GetTestRegistry().Unregister(this);
+    m_registry.Unregister(this);
   }
 }

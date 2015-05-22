@@ -52,8 +52,9 @@ DEF_PROPERTY(StringReverse, Property, const string& s)
 class FailOnEmptyStringInternal : public testinator::PropertyTest
 {
 public:
-  FailOnEmptyStringInternal(const string& name, const string& suite)
-    : testinator::PropertyTest(name, suite)
+  FailOnEmptyStringInternal(testinator::TestRegistry& r,
+                            const string& name, const string& suite)
+    : testinator::PropertyTest(r, name, suite)
   {}
 
   virtual bool Run() override
@@ -70,12 +71,13 @@ public:
 
 DEF_TEST(FailOnEmptyString, Property)
 {
+  testinator::TestRegistry r;
   ostringstream oss;
   std::unique_ptr<testinator::Outputter> op =
     make_unique<testinator::DefaultOutputter>(oss);
-  FailOnEmptyStringInternal myTestA("A", "Property");
+  FailOnEmptyStringInternal myTestA(r, "A", "Property");
 
-  testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+  testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
   static string expected = "Failed (\"\")";
   return !rs.empty() && !rs.front().m_success
@@ -86,8 +88,9 @@ DEF_TEST(FailOnEmptyString, Property)
 class FailTriggersShrinkA1Internal : public testinator::PropertyTest
 {
 public:
-  FailTriggersShrinkA1Internal(const string& name, const string& suite)
-    : testinator::PropertyTest(name, suite)
+  FailTriggersShrinkA1Internal(testinator::TestRegistry& r,
+                               const string& name, const string& suite)
+    : testinator::PropertyTest(r, name, suite)
   {}
 
   virtual bool Run() override
@@ -104,14 +107,15 @@ public:
 
 DEF_TEST(FailTriggersShrink1, Property)
 {
+  testinator::TestRegistry r;
   ostringstream oss;
   std::unique_ptr<testinator::Outputter> op =
     make_unique<testinator::DefaultOutputter>(oss);
-  FailTriggersShrinkA1Internal myTestA("A", "Property");
+  FailTriggersShrinkA1Internal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
   p.m_randomSeed = 886871573;
-  testinator::Results rs = testinator::RunAllTests(p, op.get());
+  testinator::Results rs = r.RunAllTests(p, op.get());
 
   static string expected = "Failed (\"A\")";
   return !rs.empty() && !rs.front().m_success
@@ -122,8 +126,9 @@ DEF_TEST(FailTriggersShrink1, Property)
 class FailTriggersShrinkA2Internal : public testinator::PropertyTest
 {
 public:
-  FailTriggersShrinkA2Internal(const string& name, const string& suite)
-    : testinator::PropertyTest(name, suite)
+  FailTriggersShrinkA2Internal(testinator::TestRegistry& r,
+                               const string& name, const string& suite)
+    : testinator::PropertyTest(r, name, suite)
   {}
 
   virtual bool Run() override
@@ -140,16 +145,15 @@ public:
 
 DEF_TEST(FailTriggersShrink2, Property)
 {
+  testinator::TestRegistry r;
   ostringstream oss;
   std::unique_ptr<testinator::Outputter> op =
     make_unique<testinator::DefaultOutputter>(oss);
-  FailTriggersShrinkA2Internal myTestA("A", "Property");
+  FailTriggersShrinkA2Internal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
   p.m_randomSeed = 886871573;
-  testinator::Results rs = testinator::RunAllTests(p, op.get());
-
-  //std::cout << oss.str() << std::endl;
+  testinator::Results rs = r.RunAllTests(p, op.get());
 
   static string expected = "Failed (\"\")";
   return !rs.empty() && !rs.front().m_success
@@ -160,8 +164,9 @@ DEF_TEST(FailTriggersShrink2, Property)
 class FailTriggersShrinkBInternal : public testinator::PropertyTest
 {
 public:
-  FailTriggersShrinkBInternal(const string& name, const string& suite)
-    : testinator::PropertyTest(name, suite)
+  FailTriggersShrinkBInternal(testinator::TestRegistry& r,
+                              const string& name, const string& suite)
+    : testinator::PropertyTest(r, name, suite)
   {}
 
   virtual bool Run() override
@@ -179,14 +184,15 @@ public:
 
 DEF_TEST(FailTriggersShrinkMulti, Property)
 {
+  testinator::TestRegistry r;
   ostringstream oss;
   std::unique_ptr<testinator::Outputter> op =
     make_unique<testinator::DefaultOutputter>(oss);
-  FailTriggersShrinkBInternal myTestA("A", "Property");
+  FailTriggersShrinkBInternal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
   p.m_randomSeed = 3358856245;
-  testinator::Results rs = testinator::RunAllTests(p, op.get());
+  testinator::Results rs = r.RunAllTests(p, op.get());
 
   static string expected = "Failed (\"A\",\"B\")";
   return !rs.empty() && !rs.front().m_success
@@ -197,8 +203,9 @@ DEF_TEST(FailTriggersShrinkMulti, Property)
 class FailTriggersShrinkCInternal : public testinator::PropertyTest
 {
 public:
-  FailTriggersShrinkCInternal(const string& name, const string& suite)
-    : testinator::PropertyTest(name, suite)
+  FailTriggersShrinkCInternal(testinator::TestRegistry& r,
+                              const string& name, const string& suite)
+    : testinator::PropertyTest(r, name, suite)
   {}
 
   virtual bool Run() override
@@ -216,14 +223,15 @@ public:
 
 DEF_TEST(FailTriggersShrinkPair, Property)
 {
+  testinator::TestRegistry r;
   ostringstream oss;
   std::unique_ptr<testinator::Outputter> op =
     make_unique<testinator::DefaultOutputter>(oss);
-  FailTriggersShrinkCInternal myTestA("A", "Property");
+  FailTriggersShrinkCInternal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
-  p.m_randomSeed = 1322472956;
-  testinator::Results rs = testinator::RunAllTests(p, op.get());
+  p.m_randomSeed = 932579536;
+  testinator::Results rs = r.RunAllTests(p, op.get());
 
   static string expected = "Failed ((\"A\",\"B\"))";
   return !rs.empty() && !rs.front().m_success

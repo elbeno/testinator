@@ -101,6 +101,9 @@ namespace testinator
   class PropertyTest : public Test
   {
   public:
+    PropertyTest(TestRegistry& r, const std::string& n, const std::string& s)
+      : Test(r, n, s)
+    {}
     PropertyTest(const std::string& n, const std::string& s)
       : Test(n, s)
     {}

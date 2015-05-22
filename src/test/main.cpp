@@ -19,8 +19,13 @@ public:
 
   virtual bool Run()
   {
-    testinator::Test myTest("call_test");
-    testinator::Results rs = testinator::RunTest("call_test");
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+
+    testinator::Test myTest(r, "call_test");
+    testinator::Results rs = r.RunTest("call_test", testinator::RunParams(), op.get());
     return !rs.empty() && rs.front().m_success;
   }
 };
@@ -53,8 +58,8 @@ private:
 class TestRunMultipleInternal : public testinator::Test
 {
 public:
-  TestRunMultipleInternal(const string& name)
-    : testinator::Test(name)
+  TestRunMultipleInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
     , m_runCalled(false)
   {}
 
@@ -77,9 +82,14 @@ public:
 
   virtual bool Run()
   {
-    TestRunMultipleInternal test0("test0");
-    TestRunMultipleInternal test1("test1");
-    testinator::Results rs = testinator::RunAllTests();
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+
+    TestRunMultipleInternal test0(r, "test0");
+    TestRunMultipleInternal test1(r, "test1");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
     return test0.m_runCalled && test1.m_runCalled;
   }
 };
@@ -88,8 +98,9 @@ public:
 class TestReportResultsInternal : public testinator::Test
 {
 public:
-  TestReportResultsInternal(const string& name, bool fail)
-    : testinator::Test(name)
+  TestReportResultsInternal(testinator::TestRegistry& r,
+                            const string& name, bool fail)
+    : testinator::Test(r, name)
     , m_fail(fail)
   {}
 
@@ -111,11 +122,17 @@ public:
 
   virtual bool Run()
   {
-    TestReportResultsInternal test0("expected_fail", true);
-    TestReportResultsInternal test1("expected_pass", false);
-    testinator::Results rs = testinator::RunAllTests();
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+
+    TestReportResultsInternal test0(r, "expected_fail", true);
+    TestReportResultsInternal test1(r, "expected_pass", false);
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
     auto numPassed = count_if(rs.begin(), rs.end(),
-                              [] (const testinator::Result& r) { return r.m_success; });
+                              [] (const testinator::Result& res)
+                              { return res.m_success; });
     auto total = decltype(numPassed)(rs.size());
     auto numFailed = total - numPassed;
     return numPassed == 1 && numFailed == 1;
@@ -132,21 +149,27 @@ public:
 
   virtual bool Run()
   {
-    testinator::Test myTest1("test1", "suite1");
-    testinator::Test myTest2("test2", "suite2");
-    testinator::Results rs = testinator::RunSuite("suite1");
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+
+    testinator::Test myTest1(r, "test1", "suite1");
+    testinator::Test myTest2(r, "test2", "suite2");
+    testinator::Results rs = r.RunSuite("suite1", testinator::RunParams(), op.get());
     auto numPassed = count_if(rs.begin(), rs.end(),
-                              [] (const testinator::Result& r) { return r.m_success; });
+                              [] (const testinator::Result& res)
+                              { return res.m_success; });
     return numPassed == 1;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestCheckMacroInternal : public testinator::Test
+class TestExpectMacroInternal : public testinator::Test
 {
 public:
-  TestCheckMacroInternal(const string& name)
-    : testinator::Test(name)
+  TestExpectMacroInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
   {}
 
   virtual bool Run()
@@ -158,23 +181,25 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class TestCheckMacro : public testinator::Test
+class TestExpectMacro : public testinator::Test
 {
 public:
-  TestCheckMacro(const string& name)
+  TestExpectMacro(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
   virtual bool Run()
   {
+    testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
-    TestCheckMacroInternal myTestA("A");
-    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    TestExpectMacroInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "EXPECT FAILED: build/debug/test/main.cpp:155 (!fail == fail => false == true)";
+      "EXPECT FAILED: build/debug/test/main.cpp:178 (!fail == fail => false == true)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
@@ -192,8 +217,8 @@ int CountEvals::s_evals = 0;
 class TestExpectEvalsOnceInternal : public testinator::Test
 {
 public:
-  TestExpectEvalsOnceInternal(const string& name)
-    : testinator::Test(name)
+  TestExpectEvalsOnceInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
   {}
 
   virtual bool Run()
@@ -215,11 +240,13 @@ public:
 
   virtual bool Run()
   {
+    testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
-    TestExpectEvalsOnceInternal myTestA("A");
-    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    TestExpectEvalsOnceInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string notexpected = "EXPECT FAILED";
 
@@ -232,8 +259,8 @@ public:
 class TestDiagnosticInternal : public testinator::Test
 {
 public:
-  TestDiagnosticInternal(const string& name)
-    : testinator::Test(name)
+  TestDiagnosticInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
   {}
 
   virtual bool Run()
@@ -253,11 +280,13 @@ public:
 
   virtual bool Run()
   {
+    testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
-    TestDiagnosticInternal myTestA("A");
-    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    TestDiagnosticInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected = "Hello world 42";
     return !rs.empty() && rs.front().m_success
@@ -269,8 +298,8 @@ public:
 class TestAbortInternal : public testinator::Test
 {
 public:
-  TestAbortInternal(const string& name)
-    : testinator::Test(name)
+  TestAbortInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
   {}
 
   virtual bool Run()
@@ -293,12 +322,14 @@ public:
 
   virtual bool Run()
   {
+    testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
-    TestAbortInternal myTestA("A");
-    TestAbortInternal myTestB("B");
-    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    TestAbortInternal myTestA(r, "A");
+    TestAbortInternal myTestB(r, "B");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected = "ABORT (Hello world 42)";
     return !myTestB.m_runCalled
@@ -310,8 +341,8 @@ public:
 class TestBranchInternal : public testinator::Test
 {
 public:
-  TestBranchInternal(const string& name)
-    : testinator::Test(name)
+  TestBranchInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
   {}
 
   virtual bool Run()
@@ -342,14 +373,16 @@ public:
 
   virtual bool Run()
   {
+    testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::DefaultOutputter>(oss);
-    TestBranchInternal myTestA("A");
-    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    TestBranchInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "no branch\nbranch (build/debug/test/main.cpp:321)\nno branch\nbranch B";
+      "no branch\nbranch (build/debug/test/main.cpp:352)\nno branch\nbranch B";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
@@ -359,8 +392,8 @@ public:
 class TestSkipInternal : public testinator::Test
 {
 public:
-  TestSkipInternal(const string& name)
-    : testinator::Test(name)
+  TestSkipInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
   {}
 
   virtual bool Run()
@@ -380,11 +413,13 @@ public:
 
   virtual bool Run()
   {
+    testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
       make_unique<testinator::TAPOutputter>(oss);
-    TestSkipInternal myTestA("A");
-    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    TestSkipInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected = "# skip Hello world 42";
     return myTestA.skipped()
@@ -532,7 +567,7 @@ int main(int argc, char* argv[])
   TestRunMultiple test2("TestRunMultiple");
   TestReportResults test3("TestReportResults");
   TestRunSuite test4("TestRunSuite");
-  TestCheckMacro test5("TestCheckMacro");
+  TestExpectMacro test5("TestExpectMacro");
   TestDiagnostic test6("TestDiagnostic");
   TestBranch test7("TestBranch");
   TestSkip test8("TestSkip");
