@@ -27,4 +27,4 @@ install:
 
 script:
   - scons
-  - ./export/debug/bin/test
+  - ./build/debug/test/test

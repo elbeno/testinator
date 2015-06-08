@@ -2,14 +2,11 @@ import os
 
 buildType = 'debug'
 
-include = '#export/$BUILDTYPE/include'
-lib = '#export/$BUILDTYPE/lib'
-bin = '#export/$BUILDTYPE/bin'
+include = '#build/$BUILDTYPE/include'
+lib = '#build/$BUILDTYPE/lib'
+bin = '#build/$BUILDTYPE/bin'
 
 env = Environment(BUILDTYPE = buildType,
-                  INCDIR = include,
-                  LIBDIR = lib,
-                  BINDIR = bin,
                   CPPPATH = [include],
                   LIBPATH = [lib])
 
