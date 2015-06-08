@@ -199,7 +199,7 @@ public:
     testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "EXPECT FAILED: build/debug/test/main.cpp:178 (!fail == fail => false == true)";
+      "test/main.cpp:178 (!fail == fail => false == true)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
@@ -349,7 +349,7 @@ public:
   {
     DIAGNOSTIC("no branch");
 
-    BRANCH()
+    BRANCH(A)
     {
       DIAGNOSTIC("branch " << BRANCH_NAME);
     }
@@ -382,7 +382,48 @@ public:
     testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "no branch\nbranch (build/debug/test/main.cpp:352)\nno branch\nbranch B";
+      "no branch\nbranch A\nno branch\nbranch B";
+    return !rs.empty() && rs.front().m_success
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestBranchInternal2 : public testinator::Test
+{
+public:
+  TestBranchInternal2(const string& name)
+    : testinator::Test(name)
+  {}
+
+  virtual bool Run()
+  {
+    BRANCH()
+    {
+      DIAGNOSTIC("branch " << BRANCH_NAME);
+    }
+
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestBranchNoName : public testinator::Test
+{
+public:
+  TestBranchNoName(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+    TestBranchInternal2 myTestA("A");
+    testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
+
+    static string expected = "main.cpp:401";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
@@ -572,6 +613,7 @@ int main(int argc, char* argv[])
   TestBranch test7("TestBranch");
   TestSkip test8("TestSkip");
   TestExpectEvalsOnce test9("TestExpectEvalsOnce");
+  TestBranchNoName test10("TestBranchNoName");
   testinator::Results rs;
 
   std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(
