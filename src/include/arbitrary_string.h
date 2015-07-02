@@ -15,15 +15,17 @@ namespace testinator
   //------------------------------------------------------------------------------
   // specialization for string
   //------------------------------------------------------------------------------
-  template <typename T>
-  struct Arbitrary<std::basic_string<T>>
+  template <typename T, typename CharTraits, typename Alloc>
+  struct Arbitrary<std::basic_string<T, CharTraits, Alloc>>
   {
+    typedef std::basic_string<T, CharTraits, Alloc> output_type;
+    
     static const std::size_t N = 10;
 
-    static std::basic_string<T> generate(
+    static output_type generate(
         std::size_t generation, unsigned long int randomSeed)
     {
-      std::basic_string<T> s;
+      output_type s;
       if (generation == 0) return s;
       std::size_t n = N * ((generation / 100) + 1);
       s.reserve(n);
@@ -32,18 +34,18 @@ namespace testinator
       return s;
     }
 
-    static std::basic_string<T> generate_n(std::size_t n, unsigned long int randomSeed)
+    static output_type generate_n(std::size_t n, unsigned long int randomSeed)
     {
-      std::basic_string<T> s;
+      output_type s;
       s.reserve(n);
       std::generate_n(std::back_inserter(s), n,
                       [&] () { return Arbitrary<T>::generate_n(n, randomSeed++); });
       return s;
     }
 
-    static std::vector<std::basic_string<T>> shrink(const std::basic_string<T>& t)
+    static std::vector<output_type> shrink(const output_type& t)
     {
-      std::vector<std::basic_string<T>> v;
+      std::vector<output_type> v;
       if (t.empty()) return v;
       auto l = t.size() / 2;
       v.push_back(t.substr(0, l));
