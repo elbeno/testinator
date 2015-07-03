@@ -67,25 +67,31 @@ namespace testinator
   //------------------------------------------------------------------------------
   // specializations for set types
   //------------------------------------------------------------------------------
-  template <typename T>
-  struct Arbitrary<std::set<T>> : public Arbitrary_Assoc<std::set<T>> {};
+  template <typename T, typename Compare, typename Alloc>
+  struct Arbitrary<std::set<T, Compare, Alloc>> : public Arbitrary_Assoc<std::set<T, Compare, Alloc>> {};
 
-  template <typename T>
-  struct Arbitrary<std::multiset<T>> : public Arbitrary_Assoc<std::multiset<T>> {};
+  template <typename T, typename Compare, typename Alloc>
+  struct Arbitrary<std::multiset<T, Compare, Alloc>> : public Arbitrary_Assoc<std::multiset<T, Compare, Alloc>> {};
 
-  template <typename T>
-  struct Arbitrary<std::unordered_set<T>> : public Arbitrary_Assoc<std::unordered_set<T>> {};
+  template <typename T, typename Hash, typename KeyEq, typename Alloc>
+  struct Arbitrary<std::unordered_set<T, Hash, KeyEq, Alloc>> :
+      public Arbitrary_Assoc<std::unordered_set<T, Hash, KeyEq, Alloc>>
+  {};
 
   //------------------------------------------------------------------------------
   // specializations for map types
   //------------------------------------------------------------------------------
-  template <typename K, typename V>
-  struct Arbitrary<std::map<K, V>> : public Arbitrary_Assoc<std::map<K, V>> {};
+  template <typename K, typename V, typename Compare, typename Alloc>
+  struct Arbitrary<std::map<K, V, Compare, Alloc>> : public Arbitrary_Assoc<std::map<K, V, Compare, Alloc>> {};
 
-  template <typename K, typename V>
-  struct Arbitrary<std::multimap<K, V>> : public Arbitrary_Assoc<std::multimap<K, V>> {};
+  template <typename K, typename V, typename Compare, typename Alloc>
+  struct Arbitrary<std::multimap<K, V, Compare, Alloc>> :
+      public Arbitrary_Assoc<std::multimap<K, V, Compare, Alloc>>
+  {};
 
-  template <typename K, typename V>
-  struct Arbitrary<std::unordered_map<K, V>> : public Arbitrary_Assoc<std::unordered_map<K, V>> {};
+  template <typename K, typename V, typename Hash, typename KeyEq, typename Alloc>
+  struct Arbitrary<std::unordered_map<K, V, Hash, KeyEq, Alloc>> :
+      public Arbitrary_Assoc<std::unordered_map<K, V, Hash, KeyEq, Alloc>>
+  {};
 
 }
