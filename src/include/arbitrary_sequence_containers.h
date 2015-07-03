@@ -21,7 +21,7 @@ namespace testinator
     struct Arbitrary_RandomSequence
     {
       static const std::size_t N = 10;
-      typedef typename C::value_type V;
+      using V = typename C::value_type;
 
       static C generate(std::size_t generation, unsigned long int randomSeed)
       {
@@ -61,10 +61,12 @@ namespace testinator
   // specializations for sequence containers
   //------------------------------------------------------------------------------
   template <typename T, typename Alloc>
-  struct Arbitrary<std::vector<T, Alloc>> : public Arbitrary_RandomSequence<std::vector<T, Alloc>> {};
+  struct Arbitrary<std::vector<T, Alloc>>
+    : public Arbitrary_RandomSequence<std::vector<T, Alloc>> {};
 
   template <typename T, typename Alloc>
-  struct Arbitrary<std::deque<T, Alloc>> : public Arbitrary_RandomSequence<std::deque<T, Alloc>> {};
+  struct Arbitrary<std::deque<T, Alloc>>
+    : public Arbitrary_RandomSequence<std::deque<T, Alloc>> {};
 
   //------------------------------------------------------------------------------
   // specialization for list
@@ -72,7 +74,7 @@ namespace testinator
   template <typename T, typename Alloc>
   struct Arbitrary<std::list<T, Alloc>>
   {
-    typedef std::list<T, Alloc> output_type;
+    using output_type = std::list<T, Alloc>;
     
     static const std::size_t N = 10;
 
@@ -118,7 +120,7 @@ namespace testinator
   template <typename T, typename Alloc>
   struct Arbitrary<std::forward_list<T, Alloc>>
   {
-    typedef std::forward_list<T, Alloc> output_type;
+    using output_type = std::forward_list<T, Alloc>;
     
     static const std::size_t N = 10;
 

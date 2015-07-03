@@ -15,7 +15,7 @@ namespace testinator
   template <typename L>
   struct Capture
   {
-    typedef L type;
+    using type = L;
     L m_list;
   };
 

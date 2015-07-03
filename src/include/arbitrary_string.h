@@ -18,7 +18,7 @@ namespace testinator
   template <typename T, typename CharTraits, typename Alloc>
   struct Arbitrary<std::basic_string<T, CharTraits, Alloc>>
   {
-    typedef std::basic_string<T, CharTraits, Alloc> output_type;
+    using output_type = std::basic_string<T, CharTraits, Alloc>;
     
     static const std::size_t N = 10;
 
