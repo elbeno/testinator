@@ -61,7 +61,7 @@ namespace testinator
           {
             op->diagnostic(
                 Diagnostic(Cons<Nil>()
-                           << "Reproduce failure with --seed=" << seed));
+                           << "Reproduce failure with --seed=" << m_u.m_randomSeed));
             return false;
           }
           seed = GetTestRegistry().RNG()();
