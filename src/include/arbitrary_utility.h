@@ -55,14 +55,14 @@ namespace testinator
       auto first_v = Arbitrary<std::decay_t<T1>>::shrink(p.first);
       for (auto&& e : first_v)
       {
-        ret.push_back(std::make_pair(e, p.second));
+        ret.emplace_back(e, p.second);
       }
 
       // shrink the second
       auto second_v = Arbitrary<std::decay_t<T2>>::shrink(p.second);
       for (auto&& e : second_v)
       {
-        ret.push_back(std::make_pair(p.first, e));
+        ret.emplace_back(p.first, e);
       }
 
       return ret;
