@@ -53,16 +53,16 @@ namespace testinator
 
       // shrink the first
       auto first_v = Arbitrary<std::decay_t<T1>>::shrink(p.first);
-      for (auto&& e : first_v)
+      for (auto& e : first_v)
       {
-        ret.push_back(std::make_pair(e, p.second));
+        ret.emplace_back(std::move(e), p.second);
       }
 
       // shrink the second
       auto second_v = Arbitrary<std::decay_t<T2>>::shrink(p.second);
-      for (auto&& e : second_v)
+      for (auto& e : second_v)
       {
-        ret.push_back(std::make_pair(p.first, e));
+        ret.emplace_back(p.first, std::move(e));
       }
 
       return ret;
@@ -140,17 +140,17 @@ namespace testinator
       // shrink the head
       using H = std::decay_t<decltype(std::get<0>(t))>;
       auto head_v = Arbitrary<H>::shrink(std::get<0>(t));
-      for (auto&& e : head_v)
+      for (auto& e : head_v)
       {
-        ret.push_back(tuple_cons(e, tuple_tail(t)));
+        ret.push_back(tuple_cons(std::move(e), tuple_tail(t)));
       }
 
       // shrink the tail recursively
       using T = std::decay_t<decltype(tuple_tail(t))>;
       auto tail_v = Arbitrary<T>::shrink(tuple_tail(t));
-      for (auto&& e : tail_v)
+      for (auto& e : tail_v)
       {
-        ret.push_back(tuple_cons(std::get<0>(t), e));
+        ret.push_back(tuple_cons(std::get<0>(t), std::move(e)));
       }
 
       return ret;
