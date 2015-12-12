@@ -319,3 +319,11 @@ DEF_PROPERTY(Bounded, Property, const MyBoundedType& m)
 {
   return m.m_val < MyBoundedType::MAX_VAL;
 }
+
+//------------------------------------------------------------------------------
+// Test a container with a proxy iterator
+
+DEF_PROPERTY(ProxyIterator, Property, const vector<bool>&)
+{
+  return true;
+}

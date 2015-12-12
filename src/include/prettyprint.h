@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <functional>
-#include <initializer_list>
 #include <iostream>
 #include <iterator>
 #include <string>
@@ -476,9 +475,9 @@ namespace detail
     {
       s << prettyprint(*b);
       std::for_each(++b, e,
-                    [&s, &t, &f] (auto& elem)
+                    [&s, &t, &f] (auto&& elem)
                     { s << f.separator(t)
-                        << prettyprint(elem); });
+                        << prettyprint(std::forward<decltype(elem)>(elem)); });
     }
     return s << f.closer(t);
   }
@@ -647,9 +646,9 @@ struct stringifier_select<T, F, detail::is_tuple_tag>
   {
     s << m_f.opener(m_t);
     detail::for_each_in_tuple(m_t,
-                              [&s, this] (auto& e, size_t i)
+                              [&s, this] (auto&& e, size_t i)
                               { if (i > 0) s << m_f.separator(m_t);
-                                s << prettyprint(e); });
+                                s << prettyprint(std::forward<decltype(e)>(e)); });
     return s << m_f.closer(m_t);
   }
 
