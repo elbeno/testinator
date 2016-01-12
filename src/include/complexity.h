@@ -44,9 +44,9 @@ namespace testinator
 
       // discard the outer values, take the means of each set
       double timeN = static_cast<double>(
-          std::accumulate(&countsN[1], &countsN[size-2], 0)) / (size - 2);
+          std::accumulate(&countsN[1], &countsN[size-2], static_cast<int64_t>(0))) / (size - 2);
       double timeMultN = static_cast<double>(
-          std::accumulate(&countsMultN[1], &countsMultN[size-2], 0)) / (size - 2);
+          std::accumulate(&countsMultN[1], &countsMultN[size-2], static_cast<int64_t>(0))) / (size - 2);
 
       // the actual ratio of times
       double actualRatio = timeMultN / timeN;
@@ -87,7 +87,7 @@ namespace testinator
                      [actualRatio] (double d)
                      { return std::abs(actualRatio - d); });
       auto m = std::min_element(ratio, &ratio[NUM_ORDERS]);
-      return m - ratio;
+      return static_cast<int>(m - ratio);
     }
 
   public:

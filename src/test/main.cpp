@@ -199,7 +199,7 @@ public:
     testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "test/main.cpp:178 (!fail == fail => false == true)";
+      "main.cpp:178 (!fail == fail => false == true)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
@@ -629,5 +629,5 @@ int main(int argc, char* argv[])
   auto numPassed = count_if(rs.begin(), rs.end(),
                             [] (const testinator::Result& r) { return r.m_success; });
   auto total = static_cast<decltype(numPassed)>(rs.size());
-  return total - numPassed;
+  return static_cast<int>(total - numPassed);
 }
