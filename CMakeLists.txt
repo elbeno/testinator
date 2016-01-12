@@ -6,7 +6,6 @@ option(USE_CLANG "build application with clang" OFF)
 
 if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(MY_CXX_FLAGS_LIST
-        -std=c++1y
         -pedantic
         -Wall
         -Wextra
@@ -29,6 +28,7 @@ if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         -Werror
     )
     string(REPLACE ";" " " MY_CXX_FLAGS "${MY_CXX_FLAGS_LIST}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
     if (USE_CLANG)
         SET (CMAKE_C_COMPILER             "/usr/bin/clang")
         SET (CMAKE_C_FLAGS                "-Wall -std=c99")
@@ -38,7 +38,7 @@ if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
 
         SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
-        SET (CMAKE_CXX_FLAGS    "-stdlib=libc++ ${MY_CXX_FLAGS}")
+        SET (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} -stdlib=libc++ ${MY_CXX_FLAGS}")
         SET (CMAKE_CXX_FLAGS_DEBUG          "-g")
         SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
         SET (CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
