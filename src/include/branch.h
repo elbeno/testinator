@@ -149,7 +149,8 @@ namespace testinator
 
 // From http://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
 // Used to work around MSVC preprocessor __VA_ARGS__ implementation issues.
-#define TESTINATOR_CREATE_1(x) x
+#define TESTINATOR_CREATE_2(dummy, x) x
+#define TESTINATOR_CREATE_1(x) TESTINATOR_CREATE_2(,x)
 #define TESTINATOR_CREATE_0() TESTINATOR_CREATE_1("")
 #define TESTINATOR_FUNC_CHOOSER(_f1, _f2, _f3, ...) _f3
 #define TESTINATOR_FUNC_RECOMPOSER(argsWithParen) TESTINATOR_FUNC_CHOOSER argsWithParen
@@ -159,7 +160,7 @@ namespace testinator
 
 #define BRANCH(...)                                                                 \
   testinator::BranchScope TESTINATOR_UNIQUE_NAME(rs)(                               \
-       __LINE__, __FILE__, TESTINATOR_MACRO_CHOOSER(#__VA_ARGS__)(#__VA_ARGS__));   \
+       __LINE__, __FILE__, TESTINATOR_MACRO_CHOOSER(dummy, #__VA_ARGS__)(#__VA_ARGS__));   \
   if (TESTINATOR_UNIQUE_NAME(rs).canRun())                                          \
     if (auto TESTINATOR_UNIQUE_NAME(rspop) = testinator::at_scope_exit(             \
             [] () { testinator::Branch::getStack().pop(); }))
