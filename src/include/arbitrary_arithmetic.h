@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <limits>
 #include <random>
+#include <string>
 
 namespace testinator
 {
@@ -137,11 +138,14 @@ namespace testinator
   template <>
   struct Arbitrary<wchar_t> : public detail::Arbitrary_Arithmetic_IntCast<wchar_t> {};
 
+// MSVC (as of Visual Studio 2015) does not fully support char16_t or char32_t.
+#ifndef _MSC_VER
   template <>
   struct Arbitrary<char16_t> : public detail::Arbitrary_Arithmetic<char16_t> {};
 
   template <>
   struct Arbitrary<char32_t> : public detail::Arbitrary_Arithmetic<char32_t> {};
+#endif
 
   template <>
   struct Arbitrary<short> : public detail::Arbitrary_Arithmetic<short> {};

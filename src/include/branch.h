@@ -147,11 +147,21 @@ namespace testinator
 #define TESTINATOR_CAT(a, b) TESTINATOR_XCAT(a, b)
 #define TESTINATOR_UNIQUE_NAME(base) TESTINATOR_CAT(base, __LINE__)
 
-#define BRANCH(...)                                                     \
-  testinator::BranchScope TESTINATOR_UNIQUE_NAME(rs)(                   \
-      __LINE__, __FILE__, #__VA_ARGS__);                                \
-  if (TESTINATOR_UNIQUE_NAME(rs).canRun())                              \
-    if (auto TESTINATOR_UNIQUE_NAME(rspop) = testinator::at_scope_exit( \
+// From http://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
+// Used to work around MSVC preprocessor __VA_ARGS__ implementation issues.
+#define TESTINATOR_CREATE_1(x) x
+#define TESTINATOR_CREATE_0() TESTINATOR_CREATE_1("")
+#define TESTINATOR_FUNC_CHOOSER(_f1, _f2, _f3, ...) _f3
+#define TESTINATOR_FUNC_RECOMPOSER(argsWithParen) TESTINATOR_FUNC_CHOOSER argsWithParen
+#define TESTINATOR_CHOOSE_FROM_ARG_COUNT(...) TESTINATOR_FUNC_RECOMPOSER((__VA_ARGS__, TESTINATOR_CREATE_1, ))
+#define TESTINATOR_NO_ARG_EXPANDER() ,,TESTINATOR_CREATE_0
+#define TESTINATOR_MACRO_CHOOSER(...) TESTINATOR_CHOOSE_FROM_ARG_COUNT(TESTINATOR_NO_ARG_EXPANDER __VA_ARGS__ ())
+
+#define BRANCH(...)                                                                 \
+  testinator::BranchScope TESTINATOR_UNIQUE_NAME(rs)(                               \
+       __LINE__, __FILE__, TESTINATOR_MACRO_CHOOSER(#__VA_ARGS__)(#__VA_ARGS__));   \
+  if (TESTINATOR_UNIQUE_NAME(rs).canRun())                                          \
+    if (auto TESTINATOR_UNIQUE_NAME(rspop) = testinator::at_scope_exit(             \
             [] () { testinator::Branch::getStack().pop(); }))
 
 #define BRANCH_NAME (testinator::Branch::getStack().top()->getName())

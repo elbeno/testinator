@@ -5,6 +5,11 @@
 #include <arbitrary.h>
 using namespace std;
 
+// Suppress MSVC warnings about 'a' being unused.
+#ifdef _MSC_VER
+# pragma warning(disable: 4101)
+#endif
+
 //------------------------------------------------------------------------------
 DEF_TEST(bool, Arbitrary)
 {
