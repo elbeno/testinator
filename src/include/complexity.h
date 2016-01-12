@@ -87,7 +87,7 @@ namespace testinator
                      [actualRatio] (double d)
                      { return std::abs(actualRatio - d); });
       auto m = std::min_element(ratio, &ratio[NUM_ORDERS]);
-      return m - ratio;
+      return static_cast<int>(m - ratio);
     }
 
   public:

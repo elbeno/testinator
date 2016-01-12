@@ -114,7 +114,7 @@ namespace testinator
                      const RunParams& params,
                      const Outputter* outputter)
     {
-      outputter->startRun(m.size());
+      outputter->startRun(static_cast<int>(m.size()));
       int numSuccesses = 0;
 
       // Make a vector of test names, shuffle them if necessary.
@@ -145,7 +145,7 @@ namespace testinator
         }
       }
 
-      outputter->endRun(m.size(), numSuccesses);
+      outputter->endRun(static_cast<int>(m.size()), numSuccesses);
       return rs;
     }
 
