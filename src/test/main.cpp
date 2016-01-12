@@ -199,7 +199,7 @@ public:
     testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "test/main.cpp:178 (!fail == fail => false == true)";
+      "main.cpp:178 (!fail == fail => false == true)";
 
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
