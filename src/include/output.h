@@ -30,6 +30,7 @@ namespace testinator
     virtual void endTest(const std::string&, bool) const {};
     virtual void abort(const std::string&) const {};
     virtual void endRun(int, int) const {};
+    virtual ~Outputter() {};
   };
 
   //------------------------------------------------------------------------------
