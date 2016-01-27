@@ -34,7 +34,7 @@ namespace testinator
             std::mt19937& gen = testinator::GetTestRegistry().RNG();
             gen.seed(randomSeed);
             std::uniform_int_distribution<T> dis(
-                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+                std::numeric_limits<T>::min() + 1, std::numeric_limits<T>::max() - 1);
             return dis(gen);
           }
         }
@@ -70,7 +70,7 @@ namespace testinator
             std::mt19937& gen = testinator::GetTestRegistry().RNG();
             gen.seed(randomSeed);
             std::uniform_int_distribution<int> dis(
-                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+                std::numeric_limits<T>::min() + 1, std::numeric_limits<T>::max() - 1);
             return static_cast<T>(dis(gen));
           }
         }
@@ -100,13 +100,15 @@ namespace testinator
             return std::numeric_limits<T>::min();
           case 2:
             return std::numeric_limits<T>::max();
+          case 3:
+            return std::numeric_limits<T>::lowest();
 
           default:
           {
             std::mt19937& gen = testinator::GetTestRegistry().RNG();
             gen.seed(randomSeed);
             std::uniform_real_distribution<T> dis(
-                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+                std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
             return dis(gen);
           }
         }
