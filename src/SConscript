@@ -1,5 +1,0 @@
-Import('env')
-
-#env.Install(env['INCDIR'], Glob('include/*.h'))
-env.SConscript('test/SConscript')
-env.SConscript('maintest/SConscript')
