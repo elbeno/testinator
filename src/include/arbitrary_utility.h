@@ -5,7 +5,9 @@
 
 #include "arbitrary.h"
 
+#include <random>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace testinator
