@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -45,23 +46,14 @@ namespace testinator
 // SFINAE member/functionality detection
 #define SFINAE_DETECT(name, expr)                                       \
   template <typename T>                                                 \
-  using name##_t = decltype(expr);                                      \
+  using name##_t = decltype(void(sizeof(expr)));                        \
   template <typename T, typename = void>                                \
   struct has_##name : public std::false_type {};                        \
   template <typename T>                                                 \
-  struct has_##name<T, detail::void_t<name##_t<T>>> : public std::true_type {};
+  struct has_##name<T, name##_t<T>> : public std::true_type {};
 
 namespace detail
 {
-
-  // ---------------------------------------------------------------------------
-#ifdef __clang__
-  template <typename...>
-  using void_t = void;
-#else
-  template<class...> struct voider { using type = void; };
-  template<class... Args> using void_t = typename voider<Args...>::type;
-#endif
 
   // ---------------------------------------------------------------------------
   // Is the type iterable (has begin() and end())?
@@ -93,7 +85,7 @@ namespace detail
 
   // ---------------------------------------------------------------------------
   // Is the type a callable of some kind?
-  SFINAE_DETECT(call_operator, std::declval<T>()())
+  SFINAE_DETECT(call_operator, &T::operator())
 
   template <typename T>
   struct is_std_function : public std::false_type {};
@@ -139,7 +131,7 @@ namespace detail
   // Non-capturing lambdas (and some other callables) may implicitly convert to
   // bool, which will make operator<< work. We want to treat them as callables,
   // not outputtables.
-  void bool_conversion_test(bool);
+  bool bool_conversion_test(bool);
   SFINAE_DETECT(bool_conversion, bool_conversion_test(std::declval<T>()))
 
   template<typename T>

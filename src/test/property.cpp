@@ -3,6 +3,7 @@
 
 #include <property.h>
 
+#include <iostream>
 using namespace std;
 
 //------------------------------------------------------------------------------
@@ -230,7 +231,7 @@ DEF_TEST(FailTriggersShrinkPair, Property)
   FailTriggersShrinkCInternal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
-  p.m_randomSeed = 932579536;
+  p.m_randomSeed = 1768754876;
   testinator::Results rs = r.RunAllTests(p, op.get());
 
   static string expected = "Failed ((\"A\",\"B\"))";

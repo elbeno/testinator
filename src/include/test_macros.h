@@ -10,6 +10,12 @@
 #include <string>
 #include <utility>
 
+#ifdef _MSC_VER
+#define ATTRIBUTE_NOINLINE __declspec(noinline)
+#else
+#define ATTRIBUTE_NOINLINE __attribute__((__noinline__))
+#endif
+
 namespace testinator
 {
 #pragma once
@@ -66,7 +72,7 @@ namespace testinator
   // -----------------------------------------------------------------------------
   // Stringify a diagnostic
   template <typename ConsT>
-  __attribute__((__noinline__))
+  ATTRIBUTE_NOINLINE
   std::string Diagnostic(ConsT&& t) noexcept
   {
     std::ostringstream s;
@@ -74,6 +80,8 @@ namespace testinator
     return s.str();
   }
 }
+
+#undef ATTRIBUTE_NOINLINE
 
 // -----------------------------------------------------------------------------
 #define DIAGNOSTIC(msg)                                               \

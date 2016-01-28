@@ -108,7 +108,7 @@ namespace testinator
             std::mt19937& gen = testinator::GetTestRegistry().RNG();
             gen.seed(randomSeed);
             std::uniform_real_distribution<T> dis(
-                std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
+                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
             return dis(gen);
           }
         }
@@ -139,11 +139,14 @@ namespace testinator
   template <>
   struct Arbitrary<wchar_t> : public detail::Arbitrary_Arithmetic_IntCast<wchar_t> {};
 
+// MSVC does not yet fully support char16_t or char32_t.
+#ifndef _MSC_VER
   template <>
   struct Arbitrary<char16_t> : public detail::Arbitrary_Arithmetic<char16_t> {};
 
   template <>
   struct Arbitrary<char32_t> : public detail::Arbitrary_Arithmetic<char32_t> {};
+#endif
 
   template <>
   struct Arbitrary<short> : public detail::Arbitrary_Arithmetic<short> {};

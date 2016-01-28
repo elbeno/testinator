@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -23,13 +24,13 @@ namespace testinator
 
   struct Outputter
   {
-    virtual void startRun(int) const {};
+    virtual void startRun(std::size_t) const {};
     virtual void skipTest(const std::string&, const std::string&) const {};
     virtual void startTest(const std::string&) const {};
     virtual void diagnostic(const std::string&) const {};
     virtual void endTest(const std::string&, bool) const {};
     virtual void abort(const std::string&) const {};
-    virtual void endRun(int, int) const {};
+    virtual void endRun(std::size_t, std::size_t) const {};
     virtual ~Outputter() {};
   };
 
@@ -42,7 +43,7 @@ namespace testinator
       , m_flags(flags)
     {}
 
-    virtual void startRun(int) const override
+    virtual void startRun(std::size_t) const override
     {
     }
 
@@ -79,7 +80,7 @@ namespace testinator
       m_os << COLORIZE(RED, "ABORT") << " (" << msg << ')' << std::endl;
     }
 
-    virtual void endRun(int numTests, int numSuccesses) const override
+    virtual void endRun(std::size_t numTests, std::size_t numSuccesses) const override
     {
       m_os << numSuccesses << '/' << numTests
            << " tests passed." << std::endl;
@@ -97,7 +98,7 @@ namespace testinator
       : m_os(os)
     {}
 
-    virtual void startRun(int numTests) const override
+    virtual void startRun(std::size_t numTests) const override
     {
       m_numTests = 0;
       m_os << "1.." << numTests << std::endl;
@@ -132,7 +133,7 @@ namespace testinator
       m_os << "Bail out! " << msg << std::endl;
     }
 
-    virtual void endRun(int, int) const override
+    virtual void endRun(std::size_t, std::size_t) const override
     {
     }
 

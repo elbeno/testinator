@@ -16,39 +16,48 @@ endif()
 enable_testing()
 include(CTest)
 
-set(MY_CXX_FLAGS_LIST
-  -ftemplate-backtrace-limit=0
-  -ffunction-sections
-  -Wall -Wextra -Werror -pedantic-errors
-  -Wcast-align
-  -Wcast-qual
-  -Wctor-dtor-privacy
-  -Wdisabled-optimization
-  -Wformat=2
-  -Winit-self
-  -Wmissing-include-dirs
-  -Wold-style-cast
-  -Woverloaded-virtual
-  -Wredundant-decls
-  -Wshadow
-  -Wsign-conversion
-  -Wsign-promo
-  -Wstrict-overflow=5
-  -Wswitch-default
-  -Wundef
-  )
-string(REPLACE ";" " " MY_CXX_FLAGS "${MY_CXX_FLAGS_LIST}")
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(MY_CXX_FLAGS_LIST
+    /wd4101
+    )
+  string(REPLACE ";" " " MY_CXX_FLAGS "${MY_CXX_FLAGS_LIST}")
 
-if(CI_BUILD)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MY_CXX_FLAGS}")
 else()
-  set(CMAKE_CXX_FLAGS "-fsanitize=address,undefined,integer -fno-omit-frame-pointer -fno-sanitize=unsigned-integer-overflow")
+  set(MY_CXX_FLAGS_LIST
+    -ftemplate-backtrace-limit=0
+    -ffunction-sections
+    -Wall -Wextra -Werror -pedantic-errors
+    -Wcast-align
+    -Wcast-qual
+    -Wctor-dtor-privacy
+    -Wdisabled-optimization
+    -Wformat=2
+    -Winit-self
+    -Wmissing-include-dirs
+    -Wold-style-cast
+    -Woverloaded-virtual
+    -Wredundant-decls
+    -Wshadow
+    -Wsign-conversion
+    -Wsign-promo
+    -Wstrict-overflow=5
+    -Wswitch-default
+    -Wundef
+    )
+  string(REPLACE ";" " " MY_CXX_FLAGS "${MY_CXX_FLAGS_LIST}")
+
+  if(CI_BUILD)
+  else()
+    set(CMAKE_CXX_FLAGS "-fsanitize=address,undefined,integer -fno-omit-frame-pointer -fno-sanitize=unsigned-integer-overflow")
+  endif()
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++${CXX_STD} ${MY_CXX_FLAGS}")
+
+  # Debug/Release
+  set(CMAKE_CXX_FLAGS_DEBUG "-O0 -fno-inline -g3 -fstack-protector-all")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -g0 -march=native -mtune=native -DNDEBUG")
 endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++${CXX_STD} ${MY_CXX_FLAGS}")
-
-# Debug/Release
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -fno-inline -g3 -fstack-protector-all")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -g0 -march=native -mtune=native -DNDEBUG")
 
 # Clang/GCC specifics
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

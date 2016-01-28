@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
   auto numPassed = count_if(rs.cbegin(), rs.cend(),
                             [] (const testinator::Result& r) { return r.m_success; });
   auto total = static_cast<decltype(numPassed)>(rs.size());
-  return total - numPassed;
+  return static_cast<int>(total - numPassed);
 }
 
 #endif

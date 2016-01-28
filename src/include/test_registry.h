@@ -115,7 +115,7 @@ namespace testinator
                      const Outputter* outputter)
     {
       outputter->startRun(m.size());
-      int numSuccesses = 0;
+      std::size_t numSuccesses = 0;
 
       // Make a vector of test names, shuffle them if necessary.
       std::vector<const std::string*> testNames;
