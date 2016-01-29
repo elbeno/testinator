@@ -64,5 +64,31 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
+# Pipe separate tests into ctest
+# Adapted from https://github.com/ChaiScript/ChaiScript/blob/develop/CMakeLists.txt
+macro(ADD_INDIVIDUAL_TESTS executable type)
+  set(test_path $ENV{PATH})
+  get_target_property(target_files ${executable} SOURCES)
+  foreach(source ${target_files})
+    file(READ "${source}.cpp" contents)
+    string(REGEX MATCHALL "DEF_${type}\\([ ]*[^, ]+[ ]*,[ ]*[^, ]+[ ]*[,\\)]" found_tests ${contents})
+    foreach(hit ${found_tests})
+      string(REGEX REPLACE "DEF_${type}\\([ ]*([^, ]+)[ ]*,[ ]*[^, ]+[ ]*[,\\)]" "\\1" tname ${hit})
+      string(REGEX REPLACE "DEF_${type}\\([ ]*[^, ]+[ ]*,[ ]*([^, ]+)[ ]*[,\\)]" "\\1" sname ${hit})
+      set(test_name ${executable}.${sname}.${tname})
+      add_test(NAME ${test_name}
+        COMMAND "${executable}" --testName=${tname} --suiteName=${sname})
+      set_tests_properties(${test_name} PROPERTIES TIMEOUT 30 ENVIRONMENT "PATH=${test_path}")
+    endforeach()
+  endforeach()
+endmacro()
+
+macro(ADD_TESTINATOR_TESTS executable)
+  ADD_INDIVIDUAL_TESTS(${executable} "TEST")
+  ADD_INDIVIDUAL_TESTS(${executable} "PROPERTY")
+  ADD_INDIVIDUAL_TESTS(${executable} "TIMED_TEST")
+  ADD_INDIVIDUAL_TESTS(${executable} "COMPLEXITY_PROPERTY")
+endmacro()
+
 add_subdirectory (src/test)
 add_subdirectory (src/maintest)

@@ -88,7 +88,7 @@ install:
   - make VERBOSE=1
 
 script:
-  - if [ "$BUILD_TYPE" == "Debug" ]; then ctest -VV; fi
+  - if [ "$BUILD_TYPE" == "Debug" ]; then ctest -VV --schedule-random; fi
 
 notifications:
   email: false

@@ -32,4 +32,4 @@ build_script:
   - msbuild testinator.sln /p:Configuration=%configuration% /toolsversion:14.0 /p:PlatformToolset=v140 /p:Platform=%msbuild_platform%
 
 test_script:
-  - if "%configuration%" == "Debug" ctest -VV
+  - if "%configuration%" == "Debug" ctest -VV --schedule-random -C Debug
