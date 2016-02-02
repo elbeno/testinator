@@ -7,8 +7,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/src/include")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Default C++ standard: C++14
-if(CXX_STD)
-else()
+if(NOT CXX_STD)
   set(CXX_STD 14)
 endif()
 
@@ -16,6 +15,7 @@ endif()
 enable_testing()
 include(CTest)
 
+# Compile flags
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(MY_CXX_FLAGS_LIST
     /wd4101
@@ -47,22 +47,75 @@ else()
     )
   string(REPLACE ";" " " MY_CXX_FLAGS "${MY_CXX_FLAGS_LIST}")
 
-  if(CI_BUILD)
-  else()
-    set(CMAKE_CXX_FLAGS "-fsanitize=address,undefined,integer -fno-omit-frame-pointer -fno-sanitize=unsigned-integer-overflow")
-  endif()
-
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++${CXX_STD} ${MY_CXX_FLAGS}")
 
   # Debug/Release
   set(CMAKE_CXX_FLAGS_DEBUG "-O0 -fno-inline -g3 -fstack-protector-all")
   set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -g0 -march=native -mtune=native -DNDEBUG")
+  set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
 endif()
 
 # Clang/GCC specifics
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if(NOT GCOV)
+    find_program(GCOV llvm-cov)
+  endif()
+  set(lcov_args "--gcov-tool" "${CMAKE_SOURCE_DIR}/llvm-gcov.sh")
+  if(SAN)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined,integer -fno-omit-frame-pointer -fno-sanitize=unsigned-integer-overflow")
+  endif()
 elseif(CMAKE_COMPILER_IS_GNUCXX)
+  if(NOT GCOV)
+    find_program(GCOV gcov)
+  endif()
+  set(lcov_args "--gcov-tool" "${GCOV}")
 endif()
+
+# Coverage information
+if(CMAKE_BUILD_TYPE MATCHES "Coverage")
+  find_program(LCOV lcov)
+  find_program(GENHTML genhtml)
+  find_program(CTEST ctest)
+  set(lcov_args ${lcov_args} "-q" "--compat-libtool")
+endif()
+
+macro(ADD_COVERAGE executable)
+  if(CMAKE_BUILD_TYPE MATCHES "Coverage")
+    if (GCOV AND LCOV AND GENHTML AND CTEST)
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/lcov/index.html
+        COMMAND ${LCOV} ${lcov_args} -z -d .
+        COMMAND ${LCOV} ${lcov_args} --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o before.lcov -i
+        COMMAND ${executable}
+        COMMAND ${LCOV} ${lcov_args} --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o after.lcov
+        COMMAND ${LCOV} ${lcov_args} -a before.lcov -a after.lcov -o final.lcov
+        COMMAND ${LCOV} ${lcov_args} -r final.lcov "'${CMAKE_SOURCE_DIR}/src/test/*'" -o final.lcov
+        COMMAND ${LCOV} ${lcov_args} --list final.lcov
+        COMMAND ${GENHTML} -q -o lcov -t "${executable}" --legend --demangle-cpp --sort -p "${CMAKE_BINARY_DIR}" final.lcov
+        DEPENDS ${executable}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Running LCOV"
+        )
+      add_custom_target(coverage
+        DEPENDS ${CMAKE_BINARY_DIR}/lcov/index.html
+        COMMENT "LCOV report at lcov/index.html"
+        )
+      message(STATUS
+        "Coverage added for ${executable}:\n"
+        "  gcov: ${GCOV}\n"
+        "  lcov: ${LCOV}\n"
+        "  genhtml: ${GENHTML}\n"
+        "  ctest: ${CTEST}\n")
+    else()
+      message(WARNING
+        "Coverage not available for ${executable}:\n"
+        "  gcov: ${GCOV}\n"
+        "  lcov: ${LCOV}\n"
+        "  genhtml: ${GENHTML}\n"
+        "  ctest: ${CTEST}\n")
+    endif()
+  endif()
+endmacro()
 
 # Pipe separate tests into ctest
 # Adapted from https://github.com/ChaiScript/ChaiScript/blob/develop/CMakeLists.txt
@@ -70,7 +123,7 @@ macro(ADD_INDIVIDUAL_TESTS executable type)
   set(test_path $ENV{PATH})
   get_target_property(target_files ${executable} SOURCES)
   foreach(source ${target_files})
-    file(READ "${source}.cpp" contents)
+    file(READ "${source}" contents)
     string(REGEX MATCHALL "DEF_${type}\\([ ]*[^, ]+[ ]*,[ ]*[^, ]+[ ]*[,\\)]" found_tests ${contents})
     foreach(hit ${found_tests})
       string(REGEX REPLACE "DEF_${type}\\([ ]*([^, ]+)[ ]*,[ ]*[^, ]+[ ]*[,\\)]" "\\1" tname ${hit})

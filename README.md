@@ -9,9 +9,9 @@ known to work with:
  * MSVC 2015 Update 1
 
 ### Status
-Travis CI: [![Build Status](https://travis-ci.org/elbeno/testinator.svg?branch=master)](https://travis-ci.org/elbeno/testinator)
-
-Appveyor: [![Build status](https://ci.appveyor.com/api/projects/status/u9wl49dr2wti4lqq?svg=true)](https://ci.appveyor.com/project/elbeno/testinator)
+[![Build Status](https://travis-ci.org/elbeno/testinator.svg?branch=master)](https://travis-ci.org/elbeno/testinator)
+[![Build status](https://ci.appveyor.com/api/projects/status/u9wl49dr2wti4lqq/branch/master?svg=true)](https://ci.appveyor.com/project/elbeno/testinator/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/elbeno/testinator/badge.svg?branch=master)](https://coveralls.io/github/elbeno/testinator?branch=master)
 
 Testinator is distributed under the MIT license. See LICENSE for details.
 
