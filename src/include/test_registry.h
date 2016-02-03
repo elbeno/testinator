@@ -60,19 +60,22 @@ namespace testinator
     }
 
     //------------------------------------------------------------------------------
-    Results RunAllTests(const RunParams& params,
-                        const Outputter* outputter)
+    Results RunAllTests(const RunParams& params = RunParams(),
+                        const Outputter* outputter = nullptr)
     {
       TestMap localMap;
       localMap.swap(m_tests);
-      Results rs = RunTests(localMap, params, outputter);
+      Results rs = RunTests(
+          localMap,
+          params,
+          outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
       m_tests.swap(localMap);
       return rs;
     }
 
     Results RunSuite(const std::string& suiteName,
-                     const RunParams& params,
-                     const Outputter* outputter)
+                     const RunParams& params = RunParams(),
+                     const Outputter* outputter = nullptr)
     {
       TestMap localMap;
       auto range = m_testsBySuite.equal_range(suiteName);
@@ -80,12 +83,15 @@ namespace testinator
       {
         localMap.insert({m_testNames[i->second], i->second});
       }
-      return RunTests(localMap, params, outputter);
+      return RunTests(
+          localMap,
+          params,
+          outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
     }
 
     Results RunTest(const std::string& testName,
-                    const RunParams& params,
-                    const Outputter* outputter)
+                    const RunParams& params = RunParams(),
+                    const Outputter* outputter = nullptr)
     {
       auto i = m_tests.find(testName);
       if (i == m_tests.end())
@@ -93,7 +99,10 @@ namespace testinator
 
       TestMap localMap;
       localMap.insert({testName, i->second});
-      return RunTests(localMap, params, outputter);
+      return RunTests(
+          localMap,
+          params,
+          outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
     }
 
     std::mt19937& RNG() { return m_generator; }

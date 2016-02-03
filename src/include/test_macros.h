@@ -92,7 +92,7 @@ namespace testinator
   {                                                                   \
     m_op->abort(testinator::Diagnostic(                               \
                     testinator::Cons<testinator::Nil>() << msg));     \
-    testinator::GetTestRegistry().Abort();                            \
+    m_registry.Abort();                                               \
   }
 
 #define SKIP(msg)                                                     \

@@ -325,15 +325,54 @@ public:
     testinator::TestRegistry r;
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
-      make_unique<testinator::DefaultOutputter>(oss);
+      make_unique<testinator::DefaultOutputter>(oss, testinator::OF_NONE);
 
     TestAbortInternal myTestA(r, "A");
     TestAbortInternal myTestB(r, "B");
-    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+    testinator::RunParams params;
+    params.m_flags = testinator::RF_ALPHA_ORDER;
+    testinator::Results rs = r.RunAllTests(params, op.get());
 
     static string expected = "ABORT (Hello world 42)";
     return !myTestB.m_runCalled
       && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestSkipInternal : public testinator::Test
+{
+public:
+  TestSkipInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
+  {}
+
+  virtual bool Run()
+  {
+    SKIP("Hello world " << 42);
+    return false;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestSkip : public testinator::Test
+{
+public:
+  TestSkip(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::DefaultOutputter>(oss);
+
+    TestSkipInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+
+    return myTestA.skipped();
   }
 };
 
@@ -423,32 +462,17 @@ public:
     TestBranchInternal2 myTestA("A");
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
-    static string expected = "main.cpp:401";
+    static string expected = "main.cpp:440";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
 };
 
 //------------------------------------------------------------------------------
-class TestSkipInternal : public testinator::Test
+class TestTAPSkip : public testinator::Test
 {
 public:
-  TestSkipInternal(testinator::TestRegistry& r, const string& name)
-    : testinator::Test(r, name)
-  {}
-
-  virtual bool Run()
-  {
-    SKIP("Hello world " << 42);
-    return false;
-  }
-};
-
-//------------------------------------------------------------------------------
-class TestSkip : public testinator::Test
-{
-public:
-  TestSkip(const string& name)
+  TestTAPSkip(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
@@ -465,6 +489,160 @@ public:
     static string expected = "# skip Hello world 42";
     return myTestA.skipped()
       && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestTAPDiagnostic : public testinator::Test
+{
+public:
+  TestTAPDiagnostic(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::TAPOutputter>(oss);
+
+    TestDiagnosticInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+
+    static string expected = "# Hello world 42";
+    return !rs.empty() && rs.front().m_success
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestTAPAbort : public testinator::Test
+{
+public:
+  TestTAPAbort(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::TAPOutputter>(oss);
+
+    TestAbortInternal myTestA(r, "A");
+    TestAbortInternal myTestB(r, "B");
+    testinator::RunParams params;
+    params.m_flags = testinator::RF_ALPHA_ORDER;
+    testinator::Results rs = r.RunAllTests(params, op.get());
+
+    static string expected = "Bail out! Hello world 42";
+    return !myTestB.m_runCalled
+      && oss.str().find(expected) != string::npos;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestRunsInternal : public testinator::Test
+{
+public:
+  TestRunsInternal(testinator::TestRegistry& r,
+                   const string& name, const string& suite)
+    : testinator::Test(r, name, suite)
+  {}
+
+  virtual bool Run()
+  {
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestRuns : public testinator::Test
+{
+public:
+  TestRuns(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    {
+      testinator::TestRegistry r;
+      TestRunsInternal myTestA(r, "A", "B");
+      testinator::Results rs = r.RunAllTests();
+      if (rs.empty() || !rs.front().m_success)
+        return false;
+    }
+    {
+      testinator::TestRegistry r;
+      TestRunsInternal myTestA(r, "A", "B");
+      testinator::Results rs = r.RunTest("A");
+      if (rs.empty() || !rs.front().m_success)
+        return false;
+    }
+    {
+      testinator::TestRegistry r;
+      TestRunsInternal myTestA(r, "A", "B");
+      testinator::Results rs = r.RunSuite("B");
+      if (rs.empty() || !rs.front().m_success)
+        return false;
+    }
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestNoSuchTest : public testinator::Test
+{
+public:
+  TestNoSuchTest(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    testinator::TestRegistry r;
+    testinator::Results rs = r.RunTest("A");
+    return rs.empty();
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestSkipOnSetupFailInternal : public testinator::Test
+{
+public:
+  TestSkipOnSetupFailInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
+  {}
+
+  virtual bool Setup(const testinator::RunParams&)
+  {
+    return false;
+  }
+};
+
+//------------------------------------------------------------------------------
+class TestSkipOnSetupFail : public testinator::Test
+{
+public:
+  TestSkipOnSetupFail(const string& name)
+    : testinator::Test(name, s_suiteName)
+  {}
+
+  virtual bool Run()
+  {
+    testinator::TestRegistry r;
+    ostringstream oss;
+    std::unique_ptr<testinator::Outputter> op =
+      make_unique<testinator::TAPOutputter>(oss);
+
+    TestSkipOnSetupFailInternal myTestA(r, "A");
+    testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+
+    static string expected = "A # skip";
+    return oss.str().find(expected) != string::npos;
   }
 };
 
@@ -614,6 +792,13 @@ int main(int argc, char* argv[])
   TestSkip test8("TestSkip");
   TestExpectEvalsOnce test9("TestExpectEvalsOnce");
   TestBranchNoName test10("TestBranchNoName");
+  TestAbort test11("TestAbort");
+  TestRuns test12("TestRuns");
+  TestTAPSkip test13("TestTAPSkip");
+  TestTAPDiagnostic test14("TestTAPDiagnostic");
+  TestTAPAbort test15("TestTAPAbort");
+  TestNoSuchTest test16("TestNoSuchTest");
+  TestSkipOnSetupFail test17("TestSkipOnSetupFail");
   testinator::Results rs;
 
   std::unique_ptr<testinator::Outputter> op = testinator::MakeOutputter(

@@ -95,29 +95,21 @@ namespace testinator
   inline Results RunAllTests(const RunParams& params = RunParams(),
                              const Outputter* outputter = nullptr)
   {
-    return GetTestRegistry().RunAllTests(
-        params,
-        outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
+    return GetTestRegistry().RunAllTests(params, outputter);
   }
 
   inline Results RunSuite(const std::string& suiteName,
                           const RunParams& params = RunParams(),
                           const Outputter* outputter = nullptr)
   {
-    return GetTestRegistry().RunSuite(
-        suiteName,
-        params,
-        outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
+    return GetTestRegistry().RunSuite(suiteName, params, outputter);
   }
 
   inline Results RunTest(const std::string& testName,
                          const RunParams& params = RunParams(),
                          const Outputter* outputter = nullptr)
   {
-    return GetTestRegistry().RunTest(
-        testName,
-        params,
-        outputter != nullptr ? outputter : std::make_unique<Outputter>().get());
+    return GetTestRegistry().RunTest(testName, params, outputter);
   }
 
   //------------------------------------------------------------------------------
