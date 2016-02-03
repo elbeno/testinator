@@ -75,44 +75,58 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES "Coverage")
   find_program(LCOV lcov)
   find_program(GENHTML genhtml)
-  find_program(CTEST ctest)
   set(lcov_args ${lcov_args} "-q" "--compat-libtool")
 endif()
 
-macro(ADD_COVERAGE executable)
+macro(SHIFT result listvar)
+  list(GET ${listvar} 0 ${result})
+  list(REMOVE_AT ${listvar} 0)
+endmacro(SHIFT)
+
+macro(ADD_COVERAGE executable suffix)
   if(CMAKE_BUILD_TYPE MATCHES "Coverage")
-    if (GCOV AND LCOV AND GENHTML AND CTEST)
+    if (GCOV AND LCOV AND GENHTML)
+      set(args ${ARGV})
+      list(REMOVE_AT args 0)
+      list(REMOVE_AT args 0)
+      string(REPLACE ";" " " arglist "${args}")
       add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/lcov/index.html
-        COMMAND ${LCOV} ${lcov_args} -z -d .
-        COMMAND ${LCOV} ${lcov_args} --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o before.lcov -i
-        COMMAND ${executable}
-        COMMAND ${LCOV} ${lcov_args} --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o after.lcov
-        COMMAND ${LCOV} ${lcov_args} -a before.lcov -a after.lcov -o final.lcov
-        COMMAND ${LCOV} ${lcov_args} -r final.lcov "'${CMAKE_SOURCE_DIR}/src/test/*'" -o final.lcov
-        COMMAND ${LCOV} ${lcov_args} --list final.lcov
-        COMMAND ${GENHTML} -q -o lcov -t "${executable}" --legend --demangle-cpp --sort -p "${CMAKE_BINARY_DIR}" final.lcov
+        OUTPUT ${CMAKE_BINARY_DIR}/lcov/${executable}.${suffix}.total
         DEPENDS ${executable}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Running LCOV"
-        )
-      add_custom_target(coverage
-        DEPENDS ${CMAKE_BINARY_DIR}/lcov/index.html
-        COMMENT "LCOV report at lcov/index.html"
+        COMMENT "Running ${LCOV} for ${executable} ${arglist}"
+        COMMAND mkdir -p lcov
+        COMMAND ${LCOV} ${lcov_args} -z -d .
+        COMMAND ${LCOV} ${lcov_args} --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o lcov/${executable}.${suffix}.before -i
+        COMMAND ${executable} ${args}
+        COMMAND ${LCOV} ${lcov_args} --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o lcov/${executable}.${suffix}.after
+        COMMAND ${LCOV} ${lcov_args} -a lcov/${executable}.${suffix}.before -a lcov/${executable}.${suffix}.after -o lcov/${executable}.${suffix}.total
         )
       message(STATUS
-        "Coverage added for ${executable}:\n"
+        "Coverage added for ${executable} ${arglist}:\n"
         "  gcov: ${GCOV}\n"
         "  lcov: ${LCOV}\n"
-        "  genhtml: ${GENHTML}\n"
-        "  ctest: ${CTEST}\n")
+        "  genhtml: ${GENHTML}\n")
     else()
       message(WARNING
-        "Coverage not available for ${executable}:\n"
+        "Coverage not available for ${executable} ${arglist}:\n"
         "  gcov: ${GCOV}\n"
         "  lcov: ${LCOV}\n"
-        "  genhtml: ${GENHTML}\n"
-        "  ctest: ${CTEST}\n")
+        "  genhtml: ${GENHTML}\n")
+    endif()
+  endif()
+endmacro()
+
+macro(EXCLUDE_COVERAGE executable suffix excludes)
+  if(CMAKE_BUILD_TYPE MATCHES "Coverage")
+    if (GCOV AND LCOV AND GENHTML)
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/lcov/${executable}.${suffix}.final
+        DEPENDS lcov/${executable}.${suffix}.total
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Excluding ${excludes} for ${executable}"
+        COMMAND ${LCOV} ${lcov_args} -r lcov/${executable}.${suffix}.total "${excludes}" -o lcov/${executable}.${suffix}.final
+        )
     endif()
   endif()
 endmacro()
@@ -145,3 +159,43 @@ endmacro()
 
 add_subdirectory (src/test)
 add_subdirectory (src/maintest)
+
+if(CMAKE_BUILD_TYPE MATCHES "Coverage")
+  # run test_testinator 3 times for all, suite and individual test
+  ADD_COVERAGE(test_${PROJECT_NAME} 0)
+  EXCLUDE_COVERAGE(test_${PROJECT_NAME} 0 "*.cpp")
+  ADD_COVERAGE(test_${PROJECT_NAME} 1 "--testName=Foo")
+  EXCLUDE_COVERAGE(test_${PROJECT_NAME} 1 "*.cpp")
+  ADD_COVERAGE(test_${PROJECT_NAME} 2 "--suiteName=Foo")
+  EXCLUDE_COVERAGE(test_${PROJECT_NAME} 2 "*.cpp")
+
+  # run maintest 4 times, to exercise code paths in main.h
+  ADD_COVERAGE(maintest 0 "--output=" "--testName=" "--suiteName=" "--numChecks=1" "--seed=1" "--alpha" "--verbose" "--nocolor")
+  EXCLUDE_COVERAGE(maintest 0 "*.cpp")
+  ADD_COVERAGE(maintest 1 "--help")
+  EXCLUDE_COVERAGE(maintest 1 "*.cpp")
+  ADD_COVERAGE(maintest 2 "--testName=Foo")
+  EXCLUDE_COVERAGE(maintest 2 "*.cpp")
+  ADD_COVERAGE(maintest 3 "--suiteName=Foo")
+  EXCLUDE_COVERAGE(maintest 3 "*.cpp")
+
+  add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/lcov/index.html
+    DEPENDS lcov/test_testinator.0.final
+    DEPENDS lcov/test_testinator.1.final
+    DEPENDS lcov/test_testinator.2.final
+    DEPENDS lcov/maintest.0.final
+    DEPENDS lcov/maintest.1.final
+    DEPENDS lcov/maintest.2.final
+    DEPENDS lcov/maintest.3.final
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running ${GENHTML}"
+    COMMAND ${LCOV} ${lcov_args} -a lcov/test_testinator.0.final -a lcov/test_testinator.1.final -a lcov/test_testinator.2.final -a lcov/maintest.0.final -a lcov/maintest.1.final -a lcov/maintest.2.final -a lcov/maintest.3.final -a lcov/maintest.1.final -o lcov/final
+    COMMAND ${LCOV} ${lcov_args} --list lcov/final
+    COMMAND ${GENHTML} -q -o lcov --legend --demangle-cpp --sort -p "${CMAKE_BINARY_DIR}" lcov/final
+    )
+  add_custom_target(coverage
+    DEPENDS ${CMAKE_BINARY_DIR}/lcov/index.html
+    COMMENT "LCOV report at lcov/index.html"
+    )
+endif()

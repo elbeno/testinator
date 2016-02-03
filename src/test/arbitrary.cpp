@@ -51,6 +51,18 @@ DEF_TEST(wchar_t, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
+DEF_TEST(Arbitrary_Arithmetic_IntCast, Arbitrary)
+{
+  testinator::Arbitrary<signed char> a;
+  signed char v = a.generate(0,0);
+  v = a.generate(1,0);
+  v = a.generate(2,0);
+  v = a.generate(3,0);
+  a.shrink(v);
+  return true;
+}
+
+//------------------------------------------------------------------------------
 DEF_TEST(char16_t, Arbitrary)
 {
   testinator::Arbitrary<char16_t> a;

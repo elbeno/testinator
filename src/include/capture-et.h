@@ -251,11 +251,7 @@ namespace testinator
   }
 
   // -----------------------------------------------------------------------------
-  // Overloading << and >> lowers their precedence to below relational ops. If we
-  // don't overload them, it's an error, but if we overload them, the compiler
-  // complains about the lowered precedence wrt relational ops and requires parens
-  // around the << operands, which means these functions doesn't actually get
-  // called. But they need to exist.
+  // Overload the << and >> operators.
 
   template <typename H, typename T>
   constexpr inline Capture<OpPair<H, LShiftOp, T>> operator<<(Capture<H>&& head, T&& tail)

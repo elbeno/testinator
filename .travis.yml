@@ -4,6 +4,7 @@ script: cmake
 branches:
   only:
     - master
+    # - wip
 
 matrix:
   include:
@@ -105,7 +106,7 @@ script:
 
 after_success:
   # Upload coverage info to coveralls.io
-  - if [ -n "${COVERALLS_TOKEN}" -a "$BUILD_TYPE" == "Coverage" ]; then coveralls-lcov -v --repo-token ${COVERALLS_TOKEN} final.lcov; fi
+  - if [ -n "${COVERALLS_TOKEN}" -a "$BUILD_TYPE" == "Coverage" ]; then coveralls-lcov -v --repo-token ${COVERALLS_TOKEN} lcov/final; fi
 
 notifications:
   email: false

@@ -660,6 +660,130 @@ DEF_TEST(NonConstMacros, Test)
 }
 
 //------------------------------------------------------------------------------
+class TestETCaptureCoverageInternal : public testinator::Test
+{
+public:
+  TestETCaptureCoverageInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
+  {}
+
+  virtual bool Run()
+  {
+    EXPECT(1+2 > 1+3 < 0);
+    EXPECT(false);
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+DEF_TEST(ETCaptureCoverage, Test)
+{
+  testinator::TestRegistry r;
+  ostringstream oss;
+  std::unique_ptr<testinator::Outputter> op =
+    make_unique<testinator::DefaultOutputter>(oss);
+
+  TestETCaptureCoverageInternal myTestA(r, "A");
+  testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+
+  static string expected = "EXPECT FAILED";
+  return oss.str().find(expected) != string::npos;
+}
+
+//------------------------------------------------------------------------------
+class TestPrettyPrintCoverageInternal : public testinator::Test
+{
+public:
+  TestPrettyPrintCoverageInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
+  {}
+
+  virtual bool Run()
+  {
+    vector<int> v = {1,2,3};
+    DIAGNOSTIC(testinator::prettyprint(v));
+    string s{"Hello"};
+    DIAGNOSTIC(testinator::prettyprint(s));
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+DEF_TEST(PrettyPrintCoverage, Test)
+{
+  testinator::TestRegistry r;
+  ostringstream oss;
+  std::unique_ptr<testinator::Outputter> op =
+    make_unique<testinator::DefaultOutputter>(oss);
+
+  TestPrettyPrintCoverageInternal myTestA(r, "A");
+  testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+
+  static string expected1 = "[1,2,3]";
+  static string expected2 = "\"Hello\"";
+  return oss.str().find(expected1) != string::npos
+    && oss.str().find(expected2) != string::npos;
+}
+
+//------------------------------------------------------------------------------
+class TestComplexityCoverageInternal : public testinator::Test
+{
+public:
+  TestComplexityCoverageInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
+  {}
+
+  virtual bool Run()
+  {
+    DIAGNOSTIC(testinator::ComplexityProperty::Order(testinator::ORDER_1));
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+DEF_TEST(ComplexityCoverage, Test)
+{
+  testinator::TestRegistry r;
+  ostringstream oss;
+  std::unique_ptr<testinator::Outputter> op =
+    make_unique<testinator::DefaultOutputter>(oss);
+
+  TestComplexityCoverageInternal myTestA(r, "A");
+  testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
+
+  static string expected = "O(1)";
+  return oss.str().find(expected) != string::npos;
+}
+
+//------------------------------------------------------------------------------
+class TestOutputCoverageInternal : public testinator::Test
+{
+public:
+  TestOutputCoverageInternal(testinator::TestRegistry& r, const string& name)
+    : testinator::Test(r, name)
+  {}
+
+  virtual bool Run()
+  {
+    DIAGNOSTIC("Foo");
+    SKIP("Foo");
+    ABORT("Foo");
+    return true;
+  }
+};
+
+//------------------------------------------------------------------------------
+DEF_TEST(OutputCoverage, Test)
+{
+  testinator::TestRegistry r;
+  std::unique_ptr<testinator::Outputter> op =
+    testinator::MakeOutputter("TAP", testinator::OF_NONE);
+  TestOutputCoverageInternal myTestA(r, "A");
+  testinator::Results rs = r.RunAllTests();
+  return true;
+}
+
+//------------------------------------------------------------------------------
 namespace
 {
   size_t s_numPropertyChecks = 0;
@@ -668,6 +792,14 @@ namespace
 DEF_PROPERTY(NumChecks, Property, int)
 {
   return m_numChecks == s_numPropertyChecks;
+}
+
+//------------------------------------------------------------------------------
+DEF_TEST(ArbitraryCoverage, Test)
+{
+  struct MyStruct {} s;
+  auto v = testinator::Arbitrary<MyStruct>::shrink(s);
+  return v.empty();
 }
 
 //------------------------------------------------------------------------------
