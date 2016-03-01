@@ -6,6 +6,7 @@
 #include "arbitrary.h"
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <deque>
 #include <forward_list>
@@ -158,6 +159,35 @@ namespace testinator
         copy(it, t.cend(), std::front_inserter(v[1]));
       }
       return v;
+    }
+  };
+
+  //------------------------------------------------------------------------------
+  // specialization for array
+  //------------------------------------------------------------------------------
+  template <typename T, std::size_t N>
+  struct Arbitrary<std::array<T, N>>
+  {
+    using output_type = std::array<T, N>;
+
+    static output_type generate(std::size_t generation, unsigned long int randomSeed)
+    {
+      output_type v;
+      if (generation == 0) return v;
+      std::generate_n(
+          v.begin(), N,
+          [&] () { return Arbitrary<T>::generate(generation++, randomSeed++); });
+      return v;
+    }
+
+    static output_type generate_n(std::size_t n, unsigned long int randomSeed)
+    {
+      return generate(n, randomSeed);
+    }
+
+    static std::vector<output_type> shrink(const output_type&)
+    {
+      return std::vector<output_type>{};
     }
   };
 

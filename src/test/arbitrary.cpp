@@ -180,6 +180,15 @@ DEF_TEST(longdouble, Arbitrary)
 }
 
 //------------------------------------------------------------------------------
+DEF_TEST(array, Arbitrary)
+{
+  testinator::Arbitrary<array<int, 10>> a;
+  array<int, 10> v = a.generate(1,0);
+  vector<array<int, 10>> va = a.shrink(v);
+  return va.empty();
+}
+
+//------------------------------------------------------------------------------
 DEF_TEST(vector, Arbitrary)
 {
   testinator::Arbitrary<vector<int>> a;

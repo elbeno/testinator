@@ -33,3 +33,7 @@ DEF_COMPLEXITY_PROPERTY(O_N_LOG_N, Complexity, ORDER_N_LOG_N, const string& s)
     max_element(s.begin(), s.end());
   }
 }
+
+DEF_COMPLEXITY_PROPERTY(ArrayCoverage, Complexity, ORDER_N2, const array<int, 10>&)
+{
+}
