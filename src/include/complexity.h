@@ -93,13 +93,14 @@ namespace testinator
   public:
     static const char* Order(int o)
     {
-      static const char* s_order[NUM_ORDERS] =
+      static const char* s_order[NUM_ORDERS+1] =
         {
           "O(1)",
           "O(log N)",
           "O(N)",
           "O(N log N)",
           "O(N squared)",
+          "over O(N squared)"
         };
       return s_order[o];
     }
