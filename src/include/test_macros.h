@@ -40,10 +40,16 @@ namespace testinator
   }
 
   // Output operator for stream manipulators
-  using ManipT = std::ostream& (*)(std::ostream&);
-
+  using ManipT1 = std::ostream& (*)(std::ostream&);
   template <typename A>
-  Cons<std::pair<A,ManipT>> operator<<(Cons<A>&& a, ManipT m) noexcept
+  Cons<std::pair<A,ManipT1>> operator<<(Cons<A>&& a, ManipT1 m) noexcept
+  {
+    return {{ std::forward<A>(a.m_list), m }};
+  }
+
+  using ManipT2 = std::ios_base& (*)(std::ios_base&);
+  template <typename A>
+  Cons<std::pair<A,ManipT2>> operator<<(Cons<A>&& a, ManipT2 m) noexcept
   {
     return {{ std::forward<A>(a.m_list), m }};
   }

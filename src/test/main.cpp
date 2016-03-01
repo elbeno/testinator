@@ -3,7 +3,12 @@
 
 #include <testinator.h>
 
-#include <iostream>
+#include <algorithm>
+#include <ios>
+#include <memory>
+#include <sstream>
+#include <string>
+
 using namespace std;
 
 //------------------------------------------------------------------------------
@@ -200,7 +205,7 @@ public:
     testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
     static string expected =
-      "main.cpp:179 (!fail == fail => false == true)";
+      "main.cpp:184 (!fail == fail => false == true)";
     return !rs.empty() && !rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
@@ -265,7 +270,8 @@ public:
 
   virtual bool Run()
   {
-    DIAGNOSTIC("Hello world " << 42);
+    DIAGNOSTIC("Hello world " << 42 << endl << 42);
+    DIAGNOSTIC("Hello world " << std::hex << 42);
     return true;
   }
 };
@@ -288,9 +294,11 @@ public:
     TestDiagnosticInternal myTestA(r, "A");
     testinator::Results rs = r.RunAllTests(testinator::RunParams(), op.get());
 
-    static string expected = "Hello world 42";
+    static string expected1 = "Hello world 42\n42";
+    static string expected2 = "Hello world 2a";
     return !rs.empty() && rs.front().m_success
-      && oss.str().find(expected) != string::npos;
+      && oss.str().find(expected1) != string::npos
+      && oss.str().find(expected2) != string::npos;
   }
 };
 
@@ -462,7 +470,7 @@ public:
     TestBranchInternal2 myTestA("A");
     testinator::Results rs = testinator::RunAllTests(testinator::RunParams(), op.get());
 
-    static string expected = "main.cpp:440";
+    static string expected = "main.cpp:448";
     return !rs.empty() && rs.front().m_success
       && oss.str().find(expected) != string::npos;
   }
