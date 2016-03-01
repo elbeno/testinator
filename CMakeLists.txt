@@ -192,7 +192,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Coverage")
     COMMENT "Running ${GENHTML}"
     COMMAND ${LCOV} ${lcov_args} -a lcov/test_testinator.0.final -a lcov/test_testinator.1.final -a lcov/test_testinator.2.final -a lcov/maintest.0.final -a lcov/maintest.1.final -a lcov/maintest.2.final -a lcov/maintest.3.final -a lcov/maintest.1.final -o lcov/final
     COMMAND ${LCOV} ${lcov_args} --list lcov/final
-    COMMAND ${GENHTML} -q -o lcov --legend --demangle-cpp --sort -p "${CMAKE_BINARY_DIR}" lcov/final
+    COMMAND ${GENHTML} -q -o lcov --legend --sort -p "${CMAKE_BINARY_DIR}" lcov/final
     )
   add_custom_target(coverage
     DEPENDS ${CMAKE_BINARY_DIR}/lcov/index.html
