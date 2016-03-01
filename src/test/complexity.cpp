@@ -34,6 +34,32 @@ DEF_COMPLEXITY_PROPERTY(O_N_LOG_N, Complexity, ORDER_N_LOG_N, const string& s)
   }
 }
 
+DEF_COMPLEXITY_PROPERTY(PairCoverage, Complexity, ORDER_N2, const pair<int, int>&)
+{
+}
+
+DEF_COMPLEXITY_PROPERTY(VectorCoverage, Complexity, ORDER_N2, const vector<int>&)
+{
+}
+
+DEF_COMPLEXITY_PROPERTY(DequeCoverage, Complexity, ORDER_N2, const deque<int>&)
+{
+}
+
+DEF_COMPLEXITY_PROPERTY(ListCoverage, Complexity, ORDER_N2, const list<int>&)
+{
+}
+
+DEF_COMPLEXITY_PROPERTY(ForwardListCoverage, Complexity, ORDER_N2, const forward_list<int>&)
+{
+}
+
 DEF_COMPLEXITY_PROPERTY(ArrayCoverage, Complexity, ORDER_N2, const array<int, 10>&)
+{
+}
+
+struct MyUnspecializedType {};
+
+DEF_COMPLEXITY_PROPERTY(ArbitraryCoverage, Complexity, ORDER_N2, const MyUnspecializedType)
 {
 }
