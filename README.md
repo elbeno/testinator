@@ -234,7 +234,7 @@ complexity" value (`ORDER_1`, `ORDER_LOG_N`, `ORDER_N`, `ORDER_N_LOG_N`, or
 to measure complexity.
 
 ```cpp
-DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, ORDER_N, string&& s)
+DEF_COMPLEXITY_PROPERTY(ThisIsOrderN, Complexity, ORDER_N, const string& s)
 {
   max_element(s.begin(), s.end());
 }
@@ -245,7 +245,9 @@ Generating values for use in complexity properties will call `generate_n` on the
 
 When measuring complexity, timing is of course important. If the function is
 very small and optimized by the compiler, Testinator may not be able to
-accurately measure the time.
+accurately measure the time. Also, if the test function takes an argument by
+value (rather than by const ref) a copy will be incurred, which may typically
+push the complexity to O(n).
 
 If the complexity test comes in at (or *under*) the expected complexity, it will
 be considered a pass.

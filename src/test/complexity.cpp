@@ -60,6 +60,6 @@ DEF_COMPLEXITY_PROPERTY(ArrayCoverage, Complexity, ORDER_N2, const array<int, 10
 
 struct MyUnspecializedType {};
 
-DEF_COMPLEXITY_PROPERTY(ArbitraryCoverage, Complexity, ORDER_N2, const MyUnspecializedType)
+DEF_COMPLEXITY_PROPERTY(ArbitraryCoverage, Complexity, ORDER_N2, const MyUnspecializedType&)
 {
 }
