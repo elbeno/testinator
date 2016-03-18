@@ -22,7 +22,7 @@ namespace testinator
     template <typename C>
     struct Arbitrary_Assoc
     {
-      static const std::size_t N = 10;
+      static const std::size_t N = 5;
       using V = typename C::value_type;
 
       static C generate(std::size_t generation, unsigned long int randomSeed)

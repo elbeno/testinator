@@ -21,7 +21,7 @@ namespace testinator
   {
     using output_type = std::basic_string<T, CharTraits, Alloc>;
     
-    static const std::size_t N = 10;
+    static const std::size_t N = 5;
 
     static output_type generate(
         std::size_t generation, unsigned long int randomSeed)

@@ -3,7 +3,6 @@
 
 #include <property.h>
 
-#include <iostream>
 using namespace std;
 
 //------------------------------------------------------------------------------
@@ -178,8 +177,8 @@ public:
 
   bool operator()(const string& s1, const string& s2)
   {
-    return s1.find('A') == string::npos
-      || s2.find('B') == string::npos;
+    return s1.size() <= 1
+      || s2.size() <= 1;
   }
 };
 
@@ -192,12 +191,17 @@ DEF_TEST(FailTriggersShrinkMulti, Property)
   FailTriggersShrinkBInternal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
-  p.m_randomSeed = 3358856245;
   testinator::Results rs = r.RunAllTests(p, op.get());
 
-  static string expected = "Failed (\"A\",\"B\")";
-  return !rs.empty() && !rs.front().m_success
-    && oss.str().find(expected) != string::npos;
+  static string expected = "Failed (";
+  auto i = oss.str().find(expected);
+  if (i == string::npos) return false;
+  i = oss.str().find(expected, i);
+  if (i == string::npos) return false;
+  i = oss.str().find(expected, i);
+  if (i == string::npos) return false;
+
+  return !rs.empty() && !rs.front().m_success;
 }
 
 //------------------------------------------------------------------------------
@@ -217,8 +221,8 @@ public:
 
   bool operator()(const std::pair<string, string>& p)
   {
-    return p.first.find('A') == string::npos
-      || p.second.find('B') == string::npos;
+    return p.first.size() <= 1
+      || p.second.size() <= 1;
   }
 };
 
@@ -231,12 +235,17 @@ DEF_TEST(FailTriggersShrinkPair, Property)
   FailTriggersShrinkCInternal myTestA(r, "A", "Property");
 
   testinator::RunParams p;
-  p.m_randomSeed = 1768754876;
   testinator::Results rs = r.RunAllTests(p, op.get());
 
-  static string expected = "Failed ((\"A\",\"B\"))";
-  return !rs.empty() && !rs.front().m_success
-    && oss.str().find(expected) != string::npos;
+  static string expected = "Failed ((";
+  auto i = oss.str().find(expected);
+  if (i == string::npos) return false;
+  i = oss.str().find(expected, i);
+  if (i == string::npos) return false;
+  i = oss.str().find(expected, i);
+  if (i == string::npos) return false;
+
+  return !rs.empty() && !rs.front().m_success;
 }
 
 //------------------------------------------------------------------------------

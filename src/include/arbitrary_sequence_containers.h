@@ -22,7 +22,7 @@ namespace testinator
     template <typename C>
     struct Arbitrary_RandomSequence
     {
-      static const std::size_t N = 10;
+      static const std::size_t N = 5;
       using V = typename C::value_type;
 
       static C generate(std::size_t generation, unsigned long int randomSeed)
@@ -78,7 +78,7 @@ namespace testinator
   {
     using output_type = std::list<T, Alloc>;
     
-    static const std::size_t N = 10;
+    static const std::size_t N = 5;
 
     static output_type generate(std::size_t generation, unsigned long int randomSeed)
     {
@@ -124,7 +124,7 @@ namespace testinator
   {
     using output_type = std::forward_list<T, Alloc>;
     
-    static const std::size_t N = 10;
+    static const std::size_t N = 5;
 
     static output_type generate(std::size_t generation, unsigned long int randomSeed)
     {

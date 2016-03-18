@@ -195,8 +195,7 @@ DEF_TEST(vector, Arbitrary)
   vector<int> v = a.generate(1,0);
   vector<vector<int>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -206,8 +205,7 @@ DEF_TEST(string, Arbitrary)
   string v = a.generate(1,0);
   vector<string> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -217,8 +215,7 @@ DEF_TEST(deque, Arbitrary)
   deque<int> v = a.generate(1,0);
   vector<deque<int>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -228,8 +225,7 @@ DEF_TEST(list, Arbitrary)
   list<int> v = a.generate(1,0);
   vector<list<int>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -250,8 +246,7 @@ DEF_TEST(forward_list, Arbitrary)
     for (auto it = vv[1].begin(); it != vv[1].end(); ++it, ++vv1len);
 
   return vv.size() == 2
-    && vv0len == vlen/2
-    && vv1len == vlen/2;
+    && vv0len + vv1len == vlen;
 }
 
 //------------------------------------------------------------------------------
@@ -261,8 +256,7 @@ DEF_TEST(set, Arbitrary)
   set<int> v = a.generate(1,0);
   vector<set<int>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -272,8 +266,7 @@ DEF_TEST(multiset, Arbitrary)
   multiset<int> v = a.generate(1,0);
   vector<multiset<int>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -283,8 +276,7 @@ DEF_TEST(unordered_set, Arbitrary)
   unordered_set<int> v = a.generate(1,0);
   vector<unordered_set<int>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -312,8 +304,7 @@ DEF_TEST(map, Arbitrary)
   map<int, float> v = a.generate(1,0);
   vector<map<int, float>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -323,8 +314,7 @@ DEF_TEST(multimap, Arbitrary)
   multimap<int, float> v = a.generate(1,0);
   vector<multimap<int, float>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
 
 //------------------------------------------------------------------------------
@@ -334,6 +324,5 @@ DEF_TEST(unordered_map, Arbitrary)
   unordered_map<int, float> v = a.generate(1,0);
   vector<unordered_map<int, float>> vv = a.shrink(v);
   return vv.size() == 2
-    && vv[0].size() == v.size()/2
-    && vv[1].size() == v.size()/2;
+    && vv[0].size() + vv[1].size() == v.size();
 }
