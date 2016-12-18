@@ -3,12 +3,16 @@ script: cmake
 
 branches:
   only:
-    - master
+    # - master
     # - wip
+
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/deps/cmake
 
 matrix:
   include:
-    - env: CLANG_VERSION=3.4 BUILD_TYPE=Debug CPP=1y SAN=On LIBCXX=On
+    - env: CLANG_VERSION=3.4 BUILD_TYPE=Debug CPP=1y ASAN=On LIBCXX=On
       os: linux
       addons: &clang34
         apt:
@@ -19,11 +23,11 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.4
 
-    - env: CLANG_VERSION=3.4 BUILD_TYPE=Release CPP=1y SAN=On LIBCXX=On
+    - env: CLANG_VERSION=3.4 BUILD_TYPE=Release CPP=1y ASAN=On LIBCXX=On
       os: linux
       addons: *clang34
 
-    - env: CLANG_VERSION=3.7 BUILD_TYPE=Debug CPP=14 SAN=Off LIBCXX=On
+    - env: CLANG_VERSION=3.7 BUILD_TYPE=Debug CPP=14 ASAN=Off LIBCXX=On
       os: linux
       addons: &clang37
         apt:
@@ -34,11 +38,11 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
 
-    - env: CLANG_VERSION=3.7 BUILD_TYPE=Release CPP=14 SAN=Off LIBCXX=On
+    - env: CLANG_VERSION=3.7 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=On
       os: linux
       addons: *clang37
 
-    - env: GCC_VERSION=4.9 BUILD_TYPE=Debug CPP=14 SAN=Off LIBCXX=Off
+    - env: GCC_VERSION=4.9 BUILD_TYPE=Debug CPP=14 ASAN=Off LIBCXX=Off
       os: linux
       addons: &gcc49
         apt:
@@ -47,11 +51,11 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
 
-    - env: GCC_VERSION=4.9 BUILD_TYPE=Release CPP=14 SAN=Off LIBCXX=Off
+    - env: GCC_VERSION=4.9 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=Off
       os: linux
       addons: *gcc49
 
-    - env: GCC_VERSION=5 BUILD_TYPE=Debug CPP=14 SAN=Off LIBCXX=Off
+    - env: GCC_VERSION=5 BUILD_TYPE=Debug CPP=14 ASAN=Off LIBCXX=Off
       os: linux
       addons: &gcc5
         apt:
@@ -60,21 +64,28 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
 
-    - env: GCC_VERSION=5 BUILD_TYPE=Release CPP=14 SAN=Off LIBCXX=Off
+    - env: GCC_VERSION=5 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=Off
       os: linux
       addons: *gcc5
 
-    - env: GCC_VERSION=5 BUILD_TYPE=Coverage CPP=14 SAN=Off LIBCXX=Off
+    - env: GCC_VERSION=5 BUILD_TYPE=Coverage CPP=14 ASAN=Off LIBCXX=Off
       os: linux
       addons: *gcc5
 
 before_install:
   - export CHECKOUT_PATH=`pwd`;
+  - |
+    if [ -z "$(ls -A ${TRAVIS_BUILD_DIR}/deps/cmake/bin)" ]; then
+      CMAKE_URL="https://cmake.org/files/v3.6/cmake-3.6.2-Linux-x86_64.tar.gz"
+      mkdir -p ${TRAVIS_BUILD_DIR}/deps/cmake && travis_retry wget --no-check-certificate --quiet -O - "${CMAKE_URL}" | tar --strip-components=1 -xz -C ${TRAVIS_BUILD_DIR}/deps/cmake
+    fi
+    export PATH="${TRAVIS_BUILD_DIR}/deps/cmake/bin:${PATH}"
   - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
   - if [ -n "$CLANG_VERSION" ]; then export CXX="clang++-${CLANG_VERSION}" CC="clang-${CLANG_VERSION}"; fi
   - if [ "$CLANG_VERSION" == "3.4" ]; then export CXX="/usr/local/clang-3.4/bin/clang++" CC="/usr/local/clang-3.4/bin/clang"; fi
-  - if [ "$LIBCXX" == "On" ]; then sudo CXX=$CXX CC=$CC ./install_libcxx.sh; fi
+  - if [ "$LIBCXX" == "On" ]; then sudo PATH="${PATH}" CXX="$CXX" CC="$CC" ./install_libcxx.sh; fi
   - if [ "$BUILD_TYPE" == "Coverage" ]; then export GCOV=gcov-5; fi
+  - if [ "$ASAN" == "On" ]; then export SANITIZER=Address; fi
 
 install:
   - cd $CHECKOUT_PATH
@@ -99,7 +110,7 @@ install:
   - if [ "$BUILD_TYPE" == "Coverage" ]; then gem install coveralls-lcov; fi
 
 script:
-  - cmake --no-warn-unused-cli .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" -DCMAKE_EXE_LINKER_FLAGS="${CXX_LINKER_FLAGS}" -DCXX_STD=$CPP -DGCOV=$GCOV -DSAN=$SAN
+  - cmake --no-warn-unused-cli .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" -DCMAKE_EXE_LINKER_FLAGS="${CXX_LINKER_FLAGS}" -DCXX_STD=$CPP -DGCOV=$GCOV -DASAN=$ASAN
 
   - if [ "$BUILD_TYPE" == "Coverage" ]; then make coverage VERBOSE=1; else make VERBOSE=1; fi
   - if [ "$BUILD_TYPE" == "Debug" ]; then ctest -VV --schedule-random; fi
