@@ -81,7 +81,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) + u;
+      return LHSRecur<T>::value(std::forward<T>(t)) + std::forward<U>(u);
     }
   };
 
@@ -90,7 +90,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) - u;
+      return LHSRecur<T>::value(std::forward<T>(t)) - std::forward<U>(u);
     }
   };
 
@@ -99,7 +99,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) * u;
+      return LHSRecur<T>::value(std::forward<T>(t)) * std::forward<U>(u);
     }
   };
 
@@ -108,7 +108,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) / u;
+      return LHSRecur<T>::value(std::forward<T>(t)) / std::forward<U>(u);
     }
   };
 
@@ -117,7 +117,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) % u;
+      return LHSRecur<T>::value(std::forward<T>(t)) % std::forward<U>(u);
     }
   };
 
@@ -126,7 +126,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) << u;
+      return LHSRecur<T>::value(std::forward<T>(t)) << std::forward<U>(u);
     }
   };
 
@@ -135,7 +135,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) >> u;
+      return LHSRecur<T>::value(std::forward<T>(t)) >> std::forward<U>(u);
     }
   };
 
@@ -148,7 +148,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) == u;
+      return LHSRecur<T>::value(std::forward<T>(t)) == std::forward<U>(u);
     }
   };
 
@@ -157,7 +157,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) != u;
+      return LHSRecur<T>::value(std::forward<T>(t)) != std::forward<U>(u);
     }
   };
 
@@ -166,7 +166,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) < u;
+      return LHSRecur<T>::value(std::forward<T>(t)) < std::forward<U>(u);
     }
   };
 
@@ -175,7 +175,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) > u;
+      return LHSRecur<T>::value(std::forward<T>(t)) > std::forward<U>(u);
     }
   };
 
@@ -184,7 +184,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) <= u;
+      return LHSRecur<T>::value(std::forward<T>(t)) <= std::forward<U>(u);
     }
   };
 
@@ -193,7 +193,7 @@ namespace testinator
     template <typename T, typename U>
     constexpr static decltype(auto) compute(T&& t, U&& u)
     {
-      return LHSRecur<T>::value(std::forward<T>(t)) >= u;
+      return LHSRecur<T>::value(std::forward<T>(t)) >= std::forward<U>(u);
     }
   };
 
