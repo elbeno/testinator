@@ -28,18 +28,18 @@ namespace testinator
   template <typename T>
   struct LHSRecur
   {
-    constexpr static auto value(T&& t) noexcept
+    constexpr static decltype(auto) value(T&& t) noexcept
     {
-      return t;
+      return std::forward<T>(t);
     }
   };
 
   template <typename T>
   struct RHSRecur
   {
-    constexpr static auto value(T&& t) noexcept
+    constexpr static decltype(auto) value(T&& t) noexcept
     {
-      return t;
+      return std::forward<T>(t);
     }
   };
 
@@ -55,9 +55,9 @@ namespace testinator
   template <typename T>
   struct EvalRecur
   {
-    constexpr static auto value(T&& t) noexcept
+    constexpr static decltype(auto) value(T&& t) noexcept
     {
-      return t;
+      return std::forward<T>(t);
     }
   };
 
@@ -67,9 +67,9 @@ namespace testinator
   struct SecondOp
   {
     template <typename T, typename U>
-    constexpr static U compute(T&&, U&& u) noexcept
+    constexpr static decltype(auto) compute(T&&, U&& u) noexcept
     {
-      return u;
+      return std::forward<U>(u);
     }
   };
 
@@ -79,7 +79,7 @@ namespace testinator
   struct AddOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) + u;
     }
@@ -88,7 +88,7 @@ namespace testinator
   struct SubOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) - u;
     }
@@ -97,7 +97,7 @@ namespace testinator
   struct MulOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) * u;
     }
@@ -106,7 +106,7 @@ namespace testinator
   struct DivOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) / u;
     }
@@ -115,7 +115,7 @@ namespace testinator
   struct ModOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) % u;
     }
@@ -124,7 +124,7 @@ namespace testinator
   struct LShiftOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) << u;
     }
@@ -133,7 +133,7 @@ namespace testinator
   struct RShiftOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) >> u;
     }
@@ -146,7 +146,7 @@ namespace testinator
   struct EQOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) == u;
     }
@@ -155,7 +155,7 @@ namespace testinator
   struct NEOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) != u;
     }
@@ -164,7 +164,7 @@ namespace testinator
   struct LTOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) < u;
     }
@@ -173,7 +173,7 @@ namespace testinator
   struct GTOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) > u;
     }
@@ -182,7 +182,7 @@ namespace testinator
   struct LTEOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) <= u;
     }
@@ -191,7 +191,7 @@ namespace testinator
   struct GTEOp
   {
     template <typename T, typename U>
-    constexpr static auto compute(T&& t, U&& u)
+    constexpr static decltype(auto) compute(T&& t, U&& u)
     {
       return LHSRecur<T>::value(std::forward<T>(t)) >= u;
     }
@@ -309,28 +309,28 @@ namespace testinator
   // Functions to extract the LHS, RHS and the relational op linking the sides.
 
   template <typename T>
-  constexpr inline auto LHS(T&& c)
+  constexpr inline decltype(auto) LHS(T&& c)
   {
     using L = typename std::remove_reference_t<T>::type;
     return LHSRecur<L>::value(std::forward<L>(c.m_list));
   }
 
   template <typename T>
-  constexpr inline auto RHS(T&& c)
+  constexpr inline decltype(auto) RHS(T&& c)
   {
     using L = typename std::remove_reference_t<T>::type;
     return RHSRecur<L>::value(std::forward<L>(c.m_list));
   }
 
   template <typename T>
-  constexpr inline auto RelOp(T&& c)
+  constexpr inline decltype(auto) RelOp(T&& c)
   {
     using L = typename std::remove_reference_t<T>::type;
     return RelOpRecur<L>::value(std::forward<L>(c.m_list));
   }
 
   template <typename T>
-  constexpr inline auto Eval(T&& c)
+  constexpr inline decltype(auto) Eval(T&& c)
   {
     using L = typename std::remove_reference_t<T>::type;
     return EvalRecur<L>::value(std::forward<L>(c.m_list));
@@ -343,7 +343,7 @@ namespace testinator
   template <typename H, typename Op, typename T>
   struct LHSRecur<OpPair<H, Op, T>>
   {
-    constexpr static auto value(OpPair<H, Op, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, Op, T>&& t)
     {
       return Op::compute(std::forward<H>(t.m_pair.first),
                          LHSRecur<T>::value(std::forward<T>(t.m_pair.second)));
@@ -353,7 +353,7 @@ namespace testinator
   template <typename H, typename T>
   struct LHSRecur<OpPair<H, EQOp, T>>
   {
-    constexpr static auto value(OpPair<H, EQOp, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, EQOp, T>&& t)
     {
       return LHSRecur<H>::value(std::forward<H>(t.m_pair.first));
     }
@@ -362,7 +362,7 @@ namespace testinator
   template <typename H, typename T>
   struct LHSRecur<OpPair<H, NEOp, T>>
   {
-    constexpr static auto value(OpPair<H, NEOp, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, NEOp, T>&& t)
     {
       return LHSRecur<H>::value(std::forward<H>(t.m_pair.first));
     }
@@ -371,7 +371,7 @@ namespace testinator
   template <typename H, typename T>
   struct LHSRecur<OpPair<H, LTOp, T>>
   {
-    constexpr static auto value(OpPair<H, LTOp, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, LTOp, T>&& t)
     {
       return LHSRecur<H>::value(std::forward<H>(t.m_pair.first));
     }
@@ -380,7 +380,7 @@ namespace testinator
   template <typename H, typename T>
   struct LHSRecur<OpPair<H, GTOp, T>>
   {
-    constexpr static auto value(OpPair<H, GTOp, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, GTOp, T>&& t)
     {
       return LHSRecur<H>::value(std::forward<H>(t.m_pair.first));
     }
@@ -389,7 +389,7 @@ namespace testinator
   template <typename H, typename T>
   struct LHSRecur<OpPair<H, LTEOp, T>>
   {
-    constexpr static auto value(OpPair<H, LTEOp, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, LTEOp, T>&& t)
     {
       return LHSRecur<H>::value(std::forward<H>(t.m_pair.first));
     }
@@ -398,7 +398,7 @@ namespace testinator
   template <typename H, typename T>
   struct LHSRecur<OpPair<H, GTEOp, T>>
   {
-    constexpr static auto value(OpPair<H, GTEOp, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, GTEOp, T>&& t)
     {
       return LHSRecur<H>::value(std::forward<H>(t.m_pair.first));
     }
@@ -410,7 +410,7 @@ namespace testinator
   template <typename H, typename Op, typename T>
   struct RHSRecur<OpPair<H, Op, T>>
   {
-    constexpr static auto value(OpPair<H, Op, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, Op, T>&& t)
     {
       return RHSRecur<T>::value(std::forward<T>(t.m_pair.second));
     }
@@ -423,7 +423,7 @@ namespace testinator
   template <typename H, typename Op, typename T>
   struct RelOpRecur<OpPair<H, Op, T>>
   {
-    constexpr static auto value(OpPair<H, Op, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, Op, T>&& t)
     {
       return RelOpRecur<T>::value(std::forward<T>(t.m_pair.second));
     }
@@ -489,7 +489,7 @@ namespace testinator
   template <typename H, typename Op, typename T>
   struct EvalRecur<OpPair<H, Op, T>>
   {
-    constexpr static auto value(OpPair<H, Op, T>&& t)
+    constexpr static decltype(auto) value(OpPair<H, Op, T>&& t)
     {
       return Op::compute(std::forward<H>(t.m_pair.first),
                          EvalRecur<T>::value(std::forward<T>(t.m_pair.second)));
