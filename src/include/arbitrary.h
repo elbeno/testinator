@@ -1,4 +1,4 @@
-// Copyright (c) 2014, 2015 Ben Deane
+// Copyright (c) 2014-2016 Ben Deane
 // This code is distributed under the MIT license. See LICENSE for details.
 
 #pragma once
