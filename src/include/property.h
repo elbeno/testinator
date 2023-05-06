@@ -26,7 +26,7 @@ namespace testinator
   {
   public:
     template <typename F>
-    Property(const F& f)
+    explicit Property(const F& f)
       : m_internal(std::make_unique<Internal<F>>(f))
     {
     }

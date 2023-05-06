@@ -57,7 +57,7 @@ public:
     : testinator::PropertyTest(r, name, suite)
   {}
 
-  virtual bool Run() override
+  bool Run() override
   {
     testinator::Property p(*this);
     return p.check(m_numChecks, m_op);
@@ -131,7 +131,7 @@ public:
     : testinator::PropertyTest(r, name, suite)
   {}
 
-  virtual bool Run() override
+  bool Run() override
   {
     testinator::Property p(*this);
     return p.check(m_numChecks, m_op);
@@ -169,7 +169,7 @@ public:
     : testinator::PropertyTest(r, name, suite)
   {}
 
-  virtual bool Run() override
+  bool Run() override
   {
     testinator::Property p(*this);
     return p.check(m_numChecks, m_op);
@@ -213,7 +213,7 @@ public:
     : testinator::PropertyTest(r, name, suite)
   {}
 
-  virtual bool Run() override
+  bool Run() override
   {
     testinator::Property p(*this);
     return p.check(m_numChecks, m_op);
@@ -318,10 +318,10 @@ namespace testinator
   struct Arbitrary<MyBoundedType>
   {
     static MyBoundedType generate(std::size_t generation, unsigned long int /*randomSeed*/)
-    { return MyBoundedType(generation % MyBoundedType::MAX_VAL); }
+    { return {generation % MyBoundedType::MAX_VAL}; }
 
     static vector<MyBoundedType> shrink(const MyBoundedType&)
-    { return vector<MyBoundedType>(); }
+    { return {}; }
   };
 }
 

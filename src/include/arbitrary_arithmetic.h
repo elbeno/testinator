@@ -199,7 +199,7 @@ namespace testinator
 
     static std::vector<bool> shrink(const bool&)
     {
-      return std::vector<bool>();
+      return {};
     }
   };
 
@@ -224,7 +224,7 @@ namespace testinator
 
     static std::vector<char> shrink(const char&)
     {
-      return std::vector<char>();
+      return {};
     }
   };
 

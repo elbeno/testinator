@@ -16,10 +16,10 @@ namespace testinator
   class AtScopeExit
   {
   public:
-    AtScopeExit(const F& f) : m_f(f) {}
-    AtScopeExit(F&& f) : m_f(std::move(f)) {}
+    explicit AtScopeExit(const F& f) : m_f(f) {}
+    explicit AtScopeExit(F&& f) : m_f(std::move(f)) {}
     ~AtScopeExit() { m_f(); }
-    operator bool() const { return true; }
+    explicit operator bool() const { return true; }
   private:
     F m_f;
   };

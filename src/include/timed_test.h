@@ -18,7 +18,7 @@ namespace testinator
   {
   public:
     template <typename F>
-    TimedTest(const F& f)
+    explicit TimedTest(const F& f)
       : m_internal(std::make_unique<Internal<F>>(f))
     {
     }
@@ -31,17 +31,17 @@ namespace testinator
   private:
     struct InternalBase
     {
-      virtual ~InternalBase() {}
+      virtual ~InternalBase() = default;
       virtual void check(std::size_t N, const Outputter*) = 0;
     };
 
     template <typename U>
     struct Internal : public InternalBase
     {
-      Internal(const U& u) : m_u(u) {}
+      explicit Internal(const U& u) : m_u(u) {}
 
-      virtual void check(std::size_t N,
-                         const Outputter* op)
+      void check(std::size_t N,
+                         const Outputter* op) override
       {
         auto t1 = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < N; ++i)

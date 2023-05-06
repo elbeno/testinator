@@ -14,16 +14,16 @@ using namespace std;
 //------------------------------------------------------------------------------
 namespace
 {
-  static const char* s_suiteName = "Test";
+  const char* s_suiteName = "Test";
 }
 
 //------------------------------------------------------------------------------
 class TestCallTest : public testinator::Test
 {
 public:
-  TestCallTest(const string& name) : testinator::Test(name, s_suiteName) {}
+  explicit TestCallTest(const string& name) : testinator::Test(name, s_suiteName) {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -40,18 +40,18 @@ public:
 class TestSetupFirst : public testinator::Test
 {
 public:
-  TestSetupFirst(const string& name)
+  explicit TestSetupFirst(const string& name)
     : testinator::Test(name, s_suiteName)
     , m_setupCalled(false)
   {}
 
-  virtual bool Setup(const testinator::RunParams&)
+  bool Setup(const testinator::RunParams&) override
   {
     m_setupCalled = true;
     return true;
   }
 
-  virtual bool Run()
+  bool Run() override
   {
     return m_setupCalled;
   }
@@ -69,7 +69,7 @@ public:
     , m_runCalled(false)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     m_runCalled = true;
     return true;
@@ -82,11 +82,11 @@ public:
 class TestRunMultiple : public testinator::Test
 {
 public:
-  TestRunMultiple(const string& name)
+  explicit TestRunMultiple(const std::string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -110,7 +110,7 @@ public:
     , m_fail(fail)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     return !m_fail;
   }
@@ -122,11 +122,11 @@ public:
 class TestReportResults : public testinator::Test
 {
 public:
-  TestReportResults(const string& name)
+  explicit TestReportResults(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -149,11 +149,11 @@ public:
 class TestRunSuite : public testinator::Test
 {
 public:
-  TestRunSuite(const string& name)
+  explicit TestRunSuite(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -178,7 +178,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     bool fail = true;
     EXPECT(!fail == fail);
@@ -190,11 +190,11 @@ public:
 class TestExpectMacro : public testinator::Test
 {
 public:
-  TestExpectMacro(const string& name)
+  explicit TestExpectMacro(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -214,7 +214,7 @@ public:
 //------------------------------------------------------------------------------
 struct CountEvals
 {
-  bool inc() { ++s_evals; return true; }
+  static bool inc() { ++s_evals; return true; }
   static int s_evals;
 };
 int CountEvals::s_evals = 0;
@@ -226,7 +226,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     CountEvals c;
     EXPECT(c.inc() == c.inc());
@@ -239,11 +239,11 @@ public:
 class TestExpectEvalsOnce : public testinator::Test
 {
 public:
-  TestExpectEvalsOnce(const string& name)
+  explicit TestExpectEvalsOnce(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -268,7 +268,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     DIAGNOSTIC("Hello world " << 42 << endl << 42);
     DIAGNOSTIC("Hello world " << std::hex << 42);
@@ -280,11 +280,11 @@ public:
 class TestDiagnostic : public testinator::Test
 {
 public:
-  TestDiagnostic(const string& name)
+  explicit TestDiagnostic(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -310,7 +310,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     m_runCalled = true;
     ABORT("Hello world " << 42);
@@ -324,11 +324,11 @@ public:
 class TestAbort : public testinator::Test
 {
 public:
-  TestAbort(const string& name)
+  explicit TestAbort(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -355,7 +355,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     SKIP("Hello world " << 42);
     return false;
@@ -366,11 +366,11 @@ public:
 class TestSkip : public testinator::Test
 {
 public:
-  TestSkip(const string& name)
+  explicit TestSkip(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -392,7 +392,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     DIAGNOSTIC("no branch");
 
@@ -414,11 +414,11 @@ public:
 class TestBranch : public testinator::Test
 {
 public:
-  TestBranch(const string& name)
+  explicit TestBranch(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -439,11 +439,11 @@ public:
 class TestBranchInternal2 : public testinator::Test
 {
 public:
-  TestBranchInternal2(const string& name)
+  explicit TestBranchInternal2(const string& name)
     : testinator::Test(name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     BRANCH()
     {
@@ -458,11 +458,11 @@ public:
 class TestBranchNoName : public testinator::Test
 {
 public:
-  TestBranchNoName(const string& name)
+  explicit TestBranchNoName(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     ostringstream oss;
     std::unique_ptr<testinator::Outputter> op =
@@ -480,7 +480,7 @@ public:
 class TestTAPSkip : public testinator::Test
 {
 public:
-  TestTAPSkip(const string& name)
+  explicit TestTAPSkip(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
@@ -504,11 +504,11 @@ public:
 class TestTAPDiagnostic : public testinator::Test
 {
 public:
-  TestTAPDiagnostic(const string& name)
+  explicit TestTAPDiagnostic(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -528,11 +528,11 @@ public:
 class TestTAPAbort : public testinator::Test
 {
 public:
-  TestTAPAbort(const string& name)
+  explicit TestTAPAbort(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -560,7 +560,7 @@ public:
     : testinator::Test(r, name, suite)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     return true;
   }
@@ -570,11 +570,11 @@ public:
 class TestRuns : public testinator::Test
 {
 public:
-  TestRuns(const string& name)
+  explicit TestRuns(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     {
       testinator::TestRegistry r;
@@ -605,11 +605,11 @@ public:
 class TestNoSuchTest : public testinator::Test
 {
 public:
-  TestNoSuchTest(const string& name)
+  explicit TestNoSuchTest(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     testinator::Results rs = r.RunTest("A");
@@ -625,7 +625,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Setup(const testinator::RunParams&)
+  bool Setup(const testinator::RunParams&) override
   {
     return false;
   }
@@ -635,11 +635,11 @@ public:
 class TestSkipOnSetupFail : public testinator::Test
 {
 public:
-  TestSkipOnSetupFail(const string& name)
+  explicit TestSkipOnSetupFail(const string& name)
     : testinator::Test(name, s_suiteName)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     testinator::TestRegistry r;
     ostringstream oss;
@@ -675,7 +675,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     EXPECT(1+2 > 1+3 < 0);
     EXPECT(false);
@@ -706,7 +706,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     vector<int> v = {1,2,3};
     DIAGNOSTIC(testinator::prettyprint(v));
@@ -741,7 +741,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     DIAGNOSTIC(testinator::ComplexityProperty::Order(testinator::ORDER_1));
     return true;
@@ -771,7 +771,7 @@ public:
     : testinator::Test(r, name)
   {}
 
-  virtual bool Run()
+  bool Run() override
   {
     DIAGNOSTIC("Foo");
     SKIP("Foo");
