@@ -44,9 +44,11 @@ namespace testinator
 
       // discard the outer values, take the means of each set
       double timeN = static_cast<double>(
-          std::accumulate(&countsN[1], &countsN[size-2], int64_t{0})) / (size - 2);
+          std::accumulate(&countsN[1], &countsN[size-2], int64_t{0})) /
+                     static_cast<double>(size - 2);
       double timeMultN = static_cast<double>(
-          std::accumulate(&countsMultN[1], &countsMultN[size-2], int64_t{0})) / (size - 2);
+          std::accumulate(&countsMultN[1], &countsMultN[size-2], int64_t{0})) /
+                         static_cast<double>(size - 2);
 
       // the actual ratio of times
       double actualRatio = timeMultN / timeN;
@@ -106,7 +108,7 @@ namespace testinator
     }
 
     template <typename F>
-    ComplexityProperty(const F& f)
+    explicit ComplexityProperty(const F& f)
       : m_internal(std::make_unique<Internal<F>>(f))
     {
     }
@@ -119,7 +121,7 @@ namespace testinator
   private:
     struct InternalBase
     {
-      virtual ~InternalBase() {}
+      virtual ~InternalBase() = default;
       virtual int check(std::size_t N) = 0;
     };
 
@@ -128,9 +130,9 @@ namespace testinator
     {
       using argTuple = typename function_traits<U>::argTuple;
 
-      Internal(const U& u) : m_u(u) {}
+      explicit Internal(const U& u) : m_u(u) {}
 
-      virtual int check(std::size_t N) override
+      int check(std::size_t N) override
       {
         // Get the timings for N and N * MULTIPLIER, NUM_ITER samples each
         int64_t countsN[NUM_ITER];

@@ -34,7 +34,7 @@ namespace testinator
   {
     std::string m_suiteName;
     std::string m_testName;
-    bool m_success;
+    bool m_success{};
   };
 
   using Results = std::vector<Result>;
@@ -47,7 +47,7 @@ namespace testinator
   public:
     Test(TestRegistry& reg, const std::string& name,
          const std::string& suiteName = std::string());
-    Test(const std::string& name, const std::string& suiteName = std::string());
+    explicit Test(const std::string& name, const std::string& suiteName = std::string());
     virtual ~Test();
 
     virtual bool Setup(const RunParams&) { return true; }
@@ -70,7 +70,7 @@ namespace testinator
     bool m_skipped = false;
     const std::string m_name;
     TestRegistry& m_registry;
-    const Outputter* m_op;
+    const Outputter* m_op{};
   };
 }
 

@@ -1,4 +1,5 @@
 .sconsign.dblite
-build/
+*build*/
 export/
 TAGS
+.idea/

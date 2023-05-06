@@ -48,14 +48,10 @@ namespace testinator
 
       const std::string& suiteName = m_suiteNames[test];
       auto range = m_testsBySuite.equal_range(suiteName);
-      for (auto& i = range.first; i != range.second; ++i)
-      {
-        if (i->second == test)
-        {
-          m_testsBySuite.erase(i);
-          break;
-        }
-      }
+      auto pos = std::find_if(range.first, range.second, [&test](auto& suite)
+                              {return suite.second == test;});
+      if(pos != range.second) m_testsBySuite.erase(pos);
+
       m_suiteNames.erase(test);
     }
 
@@ -95,7 +91,7 @@ namespace testinator
     {
       auto i = m_tests.find(testName);
       if (i == m_tests.end())
-        return std::vector<Result>();
+        return {};
 
       TestMap localMap;
       localMap.insert({testName, i->second});
@@ -158,7 +154,7 @@ namespace testinator
       return rs;
     }
 
-    Result RunTest(Test* test,
+    static Result RunTest(Test* test,
                    const RunParams& params,
                    const Outputter* outputter)
     {

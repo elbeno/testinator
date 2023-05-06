@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 2.8)
-project (testinator)
+cmake_minimum_required (VERSION 3.0)
+project (testinator LANGUAGES CXX)
 
 # Includes for this project
 include_directories ("${PROJECT_SOURCE_DIR}/src/include")
@@ -64,7 +64,7 @@ if("x${CMAKE_CXX_COMPILER_ID}" MATCHES "x.*Clang")
   if(ASAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined,integer -fno-omit-frame-pointer -fno-sanitize=unsigned-integer-overflow")
   endif()
-elseif(CMAKE_COMPILER_IS_GNUCXX)
+elseif("x${CMAKE_CXX_COMPILER_ID}" MATCHES "xGNU")
   if(NOT GCOV)
     find_program(GCOV gcov)
   endif()
